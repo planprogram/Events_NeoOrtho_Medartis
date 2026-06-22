@@ -3,60 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeoOrtho Dartis - Project Hub</title>
+    <title>NeoOrtho Medartis - Project Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ============================================================
-           CORES NEOORTHO DARTIS
-           Ajuste os HEX abaixo com os valores exatos da sua tabela
-           de cores (Roxo, Azul, Cinza, etc.)
-           ============================================================ */
-        :root {
-            --neo-purple:       #7B2D8E;
-            --neo-purple-dark:  #5A1F6B;
-            --neo-purple-deep:  #3D1550;
-            --neo-purple-light: #A85CC0;
-            --neo-purple-pale:  #F0E4F5;
-            --neo-blue:         #1A3E6B;
-            --neo-blue-light:   #2B6FA8;
-            --neo-blue-pale:    #E8F0F8;
-            --neo-gray-900:     #1A1A2E;
-            --neo-gray-800:     #2D2D3D;
-            --neo-gray-700:     #44445A;
-            --neo-gray-600:     #6B6B80;
-            --neo-gray-400:     #A0A0B0;
-            --neo-gray-200:     #E0E0E8;
-            --neo-gray-100:     #EDEDF2;
-            --neo-gray-50:      #F7F7FA;
-            --neo-bg:           #F4F4F8;
-            --neo-card:         #FFFFFF;
-            --neo-text:         #1A1A2E;
-            --neo-text-muted:   #6B6B80;
-            --neo-border:       #E0E0E8;
-            --neo-success:      #28A745;
-            --neo-warning:      #F0AD4E;
-            --neo-danger:       #DC3545;
-            --neo-sidebar-bg:   #1A1028;
-            --neo-sidebar-hover:#2A1D3A;
-        }
+        :root{--neo-purple:#7B2D8E;--neo-purple-dark:#5A1F6B;--neo-purple-deep:#3D1550;--neo-purple-light:#A85CC0;--neo-purple-pale:#F0E4F5;--neo-blue:#1A3E6B;--neo-blue-light:#2B6FA8;--neo-blue-pale:#E8F0F8;--neo-gray-900:#1A1A2E;--neo-gray-800:#2D2D3D;--neo-gray-700:#44445A;--neo-gray-600:#6B6B80;--neo-gray-400:#A0A0B0;--neo-gray-200:#E0E0E8;--neo-gray-100:#EDEDF2;--neo-gray-50:#F7F7FA;--neo-bg:#F4F4F8;--neo-card:#FFFFFF;--neo-text:#1A1A2E;--neo-text-muted:#6B6B80;--neo-border:#E0E0E8;--neo-success:#28A745;--neo-warning:#F0AD4E;--neo-danger:#DC3545;--neo-sidebar-bg:#1A1028;--neo-sidebar-hover:#2A1D3A}
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'DM Sans',sans-serif;background:var(--neo-bg);color:var(--neo-text);overflow-x:hidden}
-
-        /* LOADING */
         #loadingScreen{position:fixed;inset:0;z-index:99999;background:var(--neo-purple-deep);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s}
         #loadingScreen.hide{opacity:0;pointer-events:none}
         .loader-ring{width:50px;height:50px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--neo-purple-light);border-radius:50%;animation:spin .8s linear infinite}
         @keyframes spin{to{transform:rotate(360deg)}}
         .loader-text{color:rgba(255,255,255,.5);margin-top:1rem;font-size:.9rem;font-weight:500}
-
-        /* LOGIN */
         #loginScreen{position:fixed;inset:0;z-index:9999;display:none;background:var(--neo-gray-900);transition:opacity .6s,transform .6s}
         #loginScreen.visible{display:flex}
         #loginScreen.hidden{opacity:0;transform:scale(1.05);pointer-events:none}
         .login-left{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;overflow:hidden;padding:3rem}
-        .login-left::before{content:'';position:absolute;width:550px;height:550px;border-radius:50%;background:radial-gradient(circle,rgba(123,45,142,.3)0%,transparent 70%);top:15%;left:-10%;animation:blobF 8s ease-in-out infinite}
-        .login-left::after{content:'';position:absolute;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(43,111,168,.2)0%,transparent 70%);bottom:10%;right:-5%;animation:blobF 10s ease-in-out infinite reverse}
+        .login-left::before{content:'';position:absolute;width:550px;height:550px;border-radius:50%;background:radial-gradient(circle,rgba(123,45,142,.3) 0%,transparent 70%);top:15%;left:-10%;animation:blobF 8s ease-in-out infinite}
+        .login-left::after{content:'';position:absolute;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(43,111,168,.2) 0%,transparent 70%);bottom:10%;right:-5%;animation:blobF 10s ease-in-out infinite reverse}
         @keyframes blobF{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(25px,-18px) scale(1.05)}66%{transform:translate(-18px,12px) scale(.95)}}
         .login-brand{position:relative;z-index:1;text-align:center}
         .login-brand .logo-icon{width:78px;height:78px;background:linear-gradient(135deg,var(--neo-purple),var(--neo-purple-light));border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.9rem;color:#fff;box-shadow:0 12px 40px rgba(123,45,142,.5)}
@@ -84,8 +48,6 @@
         .login-error.show{display:flex}
         .login-hint{text-align:center;margin-top:1.5rem;color:rgba(255,255,255,.3);font-size:.8rem}
         .login-hint code{background:rgba(255,255,255,.07);padding:2px 7px;border-radius:4px;color:var(--neo-purple-light);font-size:.78rem}
-
-        /* APP SHELL */
         #appScreen{display:none;min-height:100vh}
         #appScreen.active{display:flex}
         .sidebar{width:255px;min-height:100vh;background:var(--neo-sidebar-bg);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s}
@@ -101,6 +63,9 @@
         .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:55%;background:var(--neo-purple-light);border-radius:0 3px 3px 0}
         .nav-item i{width:18px;text-align:center;font-size:.9rem}
         .nav-item .badge{margin-left:auto;background:var(--neo-purple);color:#fff;font-size:.67rem;font-weight:700;padding:2px 6px;border-radius:20px;min-width:18px;text-align:center}
+        .nav-item.ext-link{border:1px solid rgba(123,45,142,.15);margin-bottom:3px}
+        .nav-item.ext-link:hover{border-color:var(--neo-purple);background:rgba(123,45,142,.08)}
+        .nav-item.ext-link i{color:var(--neo-purple-light)}
         .sidebar-footer{padding:.8rem .65rem;border-top:1px solid rgba(255,255,255,.05)}
         .sidebar-user{display:flex;align-items:center;gap:.6rem;padding:.6rem .7rem;border-radius:9px;cursor:pointer;transition:background .2s}
         .sidebar-user:hover{background:var(--neo-sidebar-hover)}
@@ -110,8 +75,6 @@
         .sidebar-user .user-info .role{color:rgba(255,255,255,.3);font-size:.7rem}
         .sidebar-user .logout-btn{color:rgba(255,255,255,.25);cursor:pointer;padding:5px;border-radius:6px;transition:all .2s}
         .sidebar-user .logout-btn:hover{color:var(--neo-danger);background:rgba(220,53,69,.1)}
-
-        /* MAIN */
         .main-content{flex:1;margin-left:255px;min-height:100vh}
         .topbar{background:var(--neo-card);border-bottom:1px solid var(--neo-border);padding:.8rem 1.8rem;display:flex;align-items:center;gap:.8rem;position:sticky;top:0;z-index:50}
         .topbar-search{flex:1;max-width:400px;position:relative}
@@ -129,8 +92,6 @@
         .btn-secondary:hover{border-color:var(--neo-gray-400);color:var(--neo-text)}
         .btn-danger{padding:.6rem 1.4rem;border-radius:9px;border:none;background:var(--neo-danger);color:#fff;font-size:.86rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
         .btn-danger:hover{background:#C82333;transform:translateY(-1px)}
-
-        /* PAGES */
         .page-content{padding:1.8rem}
         .page-header{margin-bottom:1.8rem}
         .page-header h2{font-family:'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:700;color:var(--neo-text);margin-bottom:.25rem}
@@ -147,8 +108,6 @@
         .filter-tab{padding:.45rem 1rem;border-radius:7px;border:1.5px solid var(--neo-border);background:var(--neo-card);color:var(--neo-gray-600);font-size:.83rem;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
         .filter-tab:hover{border-color:var(--neo-purple);color:var(--neo-purple)}
         .filter-tab.active{background:var(--neo-purple);border-color:var(--neo-purple);color:#fff}
-
-        /* PROJECT CARDS */
         .projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:1.15rem}
         .project-card{background:var(--neo-card);border-radius:13px;border:1px solid var(--neo-border);overflow:hidden;transition:all .35s;cursor:pointer;position:relative}
         .project-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(26,26,46,.09);border-color:var(--neo-purple)}
@@ -173,8 +132,6 @@
         .card-act-btn{width:30px;height:30px;border-radius:7px;border:none;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .2s}
         .card-act-btn:hover{background:var(--neo-purple)}
         .card-act-btn.del:hover{background:var(--neo-danger)}
-
-        /* PEOPLE CARDS */
         .people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.15rem}
         .people-card{background:var(--neo-card);border-radius:13px;border:1px solid var(--neo-border);padding:1.4rem;text-align:center;transition:all .3s}
         .people-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(26,26,46,.07)}
@@ -187,8 +144,6 @@
         .p-role-badge.viewer{background:rgba(107,107,128,.1);color:var(--neo-gray-600)}
         .people-card .p-count{font-size:.78rem;color:var(--neo-text-muted)}
         .people-card .p-count strong{color:var(--neo-text)}
-
-        /* MODALS */
         .modal-overlay{position:fixed;inset:0;background:rgba(26,16,40,.55);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem;animation:mFI .2s ease}
         .modal-overlay.show{display:flex}
         @keyframes mFI{from{opacity:0}to{opacity:1}}
@@ -206,8 +161,6 @@
         .mf-group textarea{resize:vertical;min-height:75px}
         .mf-row{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
         .modal-actions{display:flex;gap:.65rem;justify-content:flex-end;margin-top:.4rem}
-
-        /* PERMISSIONS */
         .perm-title{font-size:.8rem;font-weight:600;color:var(--neo-text);margin-bottom:.55rem;display:flex;align-items:center;gap:.35rem}
         .perm-title i{color:var(--neo-purple);font-size:.82rem}
         .perm-list{display:flex;flex-direction:column;gap:.45rem}
@@ -229,21 +182,15 @@
         .dd-item{display:flex;align-items:center;gap:.55rem;padding:.55rem .8rem;cursor:pointer;transition:background .15s;font-size:.83rem}
         .dd-item:hover{background:var(--neo-gray-50)}
         .dd-av{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:#fff;flex-shrink:0}
-
-        /* CONFIRM */
         .confirm-dialog{text-align:center;padding:.8rem 0}
         .confirm-dialog i{font-size:2.3rem;color:var(--neo-danger);margin-bottom:.9rem}
         .confirm-dialog h4{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:.4rem}
         .confirm-dialog p{color:var(--neo-text-muted);font-size:.88rem;margin-bottom:1.3rem}
         .confirm-actions{display:flex;gap:.65rem;justify-content:center}
-
-        /* EMPTY */
         .empty-state{text-align:center;padding:3.5rem 2rem;grid-column:1/-1}
         .empty-state i{font-size:2.8rem;color:var(--neo-gray-200);margin-bottom:.9rem}
         .empty-state h3{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;color:var(--neo-text);margin-bottom:.35rem}
         .empty-state p{color:var(--neo-text-muted);font-size:.88rem}
-
-        /* TOAST */
         .toast-container{position:fixed;top:1.3rem;right:1.3rem;z-index:2000;display:flex;flex-direction:column;gap:.4rem}
         .toast{padding:.8rem 1.1rem;border-radius:11px;background:var(--neo-card);border:1px solid var(--neo-border);box-shadow:0 10px 35px rgba(0,0,0,.14);display:flex;align-items:center;gap:.6rem;font-size:.86rem;font-weight:500;animation:tIn .3s ease;min-width:260px}
         .toast.success{border-left:4px solid var(--neo-success)}
@@ -252,13 +199,19 @@
         .toast.removing{animation:tOut .3s ease forwards}
         @keyframes tIn{from{opacity:0;transform:translateX(35px)}to{opacity:1;transform:translateX(0)}}
         @keyframes tOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(35px)}}
-
-        /* SYNC */
         .sync-ind{display:inline-flex;align-items:center;gap:.3rem;font-size:.68rem;color:rgba(255,255,255,.25);margin-left:.4rem}
         .sync-dot{width:5px;height:5px;border-radius:50%;background:var(--neo-success);animation:pls 2s ease-in-out infinite}
         @keyframes pls{0%,100%{opacity:1}50%{opacity:.3}}
-
-        /* SECTIONS */
+        .hub-section-title{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;color:var(--neo-text);margin-top:2rem;margin-bottom:.3rem;display:flex;align-items:center;gap:.5rem}
+        .hub-section-title i{color:var(--neo-purple);font-size:.95rem}
+        .hub-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.15rem;margin-top:1rem}
+        .hub-card{background:var(--neo-card);border-radius:13px;border:1px solid var(--neo-border);padding:1.4rem;transition:all .3s;cursor:pointer;position:relative;overflow:hidden;text-decoration:none;display:block}
+        .hub-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(26,26,46,.09);border-color:var(--neo-purple)}
+        .hub-card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.9rem;color:#fff}
+        .hub-card h4{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;color:var(--neo-text);margin-bottom:.3rem}
+        .hub-card p{font-size:.82rem;color:var(--neo-text-muted);line-height:1.5;margin-bottom:.8rem}
+        .hub-card .hub-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:600;color:var(--neo-purple);transition:all .2s}
+        .hub-card:hover .hub-link{gap:.6rem}
         .page-section{display:none}
         .page-section.active{display:block}
         ::-webkit-scrollbar{width:5px}
@@ -273,7 +226,7 @@
             .sidebar.mobile-open{transform:translateX(0)}
             .main-content{margin-left:0}
             .stats-grid{grid-template-columns:1fr 1fr}
-            .projects-grid{grid-template-columns:1fr}
+            .projects-grid,.hub-grid{grid-template-columns:1fr}
             .mf-row{grid-template-columns:1fr}
             .topbar{padding:.8rem 1rem}
             .page-content{padding:1.15rem}
@@ -282,16 +235,14 @@
     </style>
 </head>
 <body>
-
 <div id="loadingScreen"><div class="loader-ring"></div><div class="loader-text">Connecting to database...</div></div>
-
 <div id="loginScreen">
     <div class="login-left">
         <div class="login-particles" id="loginParticles"></div>
         <div class="login-brand">
             <div class="logo-icon"><i class="fas fa-cubes"></i></div>
             <h1>Neo<span>Ortho</span></h1>
-            <p>Dartis Project Hub</p>
+            <p>Medartis Project Hub</p>
         </div>
     </div>
     <div class="login-right">
@@ -308,10 +259,9 @@
         </div>
     </div>
 </div>
-
 <div id="appScreen">
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-brand"><div class="s-logo"><i class="fas fa-cubes"></i></div><div><span>NeoOrtho</span><small>Dartis Hub</small></div></div>
+        <div class="sidebar-brand"><div class="s-logo"><i class="fas fa-cubes"></i></div><div><span>NeoOrtho</span><small>Medartis Hub</small></div></div>
         <nav class="sidebar-nav">
             <div class="nav-label">Main</div>
             <div class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')"><i class="fas fa-th-large"></i> Dashboard</div>
@@ -321,6 +271,11 @@
             <div class="nav-item" data-page="active" onclick="filterByStatus('active')"><i class="fas fa-bolt"></i> Active</div>
             <div class="nav-item" data-page="completed" onclick="filterByStatus('completed')"><i class="fas fa-check-circle"></i> Completed</div>
             <div class="nav-item" data-page="draft" onclick="filterByStatus('draft')"><i class="fas fa-pencil-alt"></i> Drafts</div>
+            <div class="nav-label">Project Hubs</div>
+            <a class="nav-item ext-link" href="Essential.html" target="_blank"><i class="fas fa-graduation-cap"></i> Curso Essential</a>
+            <a class="nav-item ext-link" href="Gantt - Steps2Walk v3.html" target="_blank"><i class="fas fa-chart-gantt"></i> Steps2Walk Gantt</a>
+            <a class="nav-item ext-link" href="Cadaver Lab IBRA (Apoio Medartis) Foot and Ankle - Gestão de Projetos.html" target="_blank"><i class="fas fa-bone"></i> Cadaver Lab Foot & Ankle</a>
+            <a class="nav-item ext-link" href="Cadaver Lab IBRA (Apoio Medartis) Hand and Wrist - Gestão de Projetos.html" target="_blank"><i class="fas fa-hand-holding-medical"></i> Cadaver Lab Hand & Wrist</a>
         </nav>
         <div class="sidebar-footer">
             <div class="sidebar-user">
@@ -339,7 +294,16 @@
                 <button class="topbar-btn" title="Notifications"><i class="fas fa-bell"></i><span class="notif-dot"></span></button>
             </div>
         </header>
-        <section class="page-section active" id="page-dashboard"><div class="page-content"><div class="page-header"><h2>Dashboard</h2><p>Overview of all your projects and team activity</p></div><div class="stats-grid" id="statsGrid"></div><div class="filter-bar" id="dashFilters"><button class="filter-tab active" onclick="setFilter('all',this)">All</button><button class="filter-tab" onclick="setFilter('active',this)">Active</button><button class="filter-tab" onclick="setFilter('paused',this)">Paused</button><button class="filter-tab" onclick="setFilter('completed',this)">Completed</button><button class="filter-tab" onclick="setFilter('draft',this)">Draft</button></div><div class="projects-grid" id="dashboardProjects"></div></div></section>
+        <section class="page-section active" id="page-dashboard">
+            <div class="page-content">
+                <div class="page-header"><h2>Dashboard</h2><p>Overview of all your projects and team activity</p></div>
+                <div class="stats-grid" id="statsGrid"></div>
+                <div class="filter-bar" id="dashFilters"><button class="filter-tab active" onclick="setFilter('all',this)">All</button><button class="filter-tab" onclick="setFilter('active',this)">Active</button><button class="filter-tab" onclick="setFilter('paused',this)">Paused</button><button class="filter-tab" onclick="setFilter('completed',this)">Completed</button><button class="filter-tab" onclick="setFilter('draft',this)">Draft</button></div>
+                <div class="projects-grid" id="dashboardProjects"></div>
+                <div class="hub-section-title"><i class="fas fa-external-link-alt"></i> Project Hubs & Tools</div>
+                <div class="hub-grid" id="hubGrid"></div>
+            </div>
+        </section>
         <section class="page-section" id="page-projects"><div class="page-content"><div class="page-header"><h2>All Projects</h2><p>Complete catalog of your projects</p></div><div class="filter-bar" id="allFilters"><button class="filter-tab active" onclick="setFilter('all',this)">All</button><button class="filter-tab" onclick="setFilter('active',this)">Active</button><button class="filter-tab" onclick="setFilter('paused',this)">Paused</button><button class="filter-tab" onclick="setFilter('completed',this)">Completed</button><button class="filter-tab" onclick="setFilter('draft',this)">Draft</button></div><div class="projects-grid" id="allProjects"></div></div></section>
         <section class="page-section" id="page-people"><div class="page-content"><div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;"><div><h2>People</h2><p>Manage team members and their project access</p></div><button class="btn-primary" onclick="openPeopleModal()"><i class="fas fa-user-plus"></i> Add Person</button></div><div class="people-grid" id="peopleGrid"></div></div></section>
         <section class="page-section" id="page-active"><div class="page-content"><div class="page-header"><h2>Active Projects</h2><p>Currently in progress</p></div><div class="projects-grid" id="activeProjects"></div></div></section>
@@ -347,79 +311,45 @@
         <section class="page-section" id="page-draft"><div class="page-content"><div class="page-header"><h2>Draft Projects</h2><p>Still being planned</p></div><div class="projects-grid" id="draftProjects"></div></div></section>
     </main>
 </div>
-
-<!-- PROJECT MODAL -->
 <div class="modal-overlay" id="projectModal"><div class="modal"><div class="modal-header"><h3 id="projectModalTitle">New Project</h3><button class="modal-close" onclick="closeModal('projectModal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="projectForm" onsubmit="saveProject(event)"><input type="hidden" id="projectId"><div class="mf-group"><label>Project Name</label><input type="text" id="projectName" placeholder="e.g. 3D Bracket Design v2" required></div><div class="mf-row"><div class="mf-group"><label>Category</label><select id="projectCategory"><option value="Design">Design</option><option value="Engineering">Engineering</option><option value="Research">Research</option><option value="Software">Software</option><option value="Marketing">Marketing</option><option value="Clinical">Clinical</option><option value="Other">Other</option></select></div><div class="mf-group"><label>Status</label><select id="projectStatus"><option value="active">Active</option><option value="paused">Paused</option><option value="completed">Completed</option><option value="draft">Draft</option></select></div></div><div class="mf-group"><label>Description</label><textarea id="projectDesc" placeholder="Brief description..."></textarea></div><div style="margin-top:.3rem"><div class="perm-title"><i class="fas fa-shield-alt"></i> Access & Permissions</div><div class="perm-list" id="permList"></div><div style="position:relative;width:100%" id="addPermWrap"><button type="button" class="add-perm-btn" onclick="togglePermDD()"><i class="fas fa-user-plus"></i> Add person to this project</button><div class="dd-menu" id="permDD"><div class="dd-search"><input type="text" placeholder="Search people..." id="permSearchIn" oninput="filterPermDD(this.value)"></div><div id="permDDList"></div></div></div></div><div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeModal('projectModal')">Cancel</button><button type="submit" class="btn-primary" id="projectSubmitBtn">Save Project</button></div></form></div></div></div>
-
-<!-- PEOPLE MODAL -->
 <div class="modal-overlay" id="peopleModal"><div class="modal" style="max-width:440px"><div class="modal-header"><h3 id="peopleModalTitle">Add Person</h3><button class="modal-close" onclick="closeModal('peopleModal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="peopleForm" onsubmit="savePerson(event)"><input type="hidden" id="personId"><div class="mf-group"><label>Full Name</label><input type="text" id="personName" placeholder="e.g. Maria Silva" required></div><div class="mf-group"><label>Email</label><input type="email" id="personEmail" placeholder="e.g. maria@neoortho.com" required></div><div class="mf-group"><label>Global Role</label><select id="personRole"><option value="viewer">Viewer — Can only view</option><option value="editor">Editor — Can view and edit</option><option value="admin">Admin — Full access</option></select></div><div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeModal('peopleModal')">Cancel</button><button type="submit" class="btn-primary">Save Person</button></div></form></div></div></div>
-
-<!-- CONFIRM MODAL -->
 <div class="modal-overlay" id="confirmModal"><div class="modal" style="max-width:390px"><div class="modal-body"><div class="confirm-dialog"><i class="fas fa-exclamation-triangle"></i><h4 id="confirmTitle">Delete?</h4><p id="confirmMsg">This cannot be undone.</p><div class="confirm-actions"><button class="btn-secondary" onclick="closeModal('confirmModal')">Cancel</button><button class="btn-danger" id="confirmBtn" onclick="confirmAction()">Delete</button></div></div></div></div></div>
-
-<!-- DETAIL MODAL -->
 <div class="modal-overlay" id="detailModal"><div class="modal" style="max-width:620px"><div class="modal-header"><h3>Project Details</h3><button class="modal-close" onclick="closeModal('detailModal')"><i class="fas fa-times"></i></button></div><div class="modal-body" id="detailContent"></div></div></div>
-
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-/* ================================================================
-   FIREBASE REALTIME DATABASE — REST API (sem SDK)
-   https://neoorthomedartis-default-rtdb.firebaseio.com/
-   ================================================================ */
-const FB = 'https://neoorthomedartis-default-rtdb.firebaseio.com';
+// Firebase Config
+firebase.initializeApp({
+    apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
+    authDomain: "neoorthomedartis.firebaseapp.com",
+    databaseURL: "https://neoorthomedartis-default-rtdb.firebaseio.com",
+    projectId: "neoorthomedartis",
+    storageBucket: "neoorthomedartis.firebasestorage.app",
+    messagingSenderId: "48492402152",
+    appId: "1:48492402152:web:c395acaf1e365d491bc05d",
+    measurementId: "G-W4JC235S2Y"
+});
+const db = firebase.database();
 
-async function fbGet(path) {
-    const r = await fetch(`${FB}/${path}.json`);
-    return await r.json();
-}
-async function fbPost(path, data) {
-    const r = await fetch(`${FB}/${path}.json`, {
-        method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(data)
-    });
-    return (await r.json()).name;
-}
-async function fbPatch(path, data) {
-    await fetch(`${FB}/${path}.json`, {
-        method: 'PATCH', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(data)
-    });
-}
-async function fbPut(path, data) {
-    await fetch(`${FB}/${path}.json`, {
-        method: 'PUT', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(data)
-    });
-}
-async function fbDelete(path) {
-    await fetch(`${FB}/${path}.json`, { method: 'DELETE' });
-}
+// Hub links data
+const hubLinks = [
+    { name: 'Curso Essential', desc: 'Gestão de projetos - Curso Essential', icon: 'fa-graduation-cap', color: '#7B2D8E', url: 'Essential.html' },
+    { name: 'Steps2Walk Gantt', desc: 'Gráfico Gantt do projeto Steps2Walk v3', icon: 'fa-chart-gantt', color: '#1A3E6B', url: 'Gantt - Steps2Walk v3.html' },
+    { name: 'Cadaver Lab Foot & Ankle', desc: 'Gestão de projetos - IBRA Foot and Ankle', icon: 'fa-bone', color: '#28A745', url: 'Cadaver Lab IBRA (Apoio Medartis) Foot and Ankle - Gestão de Projetos.html' },
+    { name: 'Cadaver Lab Hand & Wrist', desc: 'Gestão de projetos - IBRA Hand and Wrist', icon: 'fa-hand-holding-medical', color: '#E67E22', url: 'Cadaver Lab IBRA (Apoio Medartis) Hand and Wrist - Gestão de Projetos.html' }
+];
 
-/* Objeto Firebase → Array com chave _fbKey */
-function toArray(obj) {
-    if (!obj) return [];
-    if (Array.isArray(obj)) return obj.filter(Boolean);
-    return Object.entries(obj).map(([k,v]) => ({_fbKey:k,...v})).filter(Boolean);
-}
-
-/* Permissões de um projeto → array */
-function getPerms(pr) {
-    if (!pr || !pr.permissions) return [];
-    return toArray(pr.permissions);
-}
-
-/* ================================================================
-   ESTADO
-   ================================================================ */
+// State
 const COLORS = ['#7B2D8E','#1A3E6B','#28A745','#E67E22','#DC3545','#F0AD4E','#16A085','#2980B9','#8E44AD','#D35400'];
 const COVERS = Array.from({length:12},(_,i) => `https://picsum.photos/seed/neodart${i+1}/600/300.jpg`);
-
 let people = [], projects = [];
 let currentFilter = 'all', searchQuery = '';
 let tempPermissions = [], pendingConfirmAction = null;
 
-/* Dados seed caso banco vazio */
+// Seed data
 function seedPeople() {
     return {
         p1:{name:'Carlos Mendes',email:'carlos@neoortho.com',role:'admin',color:COLORS[0]},
@@ -432,30 +362,22 @@ function seedPeople() {
 }
 function seedProjects() {
     return {
-        pr1:{name:'3D Bracket Design v2',category:'Design',status:'active',desc:'Redesign of the self-ligating bracket with improved torque control and reduced profile for better patient comfort.',cover:COVERS[0],date:'2024-12-10',permissions:{a:{personId:'p1',role:'editor'},b:{personId:'p2',role:'editor'},c:{personId:'p4',role:'viewer'}}},
-        pr2:{name:'AI Treatment Planner',category:'Software',status:'active',desc:'Machine learning model to predict optimal tooth movement sequences based on cephalometric analysis.',cover:COVERS[1],date:'2024-11-28',permissions:{d:{personId:'p1',role:'editor'},e:{personId:'p3',role:'editor'},f:{personId:'p5',role:'viewer'}}},
-        pr3:{name:'NiTi Wire Thermal Study',category:'Research',status:'completed',desc:'Comparative analysis of superelastic NiTi wires under different thermal cycling conditions for orthodontic force delivery.',cover:COVERS[2],date:'2024-10-15',permissions:{g:{personId:'p1',role:'editor'},h:{personId:'p6',role:'editor'},i:{personId:'p4',role:'viewer'}}},
-        pr4:{name:'Patient App Redesign',category:'Software',status:'paused',desc:'Complete UX overhaul of the patient-facing mobile application with new appointment scheduling and progress tracking features.',cover:COVERS[3],date:'2024-11-05',permissions:{j:{personId:'p2',role:'editor'},k:{personId:'p3',role:'viewer'}}},
-        pr5:{name:'Clear Aligner Material Test',category:'Research',status:'active',desc:'Testing new multi-layer polymer composition for improved stress retention and optical clarity in clear aligners.',cover:COVERS[4],date:'2024-12-01',permissions:{l:{personId:'p1',role:'editor'},m:{personId:'p6',role:'editor'},n:{personId:'p5',role:'viewer'},o:{personId:'p4',role:'viewer'}}},
-        pr6:{name:'Clinic Dashboard Analytics',category:'Software',status:'draft',desc:'Business intelligence dashboard for clinic managers to track patient flow, revenue metrics, and treatment efficiency.',cover:COVERS[5],date:'2024-12-18',permissions:{p:{personId:'p1',role:'editor'},q:{personId:'p3',role:'editor'}}}
+        pr1:{name:'3D Bracket Design v2',category:'Design',status:'active',desc:'Redesign of the self-ligating bracket with improved torque control.',cover:COVERS[0],date:'2024-12-10',permissions:{a:{personId:'p1',role:'editor'},b:{personId:'p2',role:'editor'},c:{personId:'p4',role:'viewer'}}},
+        pr2:{name:'AI Treatment Planner',category:'Software',status:'active',desc:'ML model to predict optimal tooth movement sequences.',cover:COVERS[1],date:'2024-11-28',permissions:{d:{personId:'p1',role:'editor'},e:{personId:'p3',role:'editor'},f:{personId:'p5',role:'viewer'}}},
+        pr3:{name:'NiTi Wire Thermal Study',category:'Research',status:'completed',desc:'Comparative analysis of superelastic NiTi wires.',cover:COVERS[2],date:'2024-10-15',permissions:{g:{personId:'p1',role:'editor'},h:{personId:'p6',role:'editor'},i:{personId:'p4',role:'viewer'}}},
+        pr4:{name:'Patient App Redesign',category:'Software',status:'paused',desc:'Complete UX overhaul of the patient-facing mobile app.',cover:COVERS[3],date:'2024-11-05',permissions:{j:{personId:'p2',role:'editor'},k:{personId:'p3',role:'viewer'}}},
+        pr5:{name:'Clear Aligner Material Test',category:'Research',status:'active',desc:'Testing new multi-layer polymer for clear aligners.',cover:COVERS[4],date:'2024-12-01',permissions:{l:{personId:'p1',role:'editor'},m:{personId:'p6',role:'editor'},n:{personId:'p5',role:'viewer'},o:{personId:'p4',role:'viewer'}}},
+        pr6:{name:'Clinic Dashboard Analytics',category:'Software',status:'draft',desc:'BI dashboard for clinic managers.',cover:COVERS[5],date:'2024-12-18',permissions:{p:{personId:'p1',role:'editor'},q:{personId:'p3',role:'editor'}}}
     };
 }
 
-/* ================================================================
-   CARREGAR DADOS DO FIREBASE
-   ================================================================ */
+// Load data from Firebase
 async function loadData() {
     try {
-        let p = await fbGet('people');
-        let pr = await fbGet('projects');
-        if (!p || (typeof p === 'object' && Object.keys(p).length === 0)) {
-            await fbPut('people', seedPeople());
-            p = seedPeople();
-        }
-        if (!pr || (typeof pr === 'object' && Object.keys(pr).length === 0)) {
-            await fbPut('projects', seedProjects());
-            pr = seedProjects();
-        }
+        const [pSnap, prSnap] = await Promise.all([db.ref('people').once('value'), db.ref('projects').once('value')]);
+        let p = pSnap.val(), pr = prSnap.val();
+        if (!p || Object.keys(p).length === 0) { await db.ref('people').set(seedPeople()); p = seedPeople(); }
+        if (!pr || Object.keys(pr).length === 0) { await db.ref('projects').set(seedProjects()); pr = seedProjects(); }
         people = toArray(p);
         projects = toArray(pr);
     } catch(err) {
@@ -465,10 +387,17 @@ async function loadData() {
         projects = toArray(seedProjects());
     }
 }
+function toArray(obj) {
+    if (!obj) return [];
+    if (Array.isArray(obj)) return obj.filter(Boolean);
+    return Object.entries(obj).map(([k,v]) => ({_fbKey:k,...v})).filter(Boolean);
+}
+function getPerms(pr) {
+    if (!pr || !pr.permissions) return [];
+    return toArray(pr.permissions);
+}
 
-/* ================================================================
-   LOGIN
-   ================================================================ */
+// Login particles
 (function(){
     const c = document.getElementById('loginParticles');
     for(let i=0;i<25;i++){
@@ -482,6 +411,7 @@ async function loadData() {
     }
 })();
 
+// Login handler
 document.getElementById('loginForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const em = document.getElementById('loginEmail').value.trim();
@@ -504,17 +434,12 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
 function logout() {
     document.getElementById('appScreen').classList.remove('active');
     document.getElementById('loginScreen').style.display = 'flex';
-    setTimeout(() => {
-        document.getElementById('loginScreen').classList.add('visible');
-        document.getElementById('loginScreen').classList.remove('hidden');
-    }, 10);
+    setTimeout(() => { document.getElementById('loginScreen').classList.add('visible'); document.getElementById('loginScreen').classList.remove('hidden'); }, 10);
     document.getElementById('loginEmail').value = '';
     document.getElementById('loginPassword').value = '';
 }
 
-/* ================================================================
-   NAVEGAÇÃO
-   ================================================================ */
+// Navigation
 function switchPage(page) {
     document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -529,10 +454,8 @@ function switchPage(page) {
 function filterByStatus(st) { switchPage(st); currentFilter = st; renderProjectGrids(); }
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('mobile-open'); }
 
-/* ================================================================
-   RENDER
-   ================================================================ */
-function renderAll() { renderStats(); renderProjectGrids(); renderPeople(); document.getElementById('projectCount').textContent = projects.length; }
+// Render
+function renderAll() { renderStats(); renderProjectGrids(); renderPeople(); renderHubCards(); document.getElementById('projectCount').textContent = projects.length; }
 
 function getFiltered() {
     let f = [...projects];
@@ -550,7 +473,6 @@ function renderStats() {
 }
 
 function initials(name) { return name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(); }
-
 function findPerson(id) { return people.find(p=>p._fbKey===id||p.id===id); }
 
 function cardHtml(pr) {
@@ -606,15 +528,21 @@ function renderPeople() {
     }).join('');
 }
 
-/* ================================================================
-   FILTERS & SEARCH
-   ================================================================ */
+function renderHubCards() {
+    document.getElementById('hubGrid').innerHTML = hubLinks.map(hub =>
+        `<a class="hub-card" href="${hub.url}" target="_blank">
+            <div class="hub-card-icon" style="background:${hub.color}"><i class="fas ${hub.icon}"></i></div>
+            <h4>${hub.name}</h4>
+            <p>${hub.desc}</p>
+            <span class="hub-link">Open <i class="fas fa-arrow-right"></i></span>
+        </a>`
+    ).join('');
+}
+
 function setFilter(f,btn) { currentFilter=f; btn.closest('.filter-bar').querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); renderProjectGrids(); }
 function handleSearch(q) { searchQuery=q; renderProjectGrids(); }
 
-/* ================================================================
-   PROJECT CRUD → FIREBASE
-   ================================================================ */
+// Project CRUD
 async function openProjectModal(fbKey) {
     document.getElementById('projectForm').reset();
     document.getElementById('projectId').value = '';
@@ -655,12 +583,12 @@ async function saveProject(e) {
         if(fbKey) {
             const existing = projects.find(p=>p._fbKey===fbKey);
             if(existing) { data.date = existing.date; data.cover = existing.cover||COVERS[0]; }
-            await fbPatch(`projects/${fbKey}`, data);
+            await db.ref('projects/'+fbKey).update(data);
             showToast('Project updated','success');
         } else {
             data.date = new Date().toISOString().split('T')[0];
             data.cover = COVERS[Math.floor(Math.random()*COVERS.length)];
-            await fbPost('projects', data);
+            await db.ref('projects').push(data);
             showToast('Project created','success');
         }
         await loadData(); closeModal('projectModal'); renderAll();
@@ -675,15 +603,12 @@ async function deleteProject(fbKey) {
     document.getElementById('confirmMsg').textContent = `"${pr.name}" will be permanently removed.`;
     document.getElementById('confirmBtn').textContent = 'Delete';
     pendingConfirmAction = async () => {
-        try { await fbDelete(`projects/${fbKey}`); await loadData(); showToast('Project deleted','info'); renderAll(); }
+        try { await db.ref('projects/'+fbKey).remove(); await loadData(); showToast('Project deleted','info'); renderAll(); }
         catch(err) { showToast('Error deleting','error'); }
     };
     document.getElementById('confirmModal').classList.add('show');
 }
 
-/* ================================================================
-   PROJECT DETAIL
-   ================================================================ */
 function openDetail(fbKey) {
     const pr = projects.find(p=>p._fbKey===fbKey);
     if(!pr) return;
@@ -711,13 +636,105 @@ function openDetail(fbKey) {
     document.getElementById('detailModal').classList.add('show');
 }
 
-/* ================================================================
-   PERMISSIONS UI (temporário, salvo com o projeto)
-   ================================================================ */
+// Permissions UI
 function renderPermList() {
     document.getElementById('permList').innerHTML = tempPermissions.map((pm,i) => {
         const ps = findPerson(pm.personId);
         if(!ps) return '';
         return `<div class="perm-item">
             <div class="perm-av" style="background:${ps.color}">${initials(ps.name)}</div>
-            <div class="
+            <div class="perm-nm">${ps.name}</div>
+            <select class="perm-sel" onchange="tempPermissions[${i}].role=this.value">
+                <option value="editor" ${pm.role==='editor'?'selected':''}>Editor</option>
+                <option value="viewer" ${pm.role==='viewer'?'selected':''}>Viewer</option>
+            </select>
+            <button type="button" class="perm-rm" onclick="tempPermissions.splice(${i},1);renderPermList()" title="Remove"><i class="fas fa-times"></i></button>
+        </div>`;
+    }).join('');
+}
+
+function togglePermDD() {
+    document.getElementById('permDD').classList.toggle('show');
+    if(document.getElementById('permDD').classList.contains('show')) {
+        document.getElementById('permSearchIn').value = '';
+        filterPermDD('');
+        document.getElementById('permSearchIn').focus();
+    }
+}
+function filterPermDD(q) {
+    const assigned = tempPermissions.map(pm => pm.personId);
+    const avail = people.filter(p => !assigned.includes(p._fbKey) && p.name.toLowerCase().includes(q.toLowerCase()));
+    document.getElementById('permDDList').innerHTML = avail.map(p =>
+        `<div class="dd-item" onclick="addPerm('${p._fbKey}')"><div class="dd-av" style="background:${p.color}">${initials(p.name)}</div><span>${p.name}</span></div>`
+    ).join('') || '<div class="dd-item" style="color:var(--neo-text-muted)">No people found</div>';
+}
+function addPerm(personId) { tempPermissions.push({personId, role:'viewer'}); renderPermList(); document.getElementById('permDD').classList.remove('show'); }
+document.addEventListener('click', function(e) { const w = document.getElementById('addPermWrap'); if(w && !w.contains(e.target)) document.getElementById('permDD').classList.remove('show'); });
+
+// People CRUD
+function openPeopleModal(fbKey) {
+    document.getElementById('peopleForm').reset();
+    document.getElementById('personId').value = '';
+    if(fbKey) {
+        const p = people.find(x => x._fbKey === fbKey);
+        if(!p) return;
+        document.getElementById('peopleModalTitle').textContent = 'Edit Person';
+        document.getElementById('personId').value = fbKey;
+        document.getElementById('personName').value = p.name;
+        document.getElementById('personEmail').value = p.email;
+        document.getElementById('personRole').value = p.role;
+    } else {
+        document.getElementById('peopleModalTitle').textContent = 'Add Person';
+    }
+    document.getElementById('peopleModal').classList.add('show');
+}
+function editPerson(k) { openPeopleModal(k); }
+
+async function savePerson(e) {
+    e.preventDefault();
+    const fbKey = document.getElementById('personId').value;
+    const data = { name: document.getElementById('personName').value.trim(), email: document.getElementById('personEmail').value.trim(), role: document.getElementById('personRole').value, color: COLORS[Math.floor(Math.random() * COLORS.length)] };
+    try {
+        if(fbKey) { const ex = people.find(p=>p._fbKey===fbKey); if(ex) data.color=ex.color; await db.ref('people/'+fbKey).update(data); showToast('Person updated','success'); }
+        else { await db.ref('people').push(data); showToast('Person added','success'); }
+        await loadData(); closeModal('peopleModal'); renderAll();
+    } catch(err) { console.error(err); showToast('Error saving person','error'); }
+}
+
+async function deletePerson(fbKey) {
+    const p = people.find(x => x._fbKey === fbKey);
+    if(!p) return;
+    document.getElementById('confirmTitle').textContent = 'Remove Person?';
+    document.getElementById('confirmMsg').textContent = `"${p.name}" will be removed from the team.`;
+    document.getElementById('confirmBtn').textContent = 'Remove';
+    pendingConfirmAction = async () => {
+        try { await db.ref('people/'+fbKey).remove(); await loadData(); showToast('Person removed','info'); renderAll(); }
+        catch(err) { showToast('Error removing person','error'); }
+    };
+    document.getElementById('confirmModal').classList.add('show');
+}
+
+// Utilities
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function confirmAction() { if(pendingConfirmAction) pendingConfirmAction(); closeModal('confirmModal'); pendingConfirmAction = null; }
+function showToast(msg, type) {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast '+type;
+    const icons = {success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle'};
+    t.innerHTML = '<i class="fas '+(icons[type]||'fa-info-circle')+'"></i><span>'+msg+'</span>';
+    c.appendChild(t);
+    setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 300); }, 3000);
+}
+function fmtDate(d) { if(!d) return '—'; try { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); } catch { return d; } }
+
+// Init
+async function init() {
+    document.getElementById('loadingScreen').classList.add('hide');
+    document.getElementById('loginScreen').classList.add('visible');
+    try { await loadData(); } catch(e) { console.warn('Pre-load failed:', e); }
+}
+init();
+</script>
+</body>
+</html>
