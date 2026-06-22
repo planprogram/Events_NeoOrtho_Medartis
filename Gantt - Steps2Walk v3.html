@@ -119,18 +119,25 @@
                 <p class="text-sm mt-1 text-gray-500">Projeto Neoortho · Jun - Out 2026</p>
             </div>
             <div class="flex items-center gap-2">
+                <button id="btnTranslate" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-purple-500 text-purple-600 hover:bg-purple-50">
+                    <i class="fas fa-globe"></i> <span id="langLabel">EN</span>
+                </button>
+                <div class="border-l border-gray-200 h-6 mx-1"></div>
                 <button id="btnSaveData" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-green-500 text-green-600 hover:bg-green-50">
-                    <i class="fas fa-floppy-disk"></i> Salvar
+                    <i class="fas fa-floppy-disk"></i> <span id="btnSaveLabel">Salvar</span>
                 </button>
                 <button id="btnLoadData" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-blue-500 text-blue-600 hover:bg-blue-50">
-                    <i class="fas fa-folder-open"></i> Carregar
+                    <i class="fas fa-folder-open"></i> <span id="btnLoadLabel">Carregar</span>
                 </button>
-                <div class="border-l border-gray-200 h-6 mx-2"></div>
+                <button id="btnExportData" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-orange-500 text-orange-600 hover:bg-orange-50">
+                    <i class="fas fa-file-export"></i> <span id="btnExportLabel">Exportar</span>
+                </button>
+                <div class="border-l border-gray-200 h-6 mx-1"></div>
                 <button id="btnDeliv" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-gray-200 text-gray-600">
-                    <i class="fas fa-clipboard-check text-xs"></i> Entregas
+                    <i class="fas fa-clipboard-check text-xs"></i> <span id="btnDelivLabel">Entregas</span>
                 </button>
                 <button id="btnAdd" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all text-white" style="background: var(--accent-dark);">
-                    <i class="fas fa-plus text-xs"></i> Nova Atividade
+                    <i class="fas fa-plus text-xs"></i> <span id="btnAddLabel">Nova Atividade</span>
                 </button>
             </div>
         </div>
@@ -242,6 +249,134 @@
     <div class="toast-box" id="toastBox"></div>
 
     <script>
+        // ============================================================
+        // IDIOMA
+        // ============================================================
+        var lang = localStorage.getItem('gantt_lang') || 'pt';
+
+        var L = {
+          pt: {
+            title: 'Gantt Cadaver Lab & Mutirão',
+            subtitle: 'Projeto Neoortho · Jun - Out 2026',
+            btnSave: 'Salvar',
+            btnLoad: 'Carregar',
+            btnExport: 'Exportar',
+            btnDeliv: 'Entregas',
+            btnAdd: 'Nova Atividade',
+            statTasks: 'Total de Atividades',
+            statAreas: 'Áreas Envolvidas',
+            statDays: 'Duração do Projeto',
+            statDeliv: 'Entregas Concluídas',
+            zoom: 'Zoom',
+            legendTitle: 'Legenda - Áreas Exibidas no Gráfico',
+            delivTitle: 'Entregas Específicas da Neoortho',
+            btnAddDeliv: 'Nova Entrega',
+            modalTitleTask: 'Editar Atividade',
+            modalTitleDeliv: 'Editar Entrega',
+            labelName: 'Nome',
+            labelActivity: 'Atividade',
+            labelItem: 'Item de Entrega',
+            labelResp: 'Responsável',
+            labelPlannedStart: 'Planejado Início',
+            labelPlannedEnd: 'Planejado Fim',
+            labelRealStart: 'Realizado Início',
+            labelRealEnd: 'Realizado Fim',
+            labelDone: 'Marcar como concluída',
+            btnDelete: 'Excluir',
+            btnCancel: 'Cancelar',
+            btnSaveChanges: 'Salvar Alterações',
+            toastSaved: 'Progresso salvo com sucesso!',
+            toastLoaded: 'Dados carregados.',
+            toastNoData: 'Nenhum salvamento encontrado.',
+            toastExported: 'Dados exportados com sucesso!',
+            toastError: 'Erro ao salvar dados.',
+            toastLoadError: 'Erro ao carregar.',
+            toastExportError: 'Erro ao exportar dados.',
+            toastActivityUpdated: 'Atividade atualizada!',
+            toastActivityAdded: 'Nova atividade adicionada!',
+            toastDelivUpdated: 'Entrega atualizada!',
+            toastDelivAdded: 'Nova entrega adicionada!',
+            toastActivityRemoved: 'Atividade removida.',
+            toastDelivRemoved: 'Entrega removida.',
+            toastDelivDone: ' concluída!',
+            toastDelivReopened: ' reaberta',
+            toastFillFields: 'Preencha Nome e Responsável.',
+            toastFillDates: 'Preencha as datas de planejamento.',
+            toastInvalidDate: 'Data de planejamento inválida.',
+            toastInvalidEnd: 'Fim do planejado não pode ser antes do início.',
+            toastFillRealDates: 'Preencha início e fim do realizado, ou deixe ambos vazios.',
+            toastInvalidRealDate: 'Data realizada inválida.',
+            toastInvalidRealEnd: 'Fim do realizado não pode ser antes do início.',
+            toastDrawError: 'Erro ao desenhar o gráfico.',
+            confirmDelete: 'Tem certeza que deseja excluir?',
+            activity: 'Atividade',
+            planned: 'Planejado',
+            realized: 'Realizado',
+            pending: 'Pendente'
+          },
+          en: {
+            title: 'Gantt Cadaver Lab & Mutirão',
+            subtitle: 'Neoortho Project · Jun - Oct 2026',
+            btnSave: 'Save',
+            btnLoad: 'Load',
+            btnExport: 'Export',
+            btnDeliv: 'Deliverables',
+            btnAdd: 'New Activity',
+            statTasks: 'Total Activities',
+            statAreas: 'Areas Involved',
+            statDays: 'Project Duration',
+            statDeliv: 'Completed Deliverables',
+            zoom: 'Zoom',
+            legendTitle: 'Legend - Areas Displayed in Chart',
+            delivTitle: 'Neoortho Specific Deliverables',
+            btnAddDeliv: 'New Deliverable',
+            modalTitleTask: 'Edit Activity',
+            modalTitleDeliv: 'Edit Deliverable',
+            labelName: 'Name',
+            labelActivity: 'Activity',
+            labelItem: 'Deliverable Item',
+            labelResp: 'Responsible',
+            labelPlannedStart: 'Planned Start',
+            labelPlannedEnd: 'Planned End',
+            labelRealStart: 'Actual Start',
+            labelRealEnd: 'Actual End',
+            labelDone: 'Mark as completed',
+            btnDelete: 'Delete',
+            btnCancel: 'Cancel',
+            btnSaveChanges: 'Save Changes',
+            toastSaved: 'Progress saved successfully!',
+            toastLoaded: 'Data loaded.',
+            toastNoData: 'No save data found.',
+            toastExported: 'Data exported successfully!',
+            toastError: 'Error saving data.',
+            toastLoadError: 'Error loading data.',
+            toastExportError: 'Error exporting data.',
+            toastActivityUpdated: 'Activity updated!',
+            toastActivityAdded: 'New activity added!',
+            toastDelivUpdated: 'Deliverable updated!',
+            toastDelivAdded: 'New deliverable added!',
+            toastActivityRemoved: 'Activity removed.',
+            toastDelivRemoved: 'Deliverable removed.',
+            toastDelivDone: ' completed!',
+            toastDelivReopened: ' reopened',
+            toastFillFields: 'Please fill Name and Responsible.',
+            toastFillDates: 'Please fill the planning dates.',
+            toastInvalidDate: 'Invalid planning date.',
+            toastInvalidEnd: 'Planned end cannot be before start.',
+            toastFillRealDates: 'Fill both actual start and end, or leave both empty.',
+            toastInvalidRealDate: 'Invalid actual date.',
+            toastInvalidRealEnd: 'Actual end cannot be before start.',
+            toastDrawError: 'Error drawing chart.',
+            confirmDelete: 'Are you sure you want to delete?',
+            activity: 'Activity',
+            planned: 'Planned',
+            realized: 'Actual',
+            pending: 'Pending'
+          }
+        };
+
+        function t(k){ return (L[lang] && L[lang][k]) || k; }
+
         const DateUtils = {
             MSPD: 86400000,
             toDate(input) { if (!input) return null; if (input instanceof Date && !isNaN(input)) return input; if (typeof input === 'string') { const parts = input.split('-'); if (parts.length === 3) { const [y, m, d] = parts.map(Number); if (y > 0 && m > 0 && d > 0) return new Date(y, m - 1, d); } } return null; },
@@ -330,7 +465,8 @@
             KEYS: { tasks: 'neoortho_gantt_tasks_v4', deliverables: 'neoortho_gantt_delivs_v4' },
             save() { try { localStorage.setItem(this.KEYS.tasks, JSON.stringify(AppState.tasks)); localStorage.setItem(this.KEYS.deliverables, JSON.stringify(AppState.deliverables)); UI.toast("Progresso salvo com sucesso!", "success"); } catch (e) { UI.toast("Erro ao salvar dados.", "error"); } },
             load() { try { const savedTasks = localStorage.getItem(this.KEYS.tasks); const savedDelivs = localStorage.getItem(this.KEYS.deliverables); if (savedTasks) { AppState.tasks = JSON.parse(savedTasks); AppState.nextId = AppState.tasks.reduce((max, t) => Math.max(max, t.id), 0) + 1; } if (savedDelivs) { AppState.deliverables = JSON.parse(savedDelivs); AppState.nextDelivId = AppState.deliverables.reduce((max, d) => Math.max(max, d.id), 0) + 1; } if (savedTasks || savedDelivs) { App.renderAll(); UI.toast("Dados carregados.", "info"); } else UI.toast("Nenhum salvamento encontrado.", "info"); } catch (e) { UI.toast("Erro ao carregar.", "error"); } },
-            autoLoad() { try { const savedTasks = localStorage.getItem(this.KEYS.tasks); const savedDelivs = localStorage.getItem(this.KEYS.deliverables); if (savedTasks) { AppState.tasks = JSON.parse(savedTasks); AppState.nextId = AppState.tasks.reduce((max, t) => Math.max(max, t.id), 0) + 1; } if (savedDelivs) { AppState.deliverables = JSON.parse(savedDelivs); AppState.nextDelivId = AppState.deliverables.reduce((max, d) => Math.max(max, d.id), 0) + 1; } } catch (e) {} }
+            autoLoad() { try { const savedTasks = localStorage.getItem(this.KEYS.tasks); const savedDelivs = localStorage.getItem(this.KEYS.deliverables); if (savedTasks) { AppState.tasks = JSON.parse(savedTasks); AppState.nextId = AppState.tasks.reduce((max, t) => Math.max(max, t.id), 0) + 1; } if (savedDelivs) { AppState.deliverables = JSON.parse(savedDelivs); AppState.nextDelivId = AppState.deliverables.reduce((max, d) => Math.max(max, d.id), 0) + 1; } } catch (e) {} },
+            exportData() { try { const data = { tasks: AppState.tasks, deliverables: AppState.deliverables, exportDate: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'gantt_neoortho_' + new Date().toISOString().slice(0,10) + '.json'; a.click(); URL.revokeObjectURL(url); UI.toast("Dados exportados com sucesso!", "success"); } catch (e) { UI.toast("Erro ao exportar dados.", "error"); } }
         };
 
         const Stats = {
@@ -505,25 +641,81 @@
             renderDatalist() { const areas = Filter.getAllAreas().filter(a => a !== "Todos"); document.getElementById('respList').innerHTML = areas.map(a => `<option value="${a}">`).join(''); }
         };
 
+        // ============================================================
+        // TOGGLE IDIOMA
+        // ============================================================
+        function toggleLang(){
+            lang = lang === 'pt' ? 'en' : 'pt';
+            localStorage.setItem('gantt_lang', lang);
+            applyLanguage();
+            App.renderAll();
+        }
+
+        function applyLanguage(){
+            document.querySelector('h1').innerHTML = '<span style="color: var(--accent-dark);">Gantt</span> ' + (lang === 'pt' ? 'Cadaver Lab & Mutirão' : 'Cadaver Lab & Mutirão');
+            document.querySelector('header p').textContent = lang === 'pt' ? 'Projeto Neoortho · Jun - Out 2026' : 'Neoortho Project · Jun - Oct 2026';
+            document.getElementById('langLabel').textContent = lang === 'pt' ? 'EN' : 'PT';
+            document.getElementById('btnSaveLabel').textContent = t('btnSave');
+            document.getElementById('btnLoadLabel').textContent = t('btnLoad');
+            document.getElementById('btnExportLabel').textContent = t('btnExport');
+            document.getElementById('btnDelivLabel').textContent = t('btnDeliv');
+            document.getElementById('btnAddLabel').textContent = t('btnAdd');
+            
+            // Stats
+            document.querySelectorAll('.stat-card .text-xs')[0].textContent = t('statTasks');
+            document.querySelectorAll('.stat-card .text-xs')[1].textContent = t('statAreas');
+            document.querySelectorAll('.stat-card .text-xs')[2].textContent = t('statDays');
+            document.querySelectorAll('.stat-card .text-xs')[3].textContent = t('statDeliv');
+            
+            // Zoom
+            document.querySelector('label[for="zoomLvl"]').textContent = t('zoom');
+            
+            // Legend
+            document.getElementById('legendBox').previousElementSibling.textContent = t('legendTitle');
+            
+            // Deliverables section
+            document.getElementById('delivSec').querySelector('h2').textContent = t('delivTitle');
+            document.getElementById('btnAddDeliv').innerHTML = '<i class="fas fa-plus text-xs"></i> ' + t('btnAddDeliv');
+            
+            // Modal labels
+            document.getElementById('labelName').textContent = t('labelName');
+            document.querySelector('label[for="editResp"]').textContent = t('labelResp');
+            document.querySelectorAll('#taskFields label')[0].textContent = t('labelPlannedStart');
+            document.querySelectorAll('#taskFields label')[1].textContent = t('labelPlannedEnd');
+            document.querySelectorAll('#taskFields label')[2].textContent = t('labelRealStart');
+            document.querySelectorAll('#taskFields label')[3].textContent = t('labelRealEnd');
+            document.querySelector('label[for="editDone"]').textContent = t('labelDone');
+            document.getElementById('delBtn').innerHTML = '<i class="fas fa-trash-alt mr-1"></i>' + t('btnDelete');
+            document.getElementById('btnCancel').textContent = t('btnCancel');
+            document.getElementById('btnSave').textContent = t('btnSaveChanges');
+            
+            // Sidebar header
+            document.querySelector('.gantt-sidebar-header span:first-child').textContent = t('activity');
+            document.querySelectorAll('.gantt-sidebar-header span')[1].textContent = t('planned');
+            document.querySelectorAll('.gantt-sidebar-header span')[2].textContent = t('realized');
+        }
+
         const App = {
             renderAll() { Stats.render(); Filter.render(); Gantt.render(); Deliverables.render(); UI.renderLegend(); UI.renderDatalist(); },
-            bindEvents() { 
-                document.getElementById('btnDeliv').addEventListener('click', UI.toggleDeliverables); 
-                document.getElementById('btnAdd').addEventListener('click', Modal.openAdd); 
-                document.getElementById('btnAddDeliv').addEventListener('click', Modal.openAddDeliverable); // Novo botão
-                document.getElementById('btnSaveData').addEventListener('click', () => Storage.save()); 
-                document.getElementById('btnLoadData').addEventListener('click', () => Storage.load()); 
-                document.getElementById('filterTags').addEventListener('click', (e) => { const btn = e.target.closest('.ftag'); if (btn && btn.dataset.area) Filter.set(btn.dataset.area); }); 
-                document.getElementById('zoomIn').addEventListener('click', () => Gantt.changeZoom(1)); 
-                document.getElementById('zoomOut').addEventListener('click', () => Gantt.changeZoom(-1)); 
-                document.getElementById('ganttBox').addEventListener('click', (e) => { const row = e.target.closest('.timeline-row') || e.target.closest('.sidebar-row'); if (row && row.dataset.id) Modal.openEdit(parseInt(row.dataset.id, 10)); }); 
-                document.getElementById('delivGrid').addEventListener('click', (e) => { if (e.target.classList.contains('dcheck')) { const id = parseInt(e.target.dataset.delivId, 10); if (!isNaN(id)) Deliverables.toggle(id); } }); 
-                document.getElementById('btnCancel').addEventListener('click', Modal.close); 
-                document.getElementById('btnSave').addEventListener('click', Modal.save); 
-                document.getElementById('delBtn').addEventListener('click', Modal.deleteItem); // Nome alterado
-                document.getElementById('editModal').addEventListener('click', (e) => { if (e.target === e.currentTarget) Modal.close(); }); 
+            bindEvents() {
+                document.getElementById('btnTranslate').addEventListener('click', toggleLang);
+                document.getElementById('btnDeliv').addEventListener('click', UI.toggleDeliverables);
+                document.getElementById('btnAdd').addEventListener('click', Modal.openAdd);
+                document.getElementById('btnAddDeliv').addEventListener('click', Modal.openAddDeliverable);
+                document.getElementById('btnSaveData').addEventListener('click', () => Storage.save());
+                document.getElementById('btnLoadData').addEventListener('click', () => Storage.load());
+                document.getElementById('btnExportData').addEventListener('click', () => Storage.exportData());
+                document.getElementById('filterTags').addEventListener('click', (e) => { const btn = e.target.closest('.ftag'); if (btn && btn.dataset.area) Filter.set(btn.dataset.area); });
+                document.getElementById('zoomIn').addEventListener('click', () => Gantt.changeZoom(1));
+                document.getElementById('zoomOut').addEventListener('click', () => Gantt.changeZoom(-1));
+                document.getElementById('ganttBox').addEventListener('click', (e) => { const row = e.target.closest('.timeline-row') || e.target.closest('.sidebar-row'); if (row && row.dataset.id) Modal.openEdit(parseInt(row.dataset.id, 10)); });
+                document.getElementById('delivGrid').addEventListener('click', (e) => { if (e.target.classList.contains('dcheck')) { const id = parseInt(e.target.dataset.delivId, 10); if (!isNaN(id)) Deliverables.toggle(id); } });
+                document.getElementById('btnCancel').addEventListener('click', Modal.close);
+                document.getElementById('btnSave').addEventListener('click', Modal.save);
+                document.getElementById('delBtn').addEventListener('click', Modal.deleteItem);
+                document.getElementById('editModal').addEventListener('click', (e) => { if (e.target === e.currentTarget) Modal.close(); });
             },
-            init() { this.bindEvents(); Storage.autoLoad(); this.renderAll(); }
+            init() { this.bindEvents(); Storage.autoLoad(); applyLanguage(); this.renderAll(); }
         };
 
         document.addEventListener('DOMContentLoaded', () => App.init());

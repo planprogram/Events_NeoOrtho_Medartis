@@ -111,6 +111,10 @@
     }
     .btn-header svg { flex-shrink: 0; }
     .btn-header:active { transform: translateY(0); }
+    .btn-translate{border:1px solid #7c6dd8;background:rgba(106,90,205,.15);color:#b0a4f0;font-weight:700;letter-spacing:.5px}
+    .btn-translate:hover{background:rgba(106,90,205,.28);border-color:#b0a4f0;color:#d0c8ff;transform:translateY(-1px)}
+    .btn-save { border: 1px solid #555; background: transparent; color: #ccc; }
+    .btn-save:hover { background: rgba(255,255,255,0.08); border-color: #777; color: #fff; transform: translateY(-1px); }
     .btn-import { border: 1px solid var(--import-border); background: rgba(45,122,110,0.1); color: #8fd4c8; }
     .btn-import:hover { background: rgba(45,122,110,0.2); border-color: #8fd4c8; color: #b0e8de; transform: translateY(-1px); }
     .btn-export-data { border: 1px solid var(--export-border); background: rgba(106,90,16,0.1); color: #d4c870; }
@@ -562,6 +566,15 @@
         </div>
       </div>
       <div class="header-right">
+        <button class="btn-header btn-translate" onclick="toggleLang()" aria-label="Translate">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span class="label-text" id="langLabel">EN</span>
+        </button>
+        <div class="header-sep"></div>
+        <button class="btn-header btn-save" onclick="saveData()" aria-label="Salvar dados">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2-2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span class="label-text">SALVAR</span>
+        </button>
         <button class="btn-header btn-import" onclick="triggerImport()" aria-label="Importar dados">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           <span class="label-text">IMPORTAR</span>
@@ -744,6 +757,153 @@
   <div id="toastContainer"></div>
 
   <script>
+    // ============================================================
+    // IDIOMA
+    // ============================================================
+    var lang = localStorage.getItem('essential_lang') || 'pt';
+
+    var L = {
+      pt: {
+        headerTitle: 'Curso <span>Essential</span> — Planejamento',
+        headerSub: 'Publico Interno e Externo | Aptus + Modus',
+        dateBannerTitle: 'Curso <span>Essential</span> — Aptus & Modus',
+        dateBannerTag1: '<strong>Dia 1</strong> Aptus Teoria',
+        dateBannerTag2: '<strong>Dia 2</strong> Aptus Hands-On',
+        dateBannerTag3: '<strong>Dia 3</strong> Modus Teoria',
+        dateBannerTag4: '<strong>Dia 4</strong> Modus Hands-On',
+        dateBannerTag5: '<strong>Publico</strong> Interno + Externo',
+        dateStartLabel: 'Inicio do Curso',
+        dateEndLabel: 'Fim do Curso',
+        btnGenerate: 'GERAR CRONOGRAMA',
+        timelineLabel: 'Timeline',
+        timelineInfo: 'Defina as datas e clique em <strong>Gerar Cronograma</strong>',
+        dashLabel: 'Painel de Controle',
+        daysBefore: 'Faltam', daysAfter: 'dias',
+        labelNI: 'Nao iniciadas', labelEA: 'Em andamento', labelOK: 'Concluidas', labelAT: 'Atrasadas', labelCA: 'Canceladas',
+        progTitle: 'Progresso Geral',
+        progDone: ' tarefas concluidas', progOf: ' de ', progRemain: ' restantes',
+        searchPh: 'Pesquisar por palavra-chave...',
+        allCats: 'Todas as categorias', allStatus: 'Todos os status', allResponsaveis: 'Todos os responsaveis',
+        stNI: 'Nao iniciado', stEA: 'Em andamento', stOK: 'Concluido', stAT: 'Atrasado', stCan: 'Cancelado',
+        btnClear: 'Limpar', btnReset: 'Resetar', btnAdd: '+ Nova Tarefa',
+        showing: 'Mostrando ', of2: ' de ', tasks: ' tarefas',
+        thCat: 'Categoria', thEnt: 'Entrega', thResp: 'Responsavel', thOffset: 'Offset', thPP: 'Prazo Planejado', thPR: 'Prazo Real', thSt: 'Status', thObs: 'Observacoes', thAct: 'Acoes',
+        clickEdit: 'Clicar para editar',
+        emptyText: 'Nenhuma tarefa encontrada',
+        emptyTextNoData: 'Defina as datas do curso e clique em "Gerar Cronograma" para comecar',
+        modalNew: 'Nova Tarefa', modalEdit: 'Editar Tarefa',
+        lblCat: 'Categoria', lblEnt: 'Entrega', lblResp: 'Responsavel', lblSt: 'Status', lblOffset: 'Offset (dias relativos)', lblPR: 'Prazo Real', lblObs: 'Observacoes',
+        phEnt: 'Descricao da entrega', phResp: 'Setor ou pessoa', phObs: 'Detalhes, links, notas',
+        btnCancel: 'Cancelar', btnSave: 'Salvar',
+        confDelete: 'Tem certeza que deseja excluir esta tarefa?',
+        confReset: 'Tem certeza que deseja resetar? Defina as datas e gere o cronograma novamente.',
+        btnExcluir: 'Excluir', btnResetar: 'Resetar',
+        tUpdated: 'Campo atualizado', tStatus: 'Status atualizado para: ', tAdded: 'Tarefa criada',
+        tEdited: 'Tarefa atualizada', tDeleted: 'Tarefa excluida', tReset: 'Dados resetados',
+        tImported: 'Dados importados (', tTasks: ' tarefas)', tInvalid: 'Arquivo invalido',
+        tReadErr: 'Erro ao ler: ', tExported: 'JSON exportado',
+        tExcel: 'Excel exportado', tPdf: 'PDF exportado',
+        tRestored: 'Dados restaurados do navegador', tFill: 'Preencha o campo Entrega',
+        tXlsxErr: 'Erro: ', tPdfErr: 'Erro: ',
+        btnImport: 'IMPORTAR', btnExport: 'EXPORTAR', btnSave: 'SALVAR',
+        pdfTitle: 'Curso Essential — Cronograma',
+        pdfPeriod: 'Periodo: ',
+        pdfGenerated: 'Gerado: ',
+        toastGenerated: 'Cronograma gerado! ',
+        toastTasks: ' tarefas de ',
+        toastTo: ' a ',
+        toastOverdue: ' tarefas atrasadas',
+        toastDefineDate: 'Defina a data de inicio do curso',
+        toastDefineEndDate: 'Defina a data de fim do curso',
+        toastInvalidDate: 'Datas invalidas',
+        toastEndAfterStart: 'A data de fim deve ser posterior ao inicio',
+        toastMinDays: 'O curso precisa de pelo menos 4 dias (inicio a fim)',
+        before: ' antes', during: ' durante', after: ' pos-evento',
+        daysBefore: ' antes', daysDuring: ' durante', daysAfter: ' pos-evento'
+      },
+      en: {
+        headerTitle: 'Course <span>Essential</span> — Planning',
+        headerSub: 'Internal and External Audience | Aptus + Modus',
+        dateBannerTitle: 'Course <span>Essential</span> — Aptus & Modus',
+        dateBannerTag1: '<strong>Day 1</strong> Aptus Theory',
+        dateBannerTag2: '<strong>Day 2</strong> Aptus Hands-On',
+        dateBannerTag3: '<strong>Day 3</strong> Modus Theory',
+        dateBannerTag4: '<strong>Day 4</strong> Modus Hands-On',
+        dateBannerTag5: '<strong>Audience</strong> Internal + External',
+        dateStartLabel: 'Course Start',
+        dateEndLabel: 'Course End',
+        btnGenerate: 'GENERATE TIMELINE',
+        timelineLabel: 'Timeline',
+        timelineInfo: 'Set the dates and click <strong>Generate Timeline</strong>',
+        dashLabel: 'Control Panel',
+        daysBefore: 'Remaining', daysAfter: 'days',
+        labelNI: 'Not started', labelEA: 'In progress', labelOK: 'Completed', labelAT: 'Overdue', labelCA: 'Cancelled',
+        progTitle: 'Overall Progress',
+        progDone: ' tasks completed', progOf: ' of ', progRemain: ' remaining',
+        searchPh: 'Search by keyword...',
+        allCats: 'All categories', allStatus: 'All statuses', allResponsaveis: 'All responsible',
+        stNI: 'Not started', stEA: 'In progress', stOK: 'Completed', stAT: 'Overdue', stCan: 'Cancelled',
+        btnClear: 'Clear', btnReset: 'Reset', btnAdd: '+ New Task',
+        showing: 'Showing ', of2: ' of ', tasks: ' tasks',
+        thCat: 'Category', thEnt: 'Delivery', thResp: 'Responsible', thOffset: 'Offset', thPP: 'Planned Date', thPR: 'Actual Date', thSt: 'Status', thObs: 'Notes', thAct: 'Actions',
+        clickEdit: 'Click to edit',
+        emptyText: 'No tasks found',
+        emptyTextNoData: 'Set the course dates and click "Generate Timeline" to start',
+        modalNew: 'New Task', modalEdit: 'Edit Task',
+        lblCat: 'Category', lblEnt: 'Delivery', lblResp: 'Responsible', lblSt: 'Status', lblOffset: 'Offset (relative days)', lblPR: 'Actual Date', lblObs: 'Notes',
+        phEnt: 'Delivery description', phResp: 'Sector or person', phObs: 'Details, links, notes',
+        btnCancel: 'Cancel', btnSave: 'Save',
+        confDelete: 'Are you sure you want to delete this task?',
+        confReset: 'Are you sure you want to reset? Set the dates and generate the timeline again.',
+        btnExcluir: 'Delete', btnResetar: 'Reset',
+        tUpdated: 'Field updated', tStatus: 'Status updated to: ', tAdded: 'Task created',
+        tEdited: 'Task updated', tDeleted: 'Task deleted', tReset: 'Data reset',
+        tImported: 'Data imported (', tTasks: ' tasks)', tInvalid: 'Invalid file',
+        tReadErr: 'Error reading: ', tExported: 'JSON exported',
+        tExcel: 'Excel exported', tPdf: 'PDF exported',
+        tRestored: 'Data restored from browser', tFill: 'Please fill the Delivery field',
+        tXlsxErr: 'Error: ', tPdfErr: 'Error: ',
+        btnImport: 'IMPORT', btnExport: 'EXPORT', btnSave: 'SAVE',
+        pdfTitle: 'Course Essential — Timeline',
+        pdfPeriod: 'Period: ',
+        pdfGenerated: 'Generated: ',
+        toastGenerated: 'Timeline generated! ',
+        toastTasks: ' tasks from ',
+        toastTo: ' to ',
+        toastOverdue: ' overdue tasks',
+        toastDefineDate: 'Please set the course start date',
+        toastDefineEndDate: 'Please set the course end date',
+        toastInvalidDate: 'Invalid dates',
+        toastEndAfterStart: 'End date must be after start date',
+        toastMinDays: 'The course needs at least 4 days (start to end)',
+        before: ' before', during: ' during', after: ' post-event',
+        daysBefore: ' before', daysDuring: ' during', daysAfter: ' post-event'
+      }
+    };
+
+    function t(k){ return (L[lang] && L[lang][k]) || k; }
+
+    // ============================================================
+    // TRADUÇÕES DE CATEGORIAS
+    // ============================================================
+    var CAT_EN = {
+      'DEFINICAO E ESCOPO': 'DEFINITION AND SCOPE',
+      'DATAS E LOCAL': 'DATES AND VENUE',
+      'PROFESSORES': 'FACULTY',
+      'PROGRAMA CIENTIFICO': 'SCIENTIFIC PROGRAM',
+      'PRODUTOS E INSTRUMENTAIS': 'PRODUCTS AND INSTRUMENTS',
+      'INSCRICOES E PARTICIPANTES': 'REGISTRATIONS AND PARTICIPANTS',
+      'INFRAESTRUTURA': 'INFRASTRUCTURE',
+      'MATERIAIS E SUPRIMENTOS': 'MATERIALS AND SUPPLIES',
+      'DIA 1 - APTUS TEORIA': 'DAY 1 - APTUS THEORY',
+      'DIA 2 - APTUS HANDS-ON': 'DAY 2 - APTUS HANDS-ON',
+      'DIA 3 - MODUS TEORIA': 'DAY 3 - MODUS THEORY',
+      'DIA 4 - MODUS HANDS-ON': 'DAY 4 - MODUS HANDS-ON',
+      'POS-EVENTO': 'POST-EVENT'
+    };
+
+    function catL(c){ return (lang === 'en' && CAT_EN[c]) ? CAT_EN[c] : c; }
+
     // ============================================================
     // CATEGORIAS
     // ============================================================
@@ -1112,6 +1272,14 @@
         localStorage.setItem('essential_start', document.getElementById('eventStartDate').value);
         localStorage.setItem('essential_end', document.getElementById('eventEndDate').value);
       } catch(e) {}
+    }
+    
+    // ============================================================
+    // SAVE / IMPORT / EXPORT (Unified)
+    // ============================================================
+    function saveData() {
+      saveToStorage();
+      showToast('Dados salvos com sucesso!', 'success');
     }
 
     // ============================================================
@@ -1588,10 +1756,82 @@
     document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target === this) closeConfirmModal(); });
 
     // ============================================================
+    // TOGGLE IDIOMA
+    // ============================================================
+    function toggleLang(){
+      lang = lang === 'pt' ? 'en' : 'pt';
+      localStorage.setItem('essential_lang', lang);
+      applyLanguage();
+      updateDashboard();
+      renderTable();
+      populateFilters();
+    }
+
+    function applyLanguage(){
+      document.querySelector('.header-title').innerHTML = t('headerTitle');
+      document.querySelector('.header-subtitle').textContent = t('headerSub');
+      document.getElementById('langLabel').textContent = lang === 'pt' ? 'EN' : 'PT';
+      
+      // Date banner
+      document.querySelector('.date-banner-info h2').innerHTML = t('dateBannerTitle');
+      const tags = document.querySelectorAll('.info-tag');
+      if (tags.length >= 5) {
+        tags[0].innerHTML = t('dateBannerTag1');
+        tags[1].innerHTML = t('dateBannerTag2');
+        tags[2].innerHTML = t('dateBannerTag3');
+        tags[3].innerHTML = t('dateBannerTag4');
+        tags[4].innerHTML = t('dateBannerTag5');
+      }
+      
+      // Date fields
+      document.querySelector('.date-field:first-child label').textContent = t('dateStartLabel');
+      document.querySelector('.date-field:last-child label').textContent = t('dateEndLabel');
+      document.querySelector('.btn-generate').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> ' + t('btnGenerate');
+      
+      // Timeline
+      document.querySelector('.timeline-mini-label').textContent = t('timelineLabel');
+      if (!EVENT_DATE) {
+        document.getElementById('timelineInfo').innerHTML = t('timelineInfo');
+      }
+      
+      // Dashboard
+      document.getElementById('dashLabel').textContent = t('dashLabel');
+      document.getElementById('labelNI').textContent = t('labelNI');
+      document.getElementById('labelEA').textContent = t('labelEA');
+      document.getElementById('labelOK').textContent = t('labelOK');
+      document.getElementById('labelAT').textContent = t('labelAT');
+      document.getElementById('labelCA').textContent = t('labelCA');
+      document.getElementById('progTitle').textContent = t('progTitle');
+      
+      // Search
+      document.getElementById('searchInput').placeholder = t('searchPh');
+      
+      // Toolbar buttons
+      document.querySelector('.btn-clear-filters').textContent = t('btnClear');
+      document.querySelector('.btn-reset').textContent = t('btnReset');
+      document.querySelector('.btn-add').textContent = t('btnAdd');
+      
+      // Table headers
+      const ths = document.querySelectorAll('#taskTable thead th');
+      if (ths.length >= 9) {
+        ths[0].textContent = t('thCat');
+        ths[1].textContent = t('thEnt');
+        ths[2].textContent = t('thResp');
+        ths[3].textContent = t('thOffset');
+        ths[4].textContent = t('thPP');
+        ths[5].textContent = t('thPR');
+        ths[6].textContent = t('thSt');
+        ths[7].textContent = t('thObs');
+        ths[8].textContent = t('thAct');
+      }
+    }
+
+    // ============================================================
     // INICIALIZAR
     // ============================================================
     function init() {
       loadFromStorage();
+      applyLanguage();
       populateFilters();
       renderTable();
       updateDashboard();

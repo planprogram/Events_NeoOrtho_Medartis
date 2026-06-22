@@ -106,6 +106,12 @@
     }
     .btn-header svg { flex-shrink: 0; }
     .btn-header:active { transform: translateY(0); }
+    .btn-translate{border:1px solid #7c6dd8;background:rgba(106,90,205,.15);color:#b0a4f0;font-weight:700;letter-spacing:.5px}
+    .btn-translate:hover{background:rgba(106,90,205,.28);border-color:#b0a4f0;color:#d0c8ff;transform:translateY(-1px)}
+    .btn-save {
+      border: 1px solid #555; background: transparent; color: #ccc;
+    }
+    .btn-save:hover { background: rgba(255,255,255,0.08); border-color: #777; color: #fff; transform: translateY(-1px); }
     .btn-import {
       border: 1px solid var(--import-border); background: rgba(45,122,110,0.1);
       color: #8fd4c8;
@@ -450,21 +456,30 @@
         </div>
       </div>
       <div class="header-right">
-        <button class="btn-header btn-import" onclick="triggerImport()" aria-label="Importar dados">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <span class="label-text">IMPORTAR</span>
-        </button>
-        <button class="btn-header btn-export-data" onclick="exportData()" aria-label="Exportar dados editáveis">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span class="label-text">EXPORTAR</span>
-        </button>
-        <div class="header-sep"></div>
-        <button class="btn-header btn-excel" onclick="exportToExcel()" aria-label="Exportar para Excel">
-          <span class="label-text">EXCEL</span>
-        </button>
-        <button class="btn-header btn-pdf" onclick="exportToPDF()" aria-label="Exportar para PDF">
-          <span class="label-text">PDF</span>
-        </button>
+       <button class="btn-header btn-translate" onclick="toggleLang()" aria-label="Translate">
+         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+         <span class="label-text" id="langLabel">EN</span>
+       </button>
+       <div class="header-sep"></div>
+       <button class="btn-header btn-save" onclick="saveData()" aria-label="Salvar dados">
+         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+         <span class="label-text">SALVAR</span>
+       </button>
+       <button class="btn-header btn-import" onclick="triggerImport()" aria-label="Importar dados">
+         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+         <span class="label-text">IMPORTAR</span>
+       </button>
+       <button class="btn-header btn-export-data" onclick="exportData()" aria-label="Exportar dados editáveis">
+         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+         <span class="label-text">EXPORTAR</span>
+       </button>
+       <div class="header-sep"></div>
+       <button class="btn-header btn-excel" onclick="exportToExcel()" aria-label="Exportar para Excel">
+         <span class="label-text">EXCEL</span>
+       </button>
+       <button class="btn-header btn-pdf" onclick="exportToPDF()" aria-label="Exportar para PDF">
+         <span class="label-text">PDF</span>
+       </button>
       </div>
     </div>
   </header>
@@ -632,6 +647,103 @@
   <div id="toastContainer"></div>
 
   <script>
+    // ============================================================
+    // IDIOMA
+    // ============================================================
+    var lang = localStorage.getItem('ibra_hw_lang') || 'pt';
+
+    var L = {
+      pt: {
+        headerTitle: 'Cadaver Lab IBRA / Medartis Mão e Punho',
+        headerSub: '24 e 25 de agosto de 2026',
+        dashLabel: 'Painel de Controle',
+        daysBefore: 'Faltam', daysAfter: 'dias',
+        labelNI: 'Nao iniciadas', labelEA: 'Em andamento', labelOK: 'Concluidas', labelAT: 'Atrasadas',
+        progTitle: 'Progresso Geral',
+        progDone: ' tarefas concluidas', progOf: ' de ', progRemain: ' restantes',
+        searchPh: 'Pesquisar por palavra-chave...',
+        allCats: 'Todas as categorias', allStatus: 'Todos os status', allSectors: 'Todos os setores',
+        stNI: 'Nao iniciado', stEA: 'Em andamento', stOK: 'Concluido', stAT: 'Atrasado', stCan: 'Cancelado',
+        btnClear: 'Limpar', btnReset: 'Resetar Dados', btnAdd: '+ Nova Tarefa',
+        showing: 'Mostrando ', of2: ' de ', tasks: ' tarefas',
+        thCat: 'Categoria', thEnt: 'Entrega', thSet: 'Setor Responsavel', thPP: 'Prazo Planejado', thPR: 'Prazo Real', thSt: 'Status', thObs: 'Observacoes', thAct: 'Acoes',
+        clickEdit: 'Clicar para editar',
+        emptyText: 'Nenhuma tarefa encontrada',
+        modalNew: 'Nova Tarefa', modalEdit: 'Editar Tarefa',
+        lblCat: 'Categoria', lblEnt: 'Entrega', lblSet: 'Setor Responsavel', lblSt: 'Status', lblPP: 'Prazo Planejado', lblPR: 'Prazo Real', lblObs: 'Observacoes',
+        phEnt: 'Descricao da entrega', phSet: 'Setor', phObs: 'Observacoes adicionais',
+        btnCancel: 'Cancelar', btnSave: 'Salvar',
+        confDelete: 'Tem certeza que deseja excluir esta tarefa? Esta acao nao pode ser desfeita.',
+        confReset: 'Tem certeza que deseja resetar todos os dados para o estado inicial? Todas as edicoes serao perdidas.',
+        btnExcluir: 'Excluir', btnResetar: 'Resetar',
+        tUpdated: 'Campo atualizado', tStatus: 'Status atualizado para: ', tAdded: 'Tarefa criada',
+        tEdited: 'Tarefa atualizada', tDeleted: 'Tarefa excluida', tReset: 'Dados resetados para o estado inicial',
+        tImported: 'Importacao concluida: ', tTasks: ' tarefa(s) atualizada(s)', tInvalid: 'Arquivo invalido: campo "tarefas" nao encontrado',
+        tReadErr: 'Erro ao ler o arquivo JSON: ', tExported: 'Dados exportados com sucesso (',
+        tExcel: 'Excel exportado com sucesso', tPdf: 'PDF exportado com sucesso',
+        tRestored: 'Dados restaurados do navegador', tFill: 'Preencha o campo Entrega',
+        tXlsxErr: 'Biblioteca XLSX nao carregada', tPdfErr: 'Biblioteca jsPDF nao carregada',
+        btnImport: 'IMPORTAR', btnExport: 'EXPORTAR', btnSave: 'SALVAR',
+        pdfTitle: 'Cadaver Lab IBRA / Medartis - Mao e Punho',
+        pdfSub: '24 e 25 de agosto de 2026',
+        pdfGen: 'Gerado em: '
+      },
+      en: {
+        headerTitle: 'Cadaver Lab IBRA / Medartis Hand and Wrist',
+        headerSub: 'August 24-25, 2026',
+        dashLabel: 'Control Panel',
+        daysBefore: 'Remaining', daysAfter: 'days',
+        labelNI: 'Not started', labelEA: 'In progress', labelOK: 'Completed', labelAT: 'Overdue',
+        progTitle: 'Overall Progress',
+        progDone: ' tasks completed', progOf: ' of ', progRemain: ' remaining',
+        searchPh: 'Search by keyword...',
+        allCats: 'All categories', allStatus: 'All statuses', allSectors: 'All sectors',
+        stNI: 'Not started', stEA: 'In progress', stOK: 'Completed', stAT: 'Overdue', stCan: 'Cancelled',
+        btnClear: 'Clear', btnReset: 'Reset Data', btnAdd: '+ New Task',
+        showing: 'Showing ', of2: ' of ', tasks: ' tasks',
+        thCat: 'Category', thEnt: 'Delivery', thSet: 'Responsible Sector', thPP: 'Planned Date', thPR: 'Actual Date', thSt: 'Status', thObs: 'Notes', thAct: 'Actions',
+        clickEdit: 'Click to edit',
+        emptyText: 'No tasks found',
+        modalNew: 'New Task', modalEdit: 'Edit Task',
+        lblCat: 'Category', lblEnt: 'Delivery', lblSet: 'Responsible Sector', lblSt: 'Status', lblPP: 'Planned Date', lblPR: 'Actual Date', lblObs: 'Notes',
+        phEnt: 'Delivery description', phSet: 'Sector', phObs: 'Additional notes',
+        btnCancel: 'Cancel', btnSave: 'Save',
+        confDelete: 'Are you sure you want to delete this task? This action cannot be undone.',
+        confReset: 'Are you sure you want to reset all data to the original state? All changes will be lost.',
+        btnExcluir: 'Delete', btnResetar: 'Reset',
+        tUpdated: 'Field updated', tStatus: 'Status updated to: ', tAdded: 'Task created',
+        tEdited: 'Task updated', tDeleted: 'Task deleted', tReset: 'Data reset to original state',
+        tImported: 'Import completed: ', tTasks: ' task(s) updated', tInvalid: 'Invalid file: field "tarefas" not found',
+        tReadErr: 'Error reading JSON file: ', tExported: 'Data exported successfully (',
+        tExcel: 'Excel exported successfully', tPdf: 'PDF exported successfully',
+        tRestored: 'Data restored from browser', tFill: 'Please fill the Delivery field',
+        tXlsxErr: 'XLSX library not loaded', tPdfErr: 'jsPDF library not loaded',
+        btnImport: 'IMPORT', btnExport: 'EXPORT', btnSave: 'SAVE',
+        pdfTitle: 'Cadaver Lab IBRA / Medartis - Hand and Wrist',
+        pdfSub: 'August 24-25, 2026',
+        pdfGen: 'Generated on: '
+      }
+    };
+
+    function t(k){ return (L[lang] && L[lang][k]) || k; }
+
+    // ============================================================
+    // TRADUÇÕES DE CATEGORIAS
+    // ============================================================
+    var CAT_EN = {
+      'CADÁVERES': 'CADAVERS',
+      'CONTRATOS': 'CONTRACTS',
+      'EQUIPAMENTOS CIRÚRGICOS': 'SURGICAL EQUIPMENT',
+      'EVENTOS': 'EVENTS',
+      'INFRAESTRUTURA': 'INFRASTRUCTURE',
+      'INSCRIÇÕES': 'REGISTRATIONS',
+      'MATERIAIS': 'MATERIALS',
+      'PROFESSORES': 'FACULTY',
+      'PROGRAMA CIENTÍFICO': 'SCIENTIFIC PROGRAM'
+    };
+
+    function catL(c){ return (lang === 'en' && CAT_EN[c]) ? CAT_EN[c] : c; }
+
     // ============================================================
     // ORDEM DAS CATEGORIAS
     // ============================================================
@@ -1068,8 +1180,17 @@
     }
 
     // ============================================================
-    // IMPORTAR DADOS (JSON)
+    // SAVE / IMPORT / EXPORT (Unified)
     // ============================================================
+    function saveData() {
+      try {
+        localStorage.setItem('ibra_hw_tasks', JSON.stringify(tasks));
+        showToast('Dados salvos com sucesso!', 'success');
+      } catch (e) {
+        showToast('Erro ao salvar dados.', 'error');
+      }
+    }
+
     function triggerImport() {
       document.getElementById('fileImport').value = '';
       document.getElementById('fileImport').click();
@@ -1257,6 +1378,57 @@
     }
 
     // ============================================================
+    // TOGGLE IDIOMA
+    // ============================================================
+    function toggleLang(){
+      lang = lang === 'pt' ? 'en' : 'pt';
+      localStorage.setItem('ibra_hw_lang', lang);
+      applyLanguage();
+      updateDashboard();
+      renderTable();
+      populateFilters();
+    }
+
+    function applyLanguage(){
+      document.getElementById('headerTitle').textContent = t('headerTitle');
+      document.getElementById('headerSub').textContent = t('headerSub');
+      document.getElementById('langLabel').textContent = lang === 'pt' ? 'EN' : 'PT';
+      document.getElementById('btnSaveLabel').textContent = t('btnSave');
+      document.getElementById('btnImportLabel').textContent = t('btnImport');
+      document.getElementById('btnExportLabel').textContent = t('btnExport');
+      document.getElementById('dashLabel').textContent = t('dashLabel');
+      document.getElementById('labelNI').textContent = t('labelNI');
+      document.getElementById('labelEA').textContent = t('labelEA');
+      document.getElementById('labelOK').textContent = t('labelOK');
+      document.getElementById('labelAT').textContent = t('labelAT');
+      document.getElementById('progTitle').textContent = t('progTitle');
+      document.getElementById('searchInput').placeholder = t('searchPh');
+      document.getElementById('btnClear').textContent = t('btnClear');
+      document.getElementById('btnResetLabel').textContent = t('btnReset');
+      document.getElementById('btnAdd').textContent = t('btnAdd');
+      document.getElementById('thCat').textContent = t('thCat');
+      document.getElementById('thEnt').textContent = t('thEnt');
+      document.getElementById('thSet').textContent = t('thSet');
+      document.getElementById('thPP').textContent = t('thPP');
+      document.getElementById('thPR').textContent = t('thPR');
+      document.getElementById('thSt').textContent = t('thSt');
+      document.getElementById('thObs').textContent = t('thObs');
+      document.getElementById('thAct').textContent = t('thAct');
+      document.getElementById('lblCat').textContent = t('lblCat');
+      document.getElementById('lblEnt').textContent = t('lblEnt');
+      document.getElementById('lblSet').textContent = t('lblSet');
+      document.getElementById('lblSt').textContent = t('lblSt');
+      document.getElementById('lblPP').textContent = t('lblPP');
+      document.getElementById('lblPR').textContent = t('lblPR');
+      document.getElementById('lblObs').textContent = t('lblObs');
+      document.getElementById('formEntrega').placeholder = t('phEnt');
+      document.getElementById('formResponsavel').placeholder = t('phSet');
+      document.getElementById('formObservacoes').placeholder = t('phObs');
+      document.getElementById('btnCancel').textContent = t('btnCancel');
+      document.getElementById('btnSave').textContent = t('btnSave');
+    }
+
+    // ============================================================
     // FECHAR MODAIS COM ESC E CLICK FORA
     // ============================================================
     document.addEventListener('keydown', e => {
@@ -1280,6 +1452,7 @@
     // INICIALIZAÇÃO
     // ============================================================
     document.addEventListener('DOMContentLoaded', () => {
+      applyLanguage();
       populateFilters();
       renderTable();
       updateDashboard();

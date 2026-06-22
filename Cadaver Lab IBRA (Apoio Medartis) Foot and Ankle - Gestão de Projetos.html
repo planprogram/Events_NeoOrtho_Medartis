@@ -26,6 +26,8 @@
     .btn-header:active{transform:translateY(0)}
     .btn-translate{border:1px solid #7c6dd8;background:rgba(106,90,205,.15);color:#b0a4f0;font-weight:700;letter-spacing:.5px}
     .btn-translate:hover{background:rgba(106,90,205,.28);border-color:#b0a4f0;color:#d0c8ff;transform:translateY(-1px)}
+    .btn-save{border:1px solid #555;background:transparent;color:#ccc}
+    .btn-save:hover{background:rgba(255,255,255,.08);border-color:#777;color:#fff;transform:translateY(-1px)}
     .btn-import{border:1px solid var(--import-border);background:rgba(45,122,110,.1);color:#8fd4c8}
     .btn-import:hover{background:rgba(45,122,110,.2);border-color:#8fd4c8;color:#b0e8de;transform:translateY(-1px)}
     .btn-export-data{border:1px solid var(--export-border);background:rgba(106,90,16,.1);color:#d4c870}
@@ -194,6 +196,10 @@
           <span class="label-text" id="langLabel">EN</span>
         </button>
         <div class="header-sep"></div>
+        <button class="btn-header btn-save" onclick="saveData()" aria-label="Save">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span class="label-text" id="btnSaveLabel">SALVAR</span>
+        </button>
         <button class="btn-header btn-import" onclick="triggerImport()" aria-label="Import">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           <span class="label-text" id="btnImportLabel">IMPORTAR</span>
@@ -612,6 +618,14 @@
 
     function saveToStorage(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(tasks));}catch(e){}}
     function loadFromStorage(){try{var d=localStorage.getItem(STORAGE_KEY);if(d){tasks=JSON.parse(d);nextId=Math.max.apply(null,tasks.map(function(x){return x.id;}).concat([0]))+1;return true;}}catch(e){}return false;}
+    
+    // ============================================================
+    // SAVE / IMPORT / EXPORT (Unified)
+    // ============================================================
+    function saveData() {
+      saveToStorage();
+      showToast('Dados salvos com sucesso!', 'success');
+    }
 
     // ============================================================
     // TOAST
