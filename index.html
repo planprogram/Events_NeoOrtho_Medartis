@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoOrtho Dartis - Project Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* ============================================================
+           CORES NEOORTHO DARTIS
+           Ajuste os HEX abaixo com os valores exatos da sua tabela
+           de cores (Roxo, Azul, Cinza, etc.)
+           ============================================================ */
+        :root {
+            --neo-purple:       #7B2D8E;
+            --neo-purple-dark:  #5A1F6B;
+            --neo-purple-deep:  #3D1550;
+            --neo-purple-light: #A85CC0;
+            --neo-purple-pale:  #F0E4F5;
+            --neo-blue:         #1A3E6B;
+            --neo-blue-light:   #2B6FA8;
+            --neo-blue-pale:    #E8F0F8;
+            --neo-gray-900:     #1A1A2E;
+            --neo-gray-800:     #2D2D3D;
+            --neo-gray-700:     #44445A;
+            --neo-gray-600:     #6B6B80;
+            --neo-gray-400:     #A0A0B0;
+            --neo-gray-200:     #E0E0E8;
+            --neo-gray-100:     #EDEDF2;
+            --neo-gray-50:      #F7F7FA;
+            --neo-bg:           #F4F4F8;
+            --neo-card:         #FFFFFF;
+            --neo-text:         #1A1A2E;
+            --neo-text-muted:   #6B6B80;
+            --neo-border:       #E0E0E8;
+            --neo-success:      #28A745;
+            --neo-warning:      #F0AD4E;
+            --neo-danger:       #DC3545;
+            --neo-sidebar-bg:   #1A1028;
+            --neo-sidebar-hover:#2A1D3A;
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'DM Sans',sans-serif;background:var(--neo-bg);color:var(--neo-text);overflow-x:hidden}
+
+        /* LOADING */
+        #loadingScreen{position:fixed;inset:0;z-index:99999;background:var(--neo-purple-deep);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s}
+        #loadingScreen.hide{opacity:0;pointer-events:none}
+        .loader-ring{width:50px;height:50px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--neo-purple-light);border-radius:50%;animation:spin .8s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loader-text{color:rgba(255,255,255,.5);margin-top:1rem;font-size:.9rem;font-weight:500}
+
+        /* LOGIN */
+        #loginScreen{position:fixed;inset:0;z-index:9999;display:none;background:var(--neo-gray-900);transition:opacity .6s,transform .6s}
+        #loginScreen.visible{display:flex}
+        #loginScreen.hidden{opacity:0;transform:scale(1.05);pointer-events:none}
+        .login-left{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;overflow:hidden;padding:3rem}
+        .login-left::before{content:'';position:absolute;width:550px;height:550px;border-radius:50%;background:radial-gradient(circle,rgba(123,45,142,.3)0%,transparent 70%);top:15%;left:-10%;animation:blobF 8s ease-in-out infinite}
+        .login-left::after{content:'';position:absolute;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(43,111,168,.2)0%,transparent 70%);bottom:10%;right:-5%;animation:blobF 10s ease-in-out infinite reverse}
+        @keyframes blobF{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(25px,-18px) scale(1.05)}66%{transform:translate(-18px,12px) scale(.95)}}
+        .login-brand{position:relative;z-index:1;text-align:center}
+        .login-brand .logo-icon{width:78px;height:78px;background:linear-gradient(135deg,var(--neo-purple),var(--neo-purple-light));border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.9rem;color:#fff;box-shadow:0 12px 40px rgba(123,45,142,.5)}
+        .login-brand h1{font-family:'Space Grotesk',sans-serif;font-size:2.6rem;font-weight:700;color:#fff;letter-spacing:-1px}
+        .login-brand h1 span{color:var(--neo-purple-light)}
+        .login-brand p{color:rgba(255,255,255,.45);margin-top:.4rem;font-size:1rem}
+        .login-particles{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+        .login-particles span{position:absolute;width:3px;height:3px;background:var(--neo-purple-light);border-radius:50%;opacity:.25;animation:pF linear infinite}
+        @keyframes pF{0%{transform:translateY(100vh);opacity:0}10%{opacity:.25}90%{opacity:.25}100%{transform:translateY(-10vh);opacity:0}}
+        .login-right{flex:1;display:flex;align-items:center;justify-content:center;padding:3rem;background:linear-gradient(135deg,#221530,#1A1028)}
+        .login-form-container{width:100%;max-width:390px}
+        .login-form-container h2{font-family:'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:700;color:#fff;margin-bottom:.4rem}
+        .login-form-container .subtitle{color:rgba(255,255,255,.4);font-size:.92rem;margin-bottom:2rem}
+        .form-group{margin-bottom:1.2rem}
+        .form-group label{display:block;font-size:.78rem;font-weight:600;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.8px;margin-bottom:.45rem}
+        .input-wrapper{position:relative}
+        .input-wrapper i{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.25);font-size:.88rem}
+        .form-group input{width:100%;padding:.8rem 1rem .8rem 2.7rem;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.08);border-radius:11px;color:#fff;font-size:.93rem;font-family:'DM Sans',sans-serif;transition:all .3s;outline:none}
+        .form-group input:focus{border-color:var(--neo-purple);background:rgba(123,45,142,.08);box-shadow:0 0 0 3px rgba(123,45,142,.15)}
+        .form-group input::placeholder{color:rgba(255,255,255,.2)}
+        .login-btn{width:100%;padding:.9rem;background:linear-gradient(135deg,var(--neo-purple),var(--neo-purple-light));border:none;border-radius:11px;color:#fff;font-size:.98rem;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .3s;margin-top:.5rem;letter-spacing:.3px}
+        .login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(123,45,142,.45)}
+        .login-btn:active{transform:translateY(0)}
+        .login-error{background:rgba(220,53,69,.12);border:1px solid rgba(220,53,69,.3);color:#F08070;padding:.7rem 1rem;border-radius:10px;font-size:.83rem;margin-bottom:1rem;display:none;align-items:center;gap:.5rem}
+        .login-error.show{display:flex}
+        .login-hint{text-align:center;margin-top:1.5rem;color:rgba(255,255,255,.3);font-size:.8rem}
+        .login-hint code{background:rgba(255,255,255,.07);padding:2px 7px;border-radius:4px;color:var(--neo-purple-light);font-size:.78rem}
+
+        /* APP SHELL */
+        #appScreen{display:none;min-height:100vh}
+        #appScreen.active{display:flex}
+        .sidebar{width:255px;min-height:100vh;background:var(--neo-sidebar-bg);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s}
+        .sidebar-brand{padding:1.4rem 1.2rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid rgba(255,255,255,.05)}
+        .sidebar-brand .s-logo{width:38px;height:38px;background:linear-gradient(135deg,var(--neo-purple),var(--neo-purple-light));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;flex-shrink:0}
+        .sidebar-brand span{font-family:'Space Grotesk',sans-serif;font-weight:700;color:#fff;font-size:1.1rem}
+        .sidebar-brand small{display:block;color:rgba(255,255,255,.3);font-size:.67rem;font-weight:400;letter-spacing:.5px;text-transform:uppercase}
+        .sidebar-nav{flex:1;padding:.8rem .65rem;overflow-y:auto}
+        .nav-label{font-size:.65rem;font-weight:700;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:1.2px;padding:.9rem .75rem .4rem}
+        .nav-item{display:flex;align-items:center;gap:.7rem;padding:.65rem .8rem;border-radius:9px;color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s;font-size:.88rem;font-weight:500;margin-bottom:2px;position:relative}
+        .nav-item:hover{background:var(--neo-sidebar-hover);color:rgba(255,255,255,.8)}
+        .nav-item.active{background:rgba(123,45,142,.2);color:var(--neo-purple-light)}
+        .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:55%;background:var(--neo-purple-light);border-radius:0 3px 3px 0}
+        .nav-item i{width:18px;text-align:center;font-size:.9rem}
+        .nav-item .badge{margin-left:auto;background:var(--neo-purple);color:#fff;font-size:.67rem;font-weight:700;padding:2px 6px;border-radius:20px;min-width:18px;text-align:center}
+        .sidebar-footer{padding:.8rem .65rem;border-top:1px solid rgba(255,255,255,.05)}
+        .sidebar-user{display:flex;align-items:center;gap:.6rem;padding:.6rem .7rem;border-radius:9px;cursor:pointer;transition:background .2s}
+        .sidebar-user:hover{background:var(--neo-sidebar-hover)}
+        .sidebar-user .avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--neo-purple),var(--neo-blue-light));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;flex-shrink:0}
+        .sidebar-user .user-info{flex:1;min-width:0}
+        .sidebar-user .user-info .name{color:#fff;font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .sidebar-user .user-info .role{color:rgba(255,255,255,.3);font-size:.7rem}
+        .sidebar-user .logout-btn{color:rgba(255,255,255,.25);cursor:pointer;padding:5px;border-radius:6px;transition:all .2s}
+        .sidebar-user .logout-btn:hover{color:var(--neo-danger);background:rgba(220,53,69,.1)}
+
+        /* MAIN */
+        .main-content{flex:1;margin-left:255px;min-height:100vh}
+        .topbar{background:var(--neo-card);border-bottom:1px solid var(--neo-border);padding:.8rem 1.8rem;display:flex;align-items:center;gap:.8rem;position:sticky;top:0;z-index:50}
+        .topbar-search{flex:1;max-width:400px;position:relative}
+        .topbar-search input{width:100%;padding:.6rem 1rem .6rem 2.4rem;background:var(--neo-gray-50);border:1.5px solid transparent;border-radius:9px;font-size:.86rem;font-family:'DM Sans',sans-serif;color:var(--neo-text);outline:none;transition:all .3s}
+        .topbar-search input:focus{border-color:var(--neo-purple);background:#fff;box-shadow:0 0 0 3px rgba(123,45,142,.08)}
+        .topbar-search i{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--neo-gray-400);font-size:.82rem}
+        .topbar-actions{display:flex;align-items:center;gap:.45rem;margin-left:auto}
+        .topbar-btn{width:38px;height:38px;border-radius:9px;border:none;background:var(--neo-gray-50);color:var(--neo-gray-600);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.95rem;transition:all .2s;position:relative}
+        .topbar-btn:hover{background:var(--neo-gray-100);color:var(--neo-purple)}
+        .topbar-btn .notif-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--neo-purple);border-radius:50%;border:2px solid var(--neo-card)}
+        .btn-primary{display:inline-flex;align-items:center;gap:.45rem;padding:.6rem 1.15rem;background:linear-gradient(135deg,var(--neo-purple),var(--neo-purple-light));border:none;border-radius:9px;color:#fff;font-size:.86rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .3s;white-space:nowrap}
+        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(123,45,142,.35)}
+        .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+        .btn-secondary{padding:.6rem 1.15rem;border-radius:9px;border:1.5px solid var(--neo-border);background:var(--neo-card);color:var(--neo-gray-600);font-size:.86rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+        .btn-secondary:hover{border-color:var(--neo-gray-400);color:var(--neo-text)}
+        .btn-danger{padding:.6rem 1.4rem;border-radius:9px;border:none;background:var(--neo-danger);color:#fff;font-size:.86rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+        .btn-danger:hover{background:#C82333;transform:translateY(-1px)}
+
+        /* PAGES */
+        .page-content{padding:1.8rem}
+        .page-header{margin-bottom:1.8rem}
+        .page-header h2{font-family:'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:700;color:var(--neo-text);margin-bottom:.25rem}
+        .page-header p{color:var(--neo-text-muted);font-size:.92rem}
+        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.15rem;margin-bottom:1.8rem}
+        .stat-card{background:var(--neo-card);border-radius:13px;padding:1.25rem;border:1px solid var(--neo-border);transition:all .3s;position:relative;overflow:hidden}
+        .stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--neo-purple),var(--neo-purple-light));opacity:0;transition:opacity .3s}
+        .stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(26,26,46,.07)}
+        .stat-card:hover::after{opacity:1}
+        .stat-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:.8rem}
+        .stat-value{font-family:'Space Grotesk',sans-serif;font-size:1.75rem;font-weight:700;color:var(--neo-text);line-height:1}
+        .stat-label{font-size:.8rem;color:var(--neo-text-muted);margin-top:.25rem}
+        .filter-bar{display:flex;align-items:center;gap:.4rem;margin-bottom:1.4rem;flex-wrap:wrap}
+        .filter-tab{padding:.45rem 1rem;border-radius:7px;border:1.5px solid var(--neo-border);background:var(--neo-card);color:var(--neo-gray-600);font-size:.83rem;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+        .filter-tab:hover{border-color:var(--neo-purple);color:var(--neo-purple)}
+        .filter-tab.active{background:var(--neo-purple);border-color:var(--neo-purple);color:#fff}
+
+        /* PROJECT CARDS */
+        .projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:1.15rem}
+        .project-card{background:var(--neo-card);border-radius:13px;border:1px solid var(--neo-border);overflow:hidden;transition:all .35s;cursor:pointer;position:relative}
+        .project-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(26,26,46,.09);border-color:var(--neo-purple)}
+        .project-card-cover{height:150px;background-size:cover;background-position:center;position:relative}
+        .project-card-cover::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(26,16,40,.65),transparent 55%)}
+        .status-badge{position:absolute;top:10px;right:10px;z-index:2;padding:3px 9px;border-radius:5px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+        .status-badge.active{background:rgba(40,167,69,.9);color:#fff}
+        .status-badge.paused{background:rgba(240,173,78,.9);color:#333}
+        .status-badge.completed{background:rgba(43,111,168,.9);color:#fff}
+        .status-badge.draft{background:rgba(255,255,255,.85);color:var(--neo-text)}
+        .project-card-body{padding:1.1rem 1.15rem 1.15rem}
+        .project-category{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--neo-purple);margin-bottom:.3rem}
+        .project-card-body h3{font-family:'Space Grotesk',sans-serif;font-size:1.08rem;font-weight:700;color:var(--neo-text);margin-bottom:.35rem;line-height:1.3}
+        .project-desc{font-size:.83rem;color:var(--neo-text-muted);line-height:1.5;margin-bottom:.9rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+        .project-card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.8rem;border-top:1px solid var(--neo-border)}
+        .project-avatars{display:flex}
+        .p-avatar{width:28px;height:28px;border-radius:7px;border:2px solid var(--neo-card);margin-right:-7px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:#fff}
+        .p-avatar.more{background:var(--neo-gray-100);color:var(--neo-gray-600)}
+        .project-date{font-size:.76rem;color:var(--neo-text-muted)}
+        .project-card-actions{position:absolute;top:10px;left:10px;z-index:2;display:flex;gap:5px;opacity:0;transition:opacity .25s}
+        .project-card:hover .project-card-actions{opacity:1}
+        .card-act-btn{width:30px;height:30px;border-radius:7px;border:none;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .2s}
+        .card-act-btn:hover{background:var(--neo-purple)}
+        .card-act-btn.del:hover{background:var(--neo-danger)}
+
+        /* PEOPLE CARDS */
+        .people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.15rem}
+        .people-card{background:var(--neo-card);border-radius:13px;border:1px solid var(--neo-border);padding:1.4rem;text-align:center;transition:all .3s}
+        .people-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(26,26,46,.07)}
+        .p-big-avatar{width:60px;height:60px;border-radius:14px;margin:0 auto .9rem;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;color:#fff}
+        .people-card h4{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:var(--neo-text);margin-bottom:.1rem}
+        .people-card .p-email{font-size:.8rem;color:var(--neo-text-muted);margin-bottom:.7rem}
+        .p-role-badge{display:inline-block;padding:3px 11px;border-radius:5px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:.9rem}
+        .p-role-badge.admin{background:rgba(123,45,142,.1);color:var(--neo-purple)}
+        .p-role-badge.editor{background:rgba(43,111,168,.1);color:var(--neo-blue-light)}
+        .p-role-badge.viewer{background:rgba(107,107,128,.1);color:var(--neo-gray-600)}
+        .people-card .p-count{font-size:.78rem;color:var(--neo-text-muted)}
+        .people-card .p-count strong{color:var(--neo-text)}
+
+        /* MODALS */
+        .modal-overlay{position:fixed;inset:0;background:rgba(26,16,40,.55);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem;animation:mFI .2s ease}
+        .modal-overlay.show{display:flex}
+        @keyframes mFI{from{opacity:0}to{opacity:1}}
+        .modal{background:var(--neo-card);border-radius:16px;width:100%;max-width:540px;max-height:85vh;overflow-y:auto;box-shadow:0 25px 70px rgba(0,0,0,.25);animation:mSU .3s ease}
+        @keyframes mSU{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+        .modal-header{padding:1.4rem 1.4rem 0;display:flex;align-items:center;justify-content:space-between}
+        .modal-header h3{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;font-weight:700}
+        .modal-close{width:34px;height:34px;border-radius:9px;border:none;background:var(--neo-gray-50);color:var(--neo-gray-600);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.95rem;transition:all .2s}
+        .modal-close:hover{background:var(--neo-danger);color:#fff}
+        .modal-body{padding:1.15rem 1.4rem 1.4rem}
+        .mf-group{margin-bottom:1rem}
+        .mf-group label{display:block;font-size:.8rem;font-weight:600;color:var(--neo-text);margin-bottom:.35rem}
+        .mf-group input,.mf-group select,.mf-group textarea{width:100%;padding:.65rem .85rem;border:1.5px solid var(--neo-border);border-radius:9px;font-size:.88rem;font-family:'DM Sans',sans-serif;color:var(--neo-text);background:#fff;outline:none;transition:all .2s}
+        .mf-group input:focus,.mf-group select:focus,.mf-group textarea:focus{border-color:var(--neo-purple);box-shadow:0 0 0 3px rgba(123,45,142,.08)}
+        .mf-group textarea{resize:vertical;min-height:75px}
+        .mf-row{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+        .modal-actions{display:flex;gap:.65rem;justify-content:flex-end;margin-top:.4rem}
+
+        /* PERMISSIONS */
+        .perm-title{font-size:.8rem;font-weight:600;color:var(--neo-text);margin-bottom:.55rem;display:flex;align-items:center;gap:.35rem}
+        .perm-title i{color:var(--neo-purple);font-size:.82rem}
+        .perm-list{display:flex;flex-direction:column;gap:.45rem}
+        .perm-item{display:flex;align-items:center;gap:.65rem;padding:.55rem .75rem;background:var(--neo-gray-50);border-radius:9px;border:1px solid var(--neo-border);transition:all .2s}
+        .perm-item:hover{border-color:var(--neo-purple)}
+        .perm-av{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:#fff;flex-shrink:0}
+        .perm-nm{flex:1;font-size:.85rem;font-weight:500}
+        .perm-sel{padding:.3rem .55rem;border:1.5px solid var(--neo-border);border-radius:6px;font-size:.76rem;font-family:'DM Sans',sans-serif;color:var(--neo-text);background:#fff;outline:none;cursor:pointer}
+        .perm-sel:focus{border-color:var(--neo-purple)}
+        .perm-rm{width:26px;height:26px;border-radius:6px;border:none;background:transparent;color:var(--neo-gray-400);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.72rem;transition:all .2s}
+        .perm-rm:hover{background:rgba(220,53,69,.1);color:var(--neo-danger)}
+        .add-perm-btn{display:flex;align-items:center;gap:.45rem;padding:.5rem .8rem;border:1.5px dashed var(--neo-border);border-radius:9px;background:transparent;color:var(--neo-gray-600);font-size:.8rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;margin-top:.45rem;width:100%;justify-content:center}
+        .add-perm-btn:hover{border-color:var(--neo-purple);color:var(--neo-purple);background:rgba(123,45,142,.03)}
+        .dd-menu{position:absolute;bottom:calc(100% + 5px);left:0;min-width:210px;background:var(--neo-card);border:1px solid var(--neo-border);border-radius:11px;box-shadow:0 10px 35px rgba(0,0,0,.14);z-index:10;display:none;overflow:hidden}
+        .dd-menu.show{display:block;animation:mSU .2s ease}
+        .dd-search{padding:.5rem;border-bottom:1px solid var(--neo-border)}
+        .dd-search input{width:100%;padding:.45rem .6rem;border:1px solid var(--neo-border);border-radius:6px;font-size:.8rem;font-family:'DM Sans',sans-serif;outline:none}
+        .dd-search input:focus{border-color:var(--neo-purple)}
+        .dd-item{display:flex;align-items:center;gap:.55rem;padding:.55rem .8rem;cursor:pointer;transition:background .15s;font-size:.83rem}
+        .dd-item:hover{background:var(--neo-gray-50)}
+        .dd-av{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:#fff;flex-shrink:0}
+
+        /* CONFIRM */
+        .confirm-dialog{text-align:center;padding:.8rem 0}
+        .confirm-dialog i{font-size:2.3rem;color:var(--neo-danger);margin-bottom:.9rem}
+        .confirm-dialog h4{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:.4rem}
+        .confirm-dialog p{color:var(--neo-text-muted);font-size:.88rem;margin-bottom:1.3rem}
+        .confirm-actions{display:flex;gap:.65rem;justify-content:center}
+
+        /* EMPTY */
+        .empty-state{text-align:center;padding:3.5rem 2rem;grid-column:1/-1}
+        .empty-state i{font-size:2.8rem;color:var(--neo-gray-200);margin-bottom:.9rem}
+        .empty-state h3{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;color:var(--neo-text);margin-bottom:.35rem}
+        .empty-state p{color:var(--neo-text-muted);font-size:.88rem}
+
+        /* TOAST */
+        .toast-container{position:fixed;top:1.3rem;right:1.3rem;z-index:2000;display:flex;flex-direction:column;gap:.4rem}
+        .toast{padding:.8rem 1.1rem;border-radius:11px;background:var(--neo-card);border:1px solid var(--neo-border);box-shadow:0 10px 35px rgba(0,0,0,.14);display:flex;align-items:center;gap:.6rem;font-size:.86rem;font-weight:500;animation:tIn .3s ease;min-width:260px}
+        .toast.success{border-left:4px solid var(--neo-success)}
+        .toast.error{border-left:4px solid var(--neo-danger)}
+        .toast.info{border-left:4px solid var(--neo-purple)}
+        .toast.removing{animation:tOut .3s ease forwards}
+        @keyframes tIn{from{opacity:0;transform:translateX(35px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes tOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(35px)}}
+
+        /* SYNC */
+        .sync-ind{display:inline-flex;align-items:center;gap:.3rem;font-size:.68rem;color:rgba(255,255,255,.25);margin-left:.4rem}
+        .sync-dot{width:5px;height:5px;border-radius:50%;background:var(--neo-success);animation:pls 2s ease-in-out infinite}
+        @keyframes pls{0%,100%{opacity:1}50%{opacity:.3}}
+
+        /* SECTIONS */
+        .page-section{display:none}
+        .page-section.active{display:block}
+        ::-webkit-scrollbar{width:5px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:rgba(123,45,142,.2);border-radius:3px}
+        ::-webkit-scrollbar-thumb:hover{background:rgba(123,45,142,.35)}
+        .mobile-menu-btn{display:none!important}
+        @media(max-width:1024px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:768px){
+            .login-left{display:none}
+            .sidebar{transform:translateX(-100%)}
+            .sidebar.mobile-open{transform:translateX(0)}
+            .main-content{margin-left:0}
+            .stats-grid{grid-template-columns:1fr 1fr}
+            .projects-grid{grid-template-columns:1fr}
+            .mf-row{grid-template-columns:1fr}
+            .topbar{padding:.8rem 1rem}
+            .page-content{padding:1.15rem}
+            .mobile-menu-btn{display:flex!important}
+        }
+    </style>
+</head>
+<body>
+
+<div id="loadingScreen"><div class="loader-ring"></div><div class="loader-text">Connecting to database...</div></div>
+
+<div id="loginScreen">
+    <div class="login-left">
+        <div class="login-particles" id="loginParticles"></div>
+        <div class="login-brand">
+            <div class="logo-icon"><i class="fas fa-cubes"></i></div>
+            <h1>Neo<span>Ortho</span></h1>
+            <p>Dartis Project Hub</p>
+        </div>
+    </div>
+    <div class="login-right">
+        <div class="login-form-container">
+            <h2>Welcome back</h2>
+            <p class="subtitle">Sign in to manage your projects</p>
+            <div class="login-error" id="loginError"><i class="fas fa-exclamation-circle"></i><span>Invalid credentials. Try again.</span></div>
+            <form id="loginForm">
+                <div class="form-group"><label>Email</label><div class="input-wrapper"><i class="fas fa-envelope"></i><input type="email" id="loginEmail" placeholder="you@neoortho.com" autocomplete="email"></div></div>
+                <div class="form-group"><label>Password</label><div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password"></div></div>
+                <button type="submit" class="login-btn">Sign In</button>
+            </form>
+            <p class="login-hint">Demo: <code>admin@neoortho.com</code> / <code>admin123</code></p>
+        </div>
+    </div>
+</div>
+
+<div id="appScreen">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><div class="s-logo"><i class="fas fa-cubes"></i></div><div><span>NeoOrtho</span><small>Dartis Hub</small></div></div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Main</div>
+            <div class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')"><i class="fas fa-th-large"></i> Dashboard</div>
+            <div class="nav-item" data-page="projects" onclick="switchPage('projects')"><i class="fas fa-folder-open"></i> All Projects <span class="badge" id="projectCount">0</span></div>
+            <div class="nav-item" data-page="people" onclick="switchPage('people')"><i class="fas fa-users"></i> People</div>
+            <div class="nav-label">Quick Filters</div>
+            <div class="nav-item" data-page="active" onclick="filterByStatus('active')"><i class="fas fa-bolt"></i> Active</div>
+            <div class="nav-item" data-page="completed" onclick="filterByStatus('completed')"><i class="fas fa-check-circle"></i> Completed</div>
+            <div class="nav-item" data-page="draft" onclick="filterByStatus('draft')"><i class="fas fa-pencil-alt"></i> Drafts</div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" id="sidebarAvatar">AD</div>
+                <div class="user-info"><div class="name" id="sidebarName">Admin</div><div class="role">Administrator <span class="sync-ind"><span class="sync-dot"></span>synced</span></div></div>
+                <div class="logout-btn" onclick="logout()" title="Sign Out"><i class="fas fa-sign-out-alt"></i></div>
+            </div>
+        </div>
+    </aside>
+    <main class="main-content">
+        <header class="topbar">
+            <button class="topbar-btn mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="topbar-search"><i class="fas fa-search"></i><input type="text" placeholder="Search projects, people..." id="globalSearch" oninput="handleSearch(this.value)"></div>
+            <div class="topbar-actions">
+                <button class="btn-primary" onclick="openProjectModal()"><i class="fas fa-plus"></i> New Project</button>
+                <button class="topbar-btn" title="Notifications"><i class="fas fa-bell"></i><span class="notif-dot"></span></button>
+            </div>
+        </header>
+        <section class="page-section active" id="page-dashboard"><div class="page-content"><div class="page-header"><h2>Dashboard</h2><p>Overview of all your projects and team activity</p></div><div class="stats-grid" id="statsGrid"></div><div class="filter-bar" id="dashFilters"><button class="filter-tab active" onclick="setFilter('all',this)">All</button><button class="filter-tab" onclick="setFilter('active',this)">Active</button><button class="filter-tab" onclick="setFilter('paused',this)">Paused</button><button class="filter-tab" onclick="setFilter('completed',this)">Completed</button><button class="filter-tab" onclick="setFilter('draft',this)">Draft</button></div><div class="projects-grid" id="dashboardProjects"></div></div></section>
+        <section class="page-section" id="page-projects"><div class="page-content"><div class="page-header"><h2>All Projects</h2><p>Complete catalog of your projects</p></div><div class="filter-bar" id="allFilters"><button class="filter-tab active" onclick="setFilter('all',this)">All</button><button class="filter-tab" onclick="setFilter('active',this)">Active</button><button class="filter-tab" onclick="setFilter('paused',this)">Paused</button><button class="filter-tab" onclick="setFilter('completed',this)">Completed</button><button class="filter-tab" onclick="setFilter('draft',this)">Draft</button></div><div class="projects-grid" id="allProjects"></div></div></section>
+        <section class="page-section" id="page-people"><div class="page-content"><div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;"><div><h2>People</h2><p>Manage team members and their project access</p></div><button class="btn-primary" onclick="openPeopleModal()"><i class="fas fa-user-plus"></i> Add Person</button></div><div class="people-grid" id="peopleGrid"></div></div></section>
+        <section class="page-section" id="page-active"><div class="page-content"><div class="page-header"><h2>Active Projects</h2><p>Currently in progress</p></div><div class="projects-grid" id="activeProjects"></div></div></section>
+        <section class="page-section" id="page-completed"><div class="page-content"><div class="page-header"><h2>Completed Projects</h2><p>Finished projects</p></div><div class="projects-grid" id="completedProjects"></div></div></section>
+        <section class="page-section" id="page-draft"><div class="page-content"><div class="page-header"><h2>Draft Projects</h2><p>Still being planned</p></div><div class="projects-grid" id="draftProjects"></div></div></section>
+    </main>
+</div>
+
+<!-- PROJECT MODAL -->
+<div class="modal-overlay" id="projectModal"><div class="modal"><div class="modal-header"><h3 id="projectModalTitle">New Project</h3><button class="modal-close" onclick="closeModal('projectModal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="projectForm" onsubmit="saveProject(event)"><input type="hidden" id="projectId"><div class="mf-group"><label>Project Name</label><input type="text" id="projectName" placeholder="e.g. 3D Bracket Design v2" required></div><div class="mf-row"><div class="mf-group"><label>Category</label><select id="projectCategory"><option value="Design">Design</option><option value="Engineering">Engineering</option><option value="Research">Research</option><option value="Software">Software</option><option value="Marketing">Marketing</option><option value="Clinical">Clinical</option><option value="Other">Other</option></select></div><div class="mf-group"><label>Status</label><select id="projectStatus"><option value="active">Active</option><option value="paused">Paused</option><option value="completed">Completed</option><option value="draft">Draft</option></select></div></div><div class="mf-group"><label>Description</label><textarea id="projectDesc" placeholder="Brief description..."></textarea></div><div style="margin-top:.3rem"><div class="perm-title"><i class="fas fa-shield-alt"></i> Access & Permissions</div><div class="perm-list" id="permList"></div><div style="position:relative;width:100%" id="addPermWrap"><button type="button" class="add-perm-btn" onclick="togglePermDD()"><i class="fas fa-user-plus"></i> Add person to this project</button><div class="dd-menu" id="permDD"><div class="dd-search"><input type="text" placeholder="Search people..." id="permSearchIn" oninput="filterPermDD(this.value)"></div><div id="permDDList"></div></div></div></div><div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeModal('projectModal')">Cancel</button><button type="submit" class="btn-primary" id="projectSubmitBtn">Save Project</button></div></form></div></div></div>
+
+<!-- PEOPLE MODAL -->
+<div class="modal-overlay" id="peopleModal"><div class="modal" style="max-width:440px"><div class="modal-header"><h3 id="peopleModalTitle">Add Person</h3><button class="modal-close" onclick="closeModal('peopleModal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="peopleForm" onsubmit="savePerson(event)"><input type="hidden" id="personId"><div class="mf-group"><label>Full Name</label><input type="text" id="personName" placeholder="e.g. Maria Silva" required></div><div class="mf-group"><label>Email</label><input type="email" id="personEmail" placeholder="e.g. maria@neoortho.com" required></div><div class="mf-group"><label>Global Role</label><select id="personRole"><option value="viewer">Viewer — Can only view</option><option value="editor">Editor — Can view and edit</option><option value="admin">Admin — Full access</option></select></div><div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeModal('peopleModal')">Cancel</button><button type="submit" class="btn-primary">Save Person</button></div></form></div></div></div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal"><div class="modal" style="max-width:390px"><div class="modal-body"><div class="confirm-dialog"><i class="fas fa-exclamation-triangle"></i><h4 id="confirmTitle">Delete?</h4><p id="confirmMsg">This cannot be undone.</p><div class="confirm-actions"><button class="btn-secondary" onclick="closeModal('confirmModal')">Cancel</button><button class="btn-danger" id="confirmBtn" onclick="confirmAction()">Delete</button></div></div></div></div></div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal"><div class="modal" style="max-width:620px"><div class="modal-header"><h3>Project Details</h3><button class="modal-close" onclick="closeModal('detailModal')"><i class="fas fa-times"></i></button></div><div class="modal-body" id="detailContent"></div></div></div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ================================================================
+   FIREBASE REALTIME DATABASE — REST API (sem SDK)
+   https://neoorthomedartis-default-rtdb.firebaseio.com/
+   ================================================================ */
+const FB = 'https://neoorthomedartis-default-rtdb.firebaseio.com';
+
+async function fbGet(path) {
+    const r = await fetch(`${FB}/${path}.json`);
+    return await r.json();
+}
+async function fbPost(path, data) {
+    const r = await fetch(`${FB}/${path}.json`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+    });
+    return (await r.json()).name;
+}
+async function fbPatch(path, data) {
+    await fetch(`${FB}/${path}.json`, {
+        method: 'PATCH', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+    });
+}
+async function fbPut(path, data) {
+    await fetch(`${FB}/${path}.json`, {
+        method: 'PUT', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+    });
+}
+async function fbDelete(path) {
+    await fetch(`${FB}/${path}.json`, { method: 'DELETE' });
+}
+
+/* Objeto Firebase → Array com chave _fbKey */
+function toArray(obj) {
+    if (!obj) return [];
+    if (Array.isArray(obj)) return obj.filter(Boolean);
+    return Object.entries(obj).map(([k,v]) => ({_fbKey:k,...v})).filter(Boolean);
+}
+
+/* Permissões de um projeto → array */
+function getPerms(pr) {
+    if (!pr || !pr.permissions) return [];
+    return toArray(pr.permissions);
+}
+
+/* ================================================================
+   ESTADO
+   ================================================================ */
+const COLORS = ['#7B2D8E','#1A3E6B','#28A745','#E67E22','#DC3545','#F0AD4E','#16A085','#2980B9','#8E44AD','#D35400'];
+const COVERS = Array.from({length:12},(_,i) => `https://picsum.photos/seed/neodart${i+1}/600/300.jpg`);
+
+let people = [], projects = [];
+let currentFilter = 'all', searchQuery = '';
+let tempPermissions = [], pendingConfirmAction = null;
+
+/* Dados seed caso banco vazio */
+function seedPeople() {
+    return {
+        p1:{name:'Carlos Mendes',email:'carlos@neoortho.com',role:'admin',color:COLORS[0]},
+        p2:{name:'Ana Beatriz',email:'ana@neoortho.com',role:'editor',color:COLORS[1]},
+        p3:{name:'Rafael Costa',email:'rafael@neoortho.com',role:'editor',color:COLORS[2]},
+        p4:{name:'Juliana Ferreira',email:'juliana@neoortho.com',role:'viewer',color:COLORS[3]},
+        p5:{name:'Pedro Almeida',email:'pedro@neoortho.com',role:'viewer',color:COLORS[4]},
+        p6:{name:'Luciana Souza',email:'luciana@neoortho.com',role:'editor',color:COLORS[5]}
+    };
+}
+function seedProjects() {
+    return {
+        pr1:{name:'3D Bracket Design v2',category:'Design',status:'active',desc:'Redesign of the self-ligating bracket with improved torque control and reduced profile for better patient comfort.',cover:COVERS[0],date:'2024-12-10',permissions:{a:{personId:'p1',role:'editor'},b:{personId:'p2',role:'editor'},c:{personId:'p4',role:'viewer'}}},
+        pr2:{name:'AI Treatment Planner',category:'Software',status:'active',desc:'Machine learning model to predict optimal tooth movement sequences based on cephalometric analysis.',cover:COVERS[1],date:'2024-11-28',permissions:{d:{personId:'p1',role:'editor'},e:{personId:'p3',role:'editor'},f:{personId:'p5',role:'viewer'}}},
+        pr3:{name:'NiTi Wire Thermal Study',category:'Research',status:'completed',desc:'Comparative analysis of superelastic NiTi wires under different thermal cycling conditions for orthodontic force delivery.',cover:COVERS[2],date:'2024-10-15',permissions:{g:{personId:'p1',role:'editor'},h:{personId:'p6',role:'editor'},i:{personId:'p4',role:'viewer'}}},
+        pr4:{name:'Patient App Redesign',category:'Software',status:'paused',desc:'Complete UX overhaul of the patient-facing mobile application with new appointment scheduling and progress tracking features.',cover:COVERS[3],date:'2024-11-05',permissions:{j:{personId:'p2',role:'editor'},k:{personId:'p3',role:'viewer'}}},
+        pr5:{name:'Clear Aligner Material Test',category:'Research',status:'active',desc:'Testing new multi-layer polymer composition for improved stress retention and optical clarity in clear aligners.',cover:COVERS[4],date:'2024-12-01',permissions:{l:{personId:'p1',role:'editor'},m:{personId:'p6',role:'editor'},n:{personId:'p5',role:'viewer'},o:{personId:'p4',role:'viewer'}}},
+        pr6:{name:'Clinic Dashboard Analytics',category:'Software',status:'draft',desc:'Business intelligence dashboard for clinic managers to track patient flow, revenue metrics, and treatment efficiency.',cover:COVERS[5],date:'2024-12-18',permissions:{p:{personId:'p1',role:'editor'},q:{personId:'p3',role:'editor'}}}
+    };
+}
+
+/* ================================================================
+   CARREGAR DADOS DO FIREBASE
+   ================================================================ */
+async function loadData() {
+    try {
+        let p = await fbGet('people');
+        let pr = await fbGet('projects');
+        if (!p || (typeof p === 'object' && Object.keys(p).length === 0)) {
+            await fbPut('people', seedPeople());
+            p = seedPeople();
+        }
+        if (!pr || (typeof pr === 'object' && Object.keys(pr).length === 0)) {
+            await fbPut('projects', seedProjects());
+            pr = seedProjects();
+        }
+        people = toArray(p);
+        projects = toArray(pr);
+    } catch(err) {
+        console.error('Firebase error:', err);
+        showToast('Database connection failed. Using local data.', 'error');
+        people = toArray(seedPeople());
+        projects = toArray(seedProjects());
+    }
+}
+
+/* ================================================================
+   LOGIN
+   ================================================================ */
+(function(){
+    const c = document.getElementById('loginParticles');
+    for(let i=0;i<25;i++){
+        const s = document.createElement('span');
+        s.style.left = Math.random()*100+'%';
+        s.style.animationDuration = (7+Math.random()*10)+'s';
+        s.style.animationDelay = Math.random()*8+'s';
+        const sz = 2+Math.random()*3;
+        s.style.width = s.style.height = sz+'px';
+        c.appendChild(s);
+    }
+})();
+
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const em = document.getElementById('loginEmail').value.trim();
+    const pw = document.getElementById('loginPassword').value;
+    if (em === 'admin@neoortho.com' && pw === 'admin123') {
+        document.getElementById('loginError').classList.remove('show');
+        document.getElementById('loginScreen').classList.add('hidden');
+        setTimeout(() => {
+            document.getElementById('loginScreen').classList.remove('visible');
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appScreen').classList.add('active');
+            renderAll();
+        }, 600);
+    } else {
+        document.getElementById('loginError').classList.add('show');
+        document.getElementById('loginPassword').value = '';
+    }
+});
+
+function logout() {
+    document.getElementById('appScreen').classList.remove('active');
+    document.getElementById('loginScreen').style.display = 'flex';
+    setTimeout(() => {
+        document.getElementById('loginScreen').classList.add('visible');
+        document.getElementById('loginScreen').classList.remove('hidden');
+    }, 10);
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+}
+
+/* ================================================================
+   NAVEGAÇÃO
+   ================================================================ */
+function switchPage(page) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const sec = document.getElementById('page-'+page);
+    if(sec) sec.classList.add('active');
+    const ni = document.querySelector(`.nav-item[data-page="${page}"]`);
+    if(ni) ni.classList.add('active');
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    if(['dashboard','projects'].includes(page)) currentFilter = 'all';
+    renderAll();
+}
+function filterByStatus(st) { switchPage(st); currentFilter = st; renderProjectGrids(); }
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('mobile-open'); }
+
+/* ================================================================
+   RENDER
+   ================================================================ */
+function renderAll() { renderStats(); renderProjectGrids(); renderPeople(); document.getElementById('projectCount').textContent = projects.length; }
+
+function getFiltered() {
+    let f = [...projects];
+    if(currentFilter!=='all') f = f.filter(p=>p.status===currentFilter);
+    if(searchQuery) { const q=searchQuery.toLowerCase(); f=f.filter(p=>p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q)||(p.desc||'').toLowerCase().includes(q)); }
+    return f;
+}
+
+function renderStats() {
+    document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card"><div class="stat-icon" style="background:rgba(123,45,142,.1);color:var(--neo-purple)"><i class="fas fa-folder-open"></i></div><div class="stat-value">${projects.length}</div><div class="stat-label">Total Projects</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:rgba(40,167,69,.1);color:var(--neo-success)"><i class="fas fa-bolt"></i></div><div class="stat-value">${projects.filter(p=>p.status==='active').length}</div><div class="stat-label">Active</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:rgba(43,111,168,.1);color:var(--neo-blue-light)"><i class="fas fa-check-circle"></i></div><div class="stat-value">${projects.filter(p=>p.status==='completed').length}</div><div class="stat-label">Completed</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:rgba(230,126,34,.1);color:#E67E22"><i class="fas fa-users"></i></div><div class="stat-value">${people.length}</div><div class="stat-label">Team Members</div></div>`;
+}
+
+function initials(name) { return name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(); }
+
+function findPerson(id) { return people.find(p=>p._fbKey===id||p.id===id); }
+
+function cardHtml(pr) {
+    const perms = getPerms(pr);
+    const avs = perms.slice(0,3).map(pm => {
+        const ps = findPerson(pm.personId);
+        if(!ps) return '';
+        return `<div class="p-avatar" style="background:${ps.color}" title="${ps.name}">${initials(ps.name)}</div>`;
+    }).join('');
+    const more = perms.length>3 ? `<div class="p-avatar more">+${perms.length-3}</div>` : '';
+    return `<div class="project-card" onclick="openDetail('${pr._fbKey}')">
+        <div class="project-card-cover" style="background-image:url('${pr.cover||COVERS[0]}')">
+            <span class="status-badge ${pr.status}">${pr.status}</span>
+            <div class="project-card-actions">
+                <button class="card-act-btn" onclick="event.stopPropagation();editProject('${pr._fbKey}')" title="Edit"><i class="fas fa-pen"></i></button>
+                <button class="card-act-btn del" onclick="event.stopPropagation();deleteProject('${pr._fbKey}')" title="Delete"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+        <div class="project-card-body">
+            <div class="project-category">${pr.category}</div>
+            <h3>${pr.name}</h3>
+            <p class="project-desc">${pr.desc||''}</p>
+            <div class="project-card-footer"><div class="project-avatars">${avs}${more}</div><div class="project-date">${fmtDate(pr.date)}</div></div>
+        </div></div>`;
+}
+
+function emptyHtml(msg) { return `<div class="empty-state"><i class="fas fa-folder-open"></i><h3>No projects found</h3><p>${msg}</p></div>`; }
+
+function renderProjectGrids() {
+    const f = getFiltered();
+    const h = f.length ? f.map(cardHtml).join('') : emptyHtml('Try changing filters or create a new project');
+    document.getElementById('dashboardProjects').innerHTML = h;
+    document.getElementById('allProjects').innerHTML = h;
+    ['active','completed','draft'].forEach(st => {
+        const sp = projects.filter(p=>p.status===st);
+        const el = document.getElementById(st+'Projects');
+        if(el) el.innerHTML = sp.length ? sp.map(cardHtml).join('') : emptyHtml(`No ${st} projects yet`);
+    });
+}
+
+function renderPeople() {
+    document.getElementById('peopleGrid').innerHTML = people.map(p => {
+        const cnt = projects.filter(pr => getPerms(pr).some(pm => pm.personId===p._fbKey || pm.personId===p.id)).length;
+        return `<div class="people-card">
+            <div class="p-big-avatar" style="background:${p.color}">${initials(p.name)}</div>
+            <h4>${p.name}</h4><div class="p-email">${p.email}</div>
+            <span class="p-role-badge ${p.role}">${p.role}</span>
+            <div class="p-count"><strong>${cnt}</strong> projects assigned</div>
+            <div style="margin-top:.9rem;display:flex;gap:.45rem;justify-content:center">
+                <button class="btn-secondary" style="padding:.35rem .75rem;font-size:.78rem" onclick="editPerson('${p._fbKey}')"><i class="fas fa-pen" style="margin-right:3px"></i>Edit</button>
+                <button class="btn-secondary" style="padding:.35rem .75rem;font-size:.78rem;color:var(--neo-danger);border-color:rgba(220,53,69,.3)" onclick="deletePerson('${p._fbKey}')"><i class="fas fa-trash" style="margin-right:3px"></i>Remove</button>
+            </div></div>`;
+    }).join('');
+}
+
+/* ================================================================
+   FILTERS & SEARCH
+   ================================================================ */
+function setFilter(f,btn) { currentFilter=f; btn.closest('.filter-bar').querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); renderProjectGrids(); }
+function handleSearch(q) { searchQuery=q; renderProjectGrids(); }
+
+/* ================================================================
+   PROJECT CRUD → FIREBASE
+   ================================================================ */
+async function openProjectModal(fbKey) {
+    document.getElementById('projectForm').reset();
+    document.getElementById('projectId').value = '';
+    if(fbKey) {
+        const pr = projects.find(p=>p._fbKey===fbKey);
+        if(!pr) return;
+        document.getElementById('projectModalTitle').textContent = 'Edit Project';
+        document.getElementById('projectId').value = fbKey;
+        document.getElementById('projectName').value = pr.name;
+        document.getElementById('projectCategory').value = pr.category;
+        document.getElementById('projectStatus').value = pr.status;
+        document.getElementById('projectDesc').value = pr.desc||'';
+        tempPermissions = getPerms(pr).map(pm=>({personId:pm.personId,role:pm.role}));
+    } else {
+        document.getElementById('projectModalTitle').textContent = 'New Project';
+        tempPermissions = [];
+    }
+    renderPermList();
+    document.getElementById('projectModal').classList.add('show');
+}
+function editProject(k) { openProjectModal(k); }
+
+async function saveProject(e) {
+    e.preventDefault();
+    const btn = document.getElementById('projectSubmitBtn');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    const fbKey = document.getElementById('projectId').value;
+    const permObj = {};
+    tempPermissions.forEach((pm,i) => { permObj['p'+i] = {personId:pm.personId,role:pm.role}; });
+    const data = {
+        name: document.getElementById('projectName').value.trim(),
+        category: document.getElementById('projectCategory').value,
+        status: document.getElementById('projectStatus').value,
+        desc: document.getElementById('projectDesc').value.trim(),
+        permissions: permObj
+    };
+    try {
+        if(fbKey) {
+            const existing = projects.find(p=>p._fbKey===fbKey);
+            if(existing) { data.date = existing.date; data.cover = existing.cover||COVERS[0]; }
+            await fbPatch(`projects/${fbKey}`, data);
+            showToast('Project updated','success');
+        } else {
+            data.date = new Date().toISOString().split('T')[0];
+            data.cover = COVERS[Math.floor(Math.random()*COVERS.length)];
+            await fbPost('projects', data);
+            showToast('Project created','success');
+        }
+        await loadData(); closeModal('projectModal'); renderAll();
+    } catch(err) { console.error(err); showToast('Error saving project','error'); }
+    finally { btn.disabled=false; btn.innerHTML='Save Project'; }
+}
+
+async function deleteProject(fbKey) {
+    const pr = projects.find(p=>p._fbKey===fbKey);
+    if(!pr) return;
+    document.getElementById('confirmTitle').textContent = 'Delete Project?';
+    document.getElementById('confirmMsg').textContent = `"${pr.name}" will be permanently removed.`;
+    document.getElementById('confirmBtn').textContent = 'Delete';
+    pendingConfirmAction = async () => {
+        try { await fbDelete(`projects/${fbKey}`); await loadData(); showToast('Project deleted','info'); renderAll(); }
+        catch(err) { showToast('Error deleting','error'); }
+    };
+    document.getElementById('confirmModal').classList.add('show');
+}
+
+/* ================================================================
+   PROJECT DETAIL
+   ================================================================ */
+function openDetail(fbKey) {
+    const pr = projects.find(p=>p._fbKey===fbKey);
+    if(!pr) return;
+    const perms = getPerms(pr);
+    const ph = perms.map(pm => {
+        const ps = findPerson(pm.personId);
+        if(!ps) return '';
+        return `<div class="perm-item"><div class="perm-av" style="background:${ps.color}">${initials(ps.name)}</div><div class="perm-nm">${ps.name}</div><span class="p-role-badge ${pm.role}" style="margin:0">${pm.role}</span></div>`;
+    }).join('');
+    document.getElementById('detailContent').innerHTML = `
+        <div style="height:170px;border-radius:11px;background-image:url('${pr.cover||COVERS[0]}');background-size:cover;background-position:center;margin-bottom:1.15rem;position:relative"><span class="status-badge ${pr.status}" style="position:absolute;top:10px;right:10px">${pr.status}</span></div>
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--neo-purple);margin-bottom:.3rem">${pr.category}</div>
+        <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.35rem;font-weight:700;margin-bottom:.45rem">${pr.name}</h3>
+        <p style="color:var(--neo-text-muted);font-size:.9rem;line-height:1.6;margin-bottom:1.15rem">${pr.desc||'No description.'}</p>
+        <div style="display:flex;gap:1.3rem;margin-bottom:1.4rem;font-size:.83rem;color:var(--neo-text-muted)">
+            <span><i class="fas fa-calendar" style="margin-right:4px;color:var(--neo-purple)"></i>${fmtDate(pr.date)}</span>
+            <span><i class="fas fa-users" style="margin-right:4px;color:var(--neo-purple)"></i>${perms.length} people</span>
+        </div>
+        <div class="perm-title"><i class="fas fa-shield-alt"></i> Team Access</div>
+        <div class="perm-list">${ph||'<p style="color:var(--neo-text-muted);font-size:.83rem;padding:.4rem 0">No one assigned</p>'}</div>
+        <div class="modal-actions" style="margin-top:1.15rem">
+            <button class="btn-secondary" onclick="closeModal('detailModal')">Close</button>
+            <button class="btn-primary" onclick="closeModal('detailModal');editProject('${pr._fbKey}')"><i class="fas fa-pen"></i> Edit</button>
+        </div>`;
+    document.getElementById('detailModal').classList.add('show');
+}
+
+/* ================================================================
+   PERMISSIONS UI (temporário, salvo com o projeto)
+   ================================================================ */
+function renderPermList() {
+    document.getElementById('permList').innerHTML = tempPermissions.map((pm,i) => {
+        const ps = findPerson(pm.personId);
+        if(!ps) return '';
+        return `<div class="perm-item">
+            <div class="perm-av" style="background:${ps.color}">${initials(ps.name)}</div>
+            <div class="
