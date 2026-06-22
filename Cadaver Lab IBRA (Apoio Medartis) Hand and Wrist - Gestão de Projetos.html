@@ -1,0 +1,1290 @@
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadaver Lab IBRA (Apoio Medartis) Hand and Wrist - Gestão de Projetos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    :root {
+      --primary: #2a2a2a;
+      --primary-dark: #1a1a1a;
+      --primary-light: #4a4a4a;
+      --bg: #f3f3f3;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #777777;
+      --border: #e0e0e0;
+      --border-light: #ececec;
+      --success: #2d8a4e;
+      --success-bg: #edf7f0;
+      --success-border: #c1e6cb;
+      --warning: #b8860b;
+      --warning-bg: #fef9ed;
+      --warning-border: #f0ddb8;
+      --danger: #c0392b;
+      --danger-bg: #fcf0ee;
+      --danger-border: #f0c4be;
+      --cancel: #888888;
+      --cancel-bg: #f6f6f6;
+      --cancel-border: #e0e0e0;
+      --import-color: #2d7a6e;
+      --import-bg: #edf7f5;
+      --import-border: #b8e0d8;
+      --export-color: #6a5a10;
+      --export-bg: #fdf8ed;
+      --export-border: #e8d88a;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.08);
+      --shadow-xl: 0 16px 48px rgba(0,0,0,0.1);
+      --radius-sm: 5px;
+      --radius: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.015) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--primary-dark);
+      padding: 0 24px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+      border-bottom: 1px solid #333;
+    }
+    .header-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-mark {
+      width: 44px; height: 44px;
+      background: #fff;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 900; color: var(--primary-dark);
+      letter-spacing: -1px; flex-shrink: 0; border: 2px solid #444;
+    }
+    .header-title { color: #fff; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
+    .header-subtitle { color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 400; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn-header {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap; text-decoration: none;
+    }
+    .btn-header svg { flex-shrink: 0; }
+    .btn-header:active { transform: translateY(0); }
+    .btn-import {
+      border: 1px solid var(--import-border); background: rgba(45,122,110,0.1);
+      color: #8fd4c8;
+    }
+    .btn-import:hover { background: rgba(45,122,110,0.2); border-color: #8fd4c8; color: #b0e8de; transform: translateY(-1px); }
+    .btn-export-data {
+      border: 1px solid var(--export-border); background: rgba(106,90,16,0.1);
+      color: #d4c870;
+    }
+    .btn-export-data:hover { background: rgba(106,90,16,0.2); border-color: #d4c870; color: #e8de90; transform: translateY(-1px); }
+    .btn-excel {
+      border: 1px solid #555; background: transparent; color: #ccc;
+    }
+    .btn-excel:hover { background: rgba(255,255,255,0.08); border-color: #777; color: #fff; transform: translateY(-1px); }
+    .btn-pdf {
+      border: 1px solid #555; background: transparent; color: #ccc;
+    }
+    .btn-pdf:hover { background: rgba(255,255,255,0.08); border-color: #777; color: #fff; transform: translateY(-1px); }
+    .header-sep { width: 1px; height: 24px; background: #444; flex-shrink: 0; }
+
+    main { position: relative; z-index: 1; max-width: 1440px; margin: 0 auto; padding: 24px; }
+
+    /* DASHBOARD */
+    .dashboard { margin-bottom: 24px; }
+    .dashboard-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
+    }
+    .dashboard-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+    .days-counter {
+      display: flex; align-items: center; gap: 8px; padding: 6px 16px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      font-size: 13px; font-weight: 500; color: var(--text); box-shadow: var(--shadow-sm);
+    }
+    .days-counter .days-num { font-weight: 800; font-size: 16px; color: var(--text); }
+    .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+    .stat-card {
+      background: var(--card); border-radius: var(--radius-lg); padding: 20px;
+      border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .stat-card.nao-iniciado::before { background: var(--cancel); }
+    .stat-card.em-andamento::before { background: var(--warning); }
+    .stat-card.concluido::before { background: var(--success); }
+    .stat-card.atrasado::before { background: var(--danger); }
+    .stat-icon {
+      width: 38px; height: 38px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px;
+    }
+    .nao-iniciado .stat-icon { background: var(--cancel-bg); color: var(--cancel); border: 1px solid var(--cancel-border); }
+    .em-andamento .stat-icon { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+    .concluido .stat-icon { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+    .atrasado .stat-icon { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+    .stat-number { font-size: 32px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+    .nao-iniciado .stat-number { color: var(--cancel); }
+    .em-andamento .stat-number { color: var(--warning); }
+    .concluido .stat-number { color: var(--success); }
+    .atrasado .stat-number { color: var(--danger); }
+    .stat-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+    .progress-section {
+      background: var(--card); border-radius: var(--radius-lg);
+      padding: 20px 24px; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);
+    }
+    .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .progress-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .progress-percent { font-size: 20px; font-weight: 900; color: var(--text); }
+    .progress-bar-track { width: 100%; height: 10px; background: var(--border-light); border-radius: 5px; overflow: hidden; }
+    .progress-bar-fill {
+      height: 100%; background: linear-gradient(90deg, var(--primary), #555);
+      border-radius: 5px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
+    }
+    .progress-bar-fill::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+      animation: shimmer 2.5s infinite;
+    }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .progress-details { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+
+    /* TOOLBAR */
+    .toolbar {
+      background: var(--card); border-radius: var(--radius-lg); padding: 16px 20px;
+      border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .search-box { position: relative; flex: 1; min-width: 200px; }
+    .search-box input {
+      width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text);
+      background: var(--bg); transition: all 0.2s; outline: none;
+    }
+    .search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,0,0,0.06); background: #fff; }
+    .search-box input::placeholder { color: var(--text-muted); }
+    .filter-select {
+      padding: 9px 30px 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text);
+      background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23777' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 10px center;
+      appearance: none; cursor: pointer; transition: all 0.2s; outline: none; min-width: 140px;
+    }
+    .filter-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
+    .btn-add {
+      display: inline-flex; align-items: center; gap: 8px; padding: 9px 20px;
+      background: var(--text); color: #fff; border: none; border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-add:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .btn-add:active { transform: translateY(0); }
+    .btn-clear-filters {
+      padding: 9px 14px; background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 13px; cursor: pointer;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-clear-filters:hover { background: var(--bg); color: var(--text); border-color: var(--text-muted); }
+    .btn-reset {
+      padding: 9px 14px; background: transparent; color: var(--warning);
+      border: 1px solid var(--warning-border); border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 13px; cursor: pointer;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-reset:hover { background: var(--warning-bg); border-color: var(--warning); }
+    .results-count { font-size: 12px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+
+    /* TABELA */
+    .table-wrapper {
+      background: var(--card); border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); overflow: hidden;
+    }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; min-width: 960px; }
+    thead { background: var(--primary-dark); position: sticky; top: 0; z-index: 10; }
+    thead th {
+      padding: 14px 16px; font-size: 11px; font-weight: 700;
+      color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.8px;
+      text-align: left; white-space: nowrap; border-bottom: 2px solid #333;
+    }
+    thead th:first-child { padding-left: 20px; }
+    thead th:last-child { text-align: center; width: 90px; }
+    .cat-row td {
+      padding: 10px 20px; background: #f7f7f7; font-size: 11px; font-weight: 800;
+      color: var(--primary); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--border);
+    }
+    .cat-row td::before {
+      content: ''; display: inline-block; width: 8px; height: 8px;
+      background: var(--primary); border-radius: 2px; margin-right: 12px; vertical-align: middle;
+    }
+    tbody tr { transition: background 0.15s; border-bottom: 1px solid var(--border-light); }
+    tbody tr:not(.cat-row):hover { background: rgba(0,0,0,0.015); }
+    tbody tr.row-atrasado { border-left: 3px solid var(--danger); }
+    tbody tr.row-concluido { border-left: 3px solid var(--success); }
+    tbody tr.row-em-andamento { border-left: 3px solid var(--warning); }
+    tbody td { padding: 10px 16px; font-size: 13px; color: var(--text); vertical-align: middle; }
+    tbody td:first-child { padding-left: 20px; }
+    tbody td:last-child { text-align: center; }
+    .td-categoria { font-weight: 700; color: var(--primary-light); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    .td-entrega { font-weight: 500; max-width: 200px; }
+    .td-data { white-space: nowrap; font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .td-data.vencida { color: var(--danger); font-weight: 700; }
+    .editable-cell {
+      cursor: pointer; border-radius: 3px; padding: 3px 6px; margin: -3px -6px;
+      transition: background 0.15s; min-height: 22px; display: inline-block;
+      max-width: 100%; word-break: break-word;
+    }
+    .editable-cell:hover { background: #f0f0f0; }
+    .editable-cell.empty { color: #bbb; font-style: italic; font-weight: 400; }
+    .inline-input {
+      width: 100%; padding: 4px 8px; border: 2px solid var(--primary); border-radius: 3px;
+      font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text);
+      background: #fff; outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+    }
+    .inline-input[type="date"] { min-width: 130px; }
+    .status-select {
+      padding: 5px 24px 5px 10px; border: 1px solid transparent; border-radius: 4px;
+      font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; appearance: none; background-repeat: no-repeat;
+      background-position: right 7px center; background-size: 8px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%23currentColor' d='M4 6L0 2h8z'/%3E%3C/svg%3E");
+      outline: none; transition: all 0.2s; white-space: nowrap;
+    }
+    .status-select:focus { box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+    .status-nao-iniciado { background-color: var(--cancel-bg); color: var(--cancel); border-color: var(--cancel-border); }
+    .status-em-andamento { background-color: var(--warning-bg); color: var(--warning); border-color: var(--warning-border); }
+    .status-concluido { background-color: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+    .status-atrasado { background-color: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+    .status-cancelado { background-color: var(--cancel-bg); color: #999; border-color: var(--cancel-border); text-decoration: line-through; }
+    .action-btns { display: flex; gap: 4px; justify-content: center; }
+    .btn-action {
+      width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+      border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 11px; color: var(--text-muted);
+      transition: all 0.15s; font-family: 'Outfit', sans-serif; font-weight: 600;
+    }
+    .btn-action:hover { border-color: var(--primary); color: var(--text); background: #f5f5f5; }
+    .btn-action.delete:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
+    .empty-state { padding: 60px 20px; text-align: center; color: var(--text-muted); }
+    .empty-state p { font-size: 15px; font-weight: 500; }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
+      z-index: 1000; display: none; align-items: center; justify-content: center;
+      padding: 20px; opacity: 0; transition: opacity 0.25s;
+    }
+    .modal-overlay.active { display: flex; opacity: 1; }
+    .modal {
+      background: var(--card); border-radius: var(--radius-xl); width: 100%;
+      max-width: 560px; max-height: 90vh; overflow-y: auto;
+      box-shadow: var(--shadow-xl); transform: translateY(20px);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .modal-overlay.active .modal { transform: translateY(0); }
+    .modal-header { padding: 24px 28px 0; display: flex; align-items: center; justify-content: space-between; }
+    .modal-title { font-size: 20px; font-weight: 800; color: var(--text); }
+    .modal-close {
+      width: 34px; height: 34px; border: 1px solid var(--border); background: #fff;
+      border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 16px; color: var(--text-muted);
+      transition: all 0.15s; font-family: 'Outfit', sans-serif;
+    }
+    .modal-close:hover { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+    .modal-body { padding: 20px 28px 28px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block; font-size: 11px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+    }
+    .form-input, .form-textarea, .form-select {
+      width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text);
+      background: #fff; outline: none; transition: all 0.2s;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+    }
+    .form-textarea { resize: vertical; min-height: 70px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 8px; }
+    .btn-modal {
+      padding: 10px 24px; border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; border: none;
+    }
+    .btn-modal.primary { background: var(--text); color: #fff; }
+    .btn-modal.primary:hover { background: var(--primary-light); }
+    .btn-modal.secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    .btn-modal.secondary:hover { background: var(--border-light); }
+
+    /* MODAL CONFIRMAÇÃO */
+    .confirm-modal .modal { max-width: 420px; text-align: center; }
+    .confirm-icon {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--danger-bg); color: var(--danger);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 800; margin: 0 auto 16px;
+      border: 2px solid var(--danger-border);
+    }
+    .confirm-icon.warn { background: var(--warning-bg); color: var(--warning); border-color: var(--warning-border); }
+    .confirm-text { font-size: 15px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+    .btn-confirm-yes {
+      padding: 10px 28px; background: var(--danger); color: #fff; border: none;
+      border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif;
+      font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-confirm-yes:hover { background: #a93226; }
+    .btn-confirm-yes.warn { background: var(--warning); }
+    .btn-confirm-yes.warn:hover { background: #9a7509; }
+
+    /* TOAST */
+    #toastContainer {
+      position: fixed; top: 80px; right: 20px; z-index: 2000;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast {
+      padding: 12px 20px; border-radius: var(--radius); font-size: 13px; font-weight: 500;
+      color: #fff; box-shadow: var(--shadow-lg); transform: translateX(120%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; align-items: center; gap: 10px; max-width: 400px;
+    }
+    .toast.show { transform: translateX(0); }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    .toast.info { background: var(--primary); }
+    .toast.warning { background: var(--warning); }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in { animation: fadeInUp 0.5s ease-out both; }
+    .animate-in:nth-child(1) { animation-delay: 0.05s; }
+    .animate-in:nth-child(2) { animation-delay: 0.1s; }
+    .animate-in:nth-child(3) { animation-delay: 0.15s; }
+    .animate-in:nth-child(4) { animation-delay: 0.2s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+    @media (max-width: 1024px) { .stat-cards { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) {
+      header { padding: 0 16px; }
+      .header-inner { padding: 12px 0; }
+      .header-title { font-size: 17px; }
+      .header-subtitle { font-size: 12px; }
+      .btn-header span.label-text { display: none; }
+      .btn-header { padding: 8px 10px; }
+      main { padding: 16px; }
+      .stat-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat-card { padding: 14px; }
+      .stat-number { font-size: 26px; }
+      .toolbar { padding: 12px; gap: 8px; }
+      .search-box { min-width: 100%; order: -1; }
+      .filter-select { min-width: 0; flex: 1; }
+      .results-count { margin-left: 0; width: 100%; }
+      .form-row { grid-template-columns: 1fr; }
+      .modal-body { padding: 16px 20px 20px; }
+      .modal-header { padding: 20px 20px 0; }
+    }
+    @media (max-width: 480px) {
+      .stat-cards { grid-template-columns: 1fr; }
+      .header-mark { width: 38px; height: 38px; font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Input oculto para importar JSON -->
+  <input type="file" id="fileImport" accept=".json" style="display:none" onchange="handleImport(event)">
+
+  <header>
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="header-mark">M</div>
+        <div>
+          <div class="header-title">Cadaver Lab IBRA / Medartis Mão e Punho</div>
+          <div class="header-subtitle">24 e 25 de agosto de 2026</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="btn-header btn-import" onclick="triggerImport()" aria-label="Importar dados">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span class="label-text">IMPORTAR</span>
+        </button>
+        <button class="btn-header btn-export-data" onclick="exportData()" aria-label="Exportar dados editáveis">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span class="label-text">EXPORTAR</span>
+        </button>
+        <div class="header-sep"></div>
+        <button class="btn-header btn-excel" onclick="exportToExcel()" aria-label="Exportar para Excel">
+          <span class="label-text">EXCEL</span>
+        </button>
+        <button class="btn-header btn-pdf" onclick="exportToPDF()" aria-label="Exportar para PDF">
+          <span class="label-text">PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- PAINEL DE CONTROLE -->
+    <section class="dashboard">
+      <div class="dashboard-top">
+        <span class="dashboard-label">Painel de Controle</span>
+        <div class="days-counter" id="daysCounter">
+          <span>Faltam</span>
+          <span class="days-num" id="daysNum">0</span>
+          <span>dias</span>
+        </div>
+      </div>
+      <div class="stat-cards" id="statCards">
+        <div class="stat-card nao-iniciado animate-in">
+          <div class="stat-icon">NI</div>
+          <div class="stat-number" id="countNaoIniciado">0</div>
+          <div class="stat-label">Nao iniciadas</div>
+        </div>
+        <div class="stat-card em-andamento animate-in">
+          <div class="stat-icon">EA</div>
+          <div class="stat-number" id="countEmAndamento">0</div>
+          <div class="stat-label">Em andamento</div>
+        </div>
+        <div class="stat-card concluido animate-in">
+          <div class="stat-icon">OK</div>
+          <div class="stat-number" id="countConcluido">0</div>
+          <div class="stat-label">Concluidas</div>
+        </div>
+        <div class="stat-card atrasado animate-in">
+          <div class="stat-icon">AT</div>
+          <div class="stat-number" id="countAtrasado">0</div>
+          <div class="stat-label">Atrasadas</div>
+        </div>
+      </div>
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="progress-title">Progresso Geral</span>
+          <span class="progress-percent" id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progressBar" style="width: 0%;"></div>
+        </div>
+        <div class="progress-details">
+          <span id="progressDone">0 de 0 tarefas concluidas</span>
+          <span id="progressRemain">0 restantes</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- BARRA DE FERRAMENTAS -->
+    <section class="toolbar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Pesquisar por palavra-chave..." oninput="renderTable()">
+      </div>
+      <select class="filter-select" id="filterCategoria" onchange="renderTable()" aria-label="Filtrar por categoria"></select>
+      <select class="filter-select" id="filterStatus" onchange="renderTable()" aria-label="Filtrar por status">
+        <option value="">Todos os status</option>
+        <option value="Nao iniciado">Nao iniciado</option>
+        <option value="Em andamento">Em andamento</option>
+        <option value="Concluido">Concluido</option>
+        <option value="Atrasado">Atrasado</option>
+        <option value="Cancelado">Cancelado</option>
+      </select>
+      <select class="filter-select" id="filterResponsavel" onchange="renderTable()" aria-label="Filtrar por setor"></select>
+      <button class="btn-clear-filters" onclick="clearFilters()">Limpar</button>
+      <button class="btn-reset" onclick="requestReset()">Resetar Dados</button>
+      <button class="btn-add" onclick="openModal()">+ Nova Tarefa</button>
+      <span class="results-count" id="resultsCount"></span>
+    </section>
+
+    <!-- TABELA -->
+    <section class="table-wrapper">
+      <div class="table-scroll">
+        <table id="taskTable" role="grid">
+          <thead>
+            <tr>
+              <th>Categoria</th>
+              <th>Entrega</th>
+              <th>Setor Responsavel</th>
+              <th>Prazo Planejado</th>
+              <th>Prazo Real</th>
+              <th>Status</th>
+              <th>Observacoes</th>
+              <th>Acoes</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL ADICIONAR / EDITAR -->
+  <div class="modal-overlay" id="taskModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Nova Tarefa</div>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fechar">X</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Categoria</label>
+          <select class="form-select" id="formCategoria"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Entrega</label>
+          <input class="form-input" type="text" id="formEntrega" placeholder="Descrição da entrega">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Setor Responsavel</label>
+            <input class="form-input" type="text" id="formResponsavel" placeholder="Setor">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="formStatus">
+              <option value="Nao iniciado">Nao iniciado</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Concluido">Concluido</option>
+              <option value="Atrasado">Atrasado</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Prazo Planejado</label>
+            <input class="form-input" type="date" id="formPrazoPlanejado">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Prazo Real</label>
+            <input class="form-input" type="date" id="formPrazoReal">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observacoes</label>
+          <textarea class="form-textarea" id="formObservacoes" placeholder="Observações adicionais"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-modal secondary" onclick="closeModal()">Cancelar</button>
+          <button class="btn-modal primary" onclick="saveTask()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMAÇÃO -->
+  <div class="modal-overlay confirm-modal" id="confirmModal">
+    <div class="modal">
+      <div class="modal-body" style="padding-top:32px;">
+        <div class="confirm-icon" id="confirmIcon">X</div>
+        <div class="confirm-text" id="confirmText">Tem certeza?</div>
+        <div class="confirm-actions">
+          <button class="btn-modal secondary" onclick="closeConfirmModal()">Cancelar</button>
+          <button class="btn-confirm-yes" id="confirmYesBtn" onclick="executeConfirm()">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOASTS -->
+  <div id="toastContainer"></div>
+
+  <script>
+    // ============================================================
+    // ORDEM DAS CATEGORIAS
+    // ============================================================
+    const CATEGORIAS_ORDER = [
+      'CADÁVERES', 'CONTRATOS', 'EQUIPAMENTOS CIRÚRGICOS', 'EVENTOS',
+      'INFRAESTRUTURA', 'INSCRIÇÕES', 'MATERIAIS', 'PROFESSORES', 'PROGRAMA CIENTÍFICO'
+    ];
+
+    // Data do evento para contagem de dias
+    const EVENT_DATE = new Date(2026, 7, 24);
+
+    // ============================================================
+    // DADOS INICIAIS (snapshot imutável — datas originais do arquivo)
+    // ============================================================
+    const INITIAL_TASKS = [
+      // CADÁVERES
+      { id:4,  categoria:'CADÁVERES', entrega:'Quantidade confirmada', responsavel:'Educação/Produto', prazoPlanejado:'05/05/2026', prazoReal:'05/05/2026', status:'Concluido', observacoes:'10 pecas confirmadas' },
+      { id:5,  categoria:'CADÁVERES', entrega:'Importacao concluida', responsavel:'Supply Chain', prazoPlanejado:'17/07/2026', prazoReal:'', status:'Em andamento', observacoes:'Aprovação do pedido' },
+      { id:6,  categoria:'CADÁVERES', entrega:'Transporte confirmado', responsavel:'Logistica', prazoPlanejado:'31/07/2026', prazoReal:'', status:'Nao iniciado', observacoes:'' },
+      { id:7,  categoria:'CADÁVERES', entrega:'Recebimento confirmado', responsavel:'Logistica', prazoPlanejado:'17/08/2026', prazoReal:'', status:'Nao iniciado', observacoes:'' },
+
+      // CONTRATOS
+      { id:1,  categoria:'CONTRATOS', entrega:'Contrato Universidade Positivo', responsavel:'Juridico', prazoPlanejado:'10/07/2026', prazoReal:'08/07/2025', status:'Em andamento', observacoes:'Contrato em avaliação Jurídica medartis' },
+      { id:2,  categoria:'CONTRATOS', entrega:'Contrato fornecedores', responsavel:'Juridico', prazoPlanejado:'30/06/2026', prazoReal:'30/06/2026', status:'Concluido', observacoes:'Contrato transporte, refeição e Cooffe-Break' },
+
+      // EQUIPAMENTOS CIRÚRGICOS
+      { id:27, categoria:'EQUIPAMENTOS CIRÚRGICOS', entrega:'Motores cirurgicos', responsavel:'Educação/Produto', prazoPlanejado:'30/07/2026', prazoReal:'', status:'Em andamento', observacoes:'Fornecedor ORTHOMEDICAL' },
+      { id:28, categoria:'EQUIPAMENTOS CIRÚRGICOS', entrega:'Arco em C', responsavel:'Educação/Produto', prazoPlanejado:'30/07/2026', prazoReal:'29/05/2026', status:'Concluido', observacoes:'Empréstimo GE' },
+      { id:29, categoria:'EQUIPAMENTOS CIRÚRGICOS', entrega:'Instrumentais Medartis', responsavel:'Educação/Produto', prazoPlanejado:'21/08/2026', prazoReal:'', status:'Nao iniciado', observacoes:'Separação dos materiais para cadaver lab' },
+      { id:30, categoria:'EQUIPAMENTOS CIRÚRGICOS', entrega:'Instrumentais apoio', responsavel:'Educação/Produto', prazoPlanejado:'05/06/2026', prazoReal:'05/06/2026', status:'Concluido', observacoes:'Avaliação Instrumentais MARC ( Será necessario o Uso de instrumentais de apoio medartis)' },
+      { id:50, categoria:'EQUIPAMENTOS CIRÚRGICOS', entrega:'Materias de demonstração', responsavel:'Educação/Produto', prazoPlanejado:'21/08/2026', prazoReal:'', status:'Nao iniciado', observacoes:'' },
+
+      // EVENTOS
+      { id:51, categoria:'EVENTOS', entrega:'Cotação espaço evento', responsavel:'Eventos', prazoPlanejado:'15/03/2026', prazoReal:'10/03/2026', status:'Concluido', observacoes:'3 orçamentos solicitados' },
+      { id:52, categoria:'EVENTOS', entrega:'Reserva local confirmada', responsavel:'Eventos', prazoPlanejado:'30/04/2026', prazoReal:'28/04/2026', status:'Concluido', observacoes:'Universidade Positivo - Bloco C' },
+      { id:53, categoria:'EVENTOS', entrega:'Layout sala cirúrgica', responsavel:'Eventos', prazoPlanejado:'30/06/2026', prazoReal:'', status:'Em andamento', observacoes:'8 estações cirúrgicas' },
+      { id:54, categoria:'EVENTOS', entrega:'Sinalização e identificação', responsavel:'Eventos', prazoPlanejado:'20/08/2026', prazoReal:'', status:'Nao iniciado', observacoes:'' },
+
+      // INFRAESTRUTURA
+      { id:55, categoria:'INFRAESTRUTURA', entrega:'Montagem mesas cirúrgicas', responsavel:'Logistica', prazoPlanejado:'21/08/2026', prazoReal:'', status:'Em andamento', observacoes:'8 mesas com acessórios' },
+      { id:56, categoria:'INFRAESTRUTURA', entrega:'Iluminação sala cirúrgica', responsavel:'Logistica', prazoPlanejado:'20/08/2026', prazoReal:'', status:'Em andamento', observacoes:'Verificação luminárias' },
+      { id:57, categoria:'INFRAESTRUTURA', entrega:'Ventilação e climatização', responsavel:'Logistica', prazoPlanejado:'20/08/2026', prazoReal:'', status:'Em andamento', observacoes:'Verificação ar condicionado' },
+      { id:58, categoria:'INFRAESTRUTURA', entrega:'Instalação elétrica', responsavel:'Logistica', prazoPlanejado:'20/08/2026', prazoReal:'', status:'Nao iniciado', observacoes:'Tomadas para motores e arco em C' },
+      { id:59, categoria:'INFRAESTRUTURA', entrega:'Limpeza e preparo do espaço', responsavel:'IBRA', prazoPlanejado:'21/08/2026', prazoReal:'', status:'Nao iniciado', observacoes:'' },
+
+      // INSCRIÇÕES
+      { id:60, categoria:'INSCRIÇÕES', entrega:'Formulário inscrição online', responsavel:'Educação/Eventos', prazoPlanejado:'01/04/2026', prazoReal:'28/03/2026', status:'Concluido', observacoes:'Plataforma Google Forms' },
+      { id:61, categoria:'INSCRIÇÕES', entrega:'Lista participantes confirmados', responsavel:'Educação/Eventos', prazoPlanejado:'10/08/2026', prazoReal:'', status:'Em andamento', observacoes:'40 vagas disponíveis' },
+      { id:62, categoria:'INSCRIÇÕES', entrega:'Crachás e materiais participantes', responsavel:'Eventos', prazoPlanejado:'18/08/2026', prazoReal:'', status:'Em andamento', observacoes:'Impressão e montagem' },
+      { id:63, categoria:'INSCRIÇÕES', entrega:'Emissão certificados', responsavel:'Educação/Eventos', prazoPlanejado:'30/08/2026', prazoReal:'', status:'Nao iniciado', observacoes:'Pós-evento' },
+
+      // MATERIAIS
+      { id:64, categoria:'MATERIAIS', entrega:'Materiais descartáveis cirúrgicos', responsavel:'Supply Chain', prazoPlanejado:'10/08/2026', prazoReal:'', status:'Em andamento', observacoes:'Luvas, campos, aventais' },
+      { id:65, categoria:'MATERIAIS', entrega:'Produtos de limpeza e desinfecção', responsavel:'Supply Chain', prazoPlanejado:'15/08/2026', prazoReal:'', status:'Em andamento', observacoes:'Formol, álcool, hipoclorito' },
+      { id:66, categoria:'MATERIAIS', entrega:'EPIs para participantes', responsavel:'Supply Chain', prazoPlanejado:'15/08/2026', prazoReal:'', status:'Em andamento', observacoes:'Óculos, máscaras, luvas' },
+      { id:67, categoria:'MATERIAIS', entrega:'Materiais escritório e sinalização', responsavel:'Logistica', prazoPlanejado:'18/08/2026', prazoReal:'', status:'Em andamento', observacoes:'' },
+      { id:68, categoria:'MATERIAIS', entrega:'Kits participantes', responsavel:'Educação', prazoPlanejado:'20/08/2026', prazoReal:'', status:'Nao iniciado', observacoes:'Caderno, caneta, programa' },
+
+      // PROFESSORES
+      { id:69, categoria:'PROFESSORES', entrega:'Confirmação presença professores', responsavel:'Educação', prazoPlanejado:'30/04/2026', prazoReal:'', status:'Em andamento', observacoes:'6 professores convidados' },
+      { id:70, categoria:'PROFESSORES', entrega:'Passagens aéreas professores', responsavel:'Logistica', prazoPlanejado:'30/06/2026', prazoReal:'', status:'Em andamento', observacoes:'6 passagens necessárias' },
+      { id:71, categoria:'PROFESSORES', entrega:'Hospedagem professores', responsavel:'Logistica', prazoPlanejado:'10/08/2026', prazoReal:'', status:'Em andamento', observacoes:'Reserva hotel próximo ao local' },
+      { id:72, categoria:'PROFESSORES', entrega:'Transporte local professores', responsavel:'Logistica', prazoPlanejado:'23/08/2026', prazoReal:'', status:'Nao iniciado', observacoes:'Transfer aeroporto/hotel/local' },
+
+      // PROGRAMA CIENTÍFICO
+      { id:73, categoria:'PROGRAMA CIENTÍFICO', entrega:'Definição programa científico', responsavel:'Educação', prazoPlanejado:'30/04/2026', prazoReal:'22/04/2026', status:'Concluido', observacoes:'8 módulos definidos' },
+      { id:74, categoria:'PROGRAMA CIENTÍFICO', entrega:'Apresentações PowerPoint', responsavel:'Educação', prazoPlanejado:'15/08/2026', prazoReal:'', status:'Em andamento', observacoes:'Revisão com professores' },
+      { id:75, categoria:'PROGRAMA CIENTÍFICO', entrega:'Material didático impresso', responsavel:'Eventos', prazoPlanejado:'18/08/2026', prazoReal:'', status:'Em andamento', observacoes:'Roteiros e guias cirúrgicos' },
+      { id:76, categoria:'PROGRAMA CIENTÍFICO', entrega:'Cronograma finalizado', responsavel:'Educação/Eventos', prazoPlanejado:'20/08/2026', prazoReal:'', status:'Nao iniciado', observacoes:'' }
+    ];
+
+    // ============================================================
+    // ESTADO ATUAL (cópia mutável)
+    // ============================================================
+    let tasks = JSON.parse(JSON.stringify(INITIAL_TASKS));
+    let nextId = Math.max(...tasks.map(t => t.id)) + 1;
+    let editingId = null;      // ID da tarefa sendo editada no modal (null = nova)
+    let confirmAction = null;  // 'delete' ou 'reset'
+    let deleteTargetId = null;
+
+    // ============================================================
+    // UTILITÁRIOS
+    // ============================================================
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Converte DD/MM/YYYY -> YYYY-MM-DD (para input[type=date])
+    function dateToISO(d) {
+      if (!d || !d.includes('/')) return '';
+      const p = d.split('/');
+      if (p.length !== 3) return '';
+      return p[2] + '-' + p[1].padStart(2,'0') + '-' + p[0].padStart(2,'0');
+    }
+
+    // Converte YYYY-MM-DD -> DD/MM/YYYY
+    function isoToDate(iso) {
+      if (!iso || !iso.includes('-')) return '';
+      const p = iso.split('-');
+      if (p.length !== 3) return '';
+      return p[2] + '/' + p[1] + '/' + p[0];
+    }
+
+    // Converte DD/MM/YYYY para objeto Date
+    function parseDate(d) {
+      if (!d || !d.includes('/')) return null;
+      const p = d.split('/').map(Number);
+      if (p.length !== 3 || p.some(isNaN)) return null;
+      return new Date(p[2], p[1] - 1, p[0]);
+    }
+
+    // ============================================================
+    // POPULAR FILTROS
+    // ============================================================
+    function populateFilters() {
+      // Categorias
+      const catSel = document.getElementById('filterCategoria');
+      const curCat = catSel.value;
+      catSel.innerHTML = '<option value="">Todas as categorias</option>';
+      CATEGORIAS_ORDER.forEach(c => {
+        catSel.innerHTML += '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>';
+      });
+      catSel.value = curCat;
+
+      // Responsáveis (ordenados alfabeticamente)
+      const respSel = document.getElementById('filterResponsavel');
+      const curResp = respSel.value;
+      const resps = [...new Set(tasks.map(t => t.responsavel).filter(Boolean))].sort();
+      respSel.innerHTML = '<option value="">Todos os setores</option>';
+      resps.forEach(r => {
+        respSel.innerHTML += '<option value="' + escapeHtml(r) + '">' + escapeHtml(r) + '</option>';
+      });
+      respSel.value = curResp;
+
+      // Select de categoria no modal
+      const formCat = document.getElementById('formCategoria');
+      const curFormCat = formCat.value;
+      formCat.innerHTML = '';
+      CATEGORIAS_ORDER.forEach(c => {
+        formCat.innerHTML += '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>';
+      });
+      formCat.value = curFormCat;
+    }
+
+    // ============================================================
+    // RENDERIZAR TABELA
+    // ============================================================
+    function renderTable() {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const catFilter = document.getElementById('filterCategoria').value;
+      const statusFilter = document.getElementById('filterStatus').value;
+      const respFilter = document.getElementById('filterResponsavel').value;
+
+      const filtered = tasks.filter(t => {
+        if (catFilter && t.categoria !== catFilter) return false;
+        if (statusFilter && t.status !== statusFilter) return false;
+        if (respFilter && t.responsavel !== respFilter) return false;
+        if (search) {
+          const hay = [t.entrega, t.responsavel, t.observacoes, t.categoria, t.prazoPlanejado, t.prazoReal].join(' ').toLowerCase();
+          if (!hay.includes(search)) return false;
+        }
+        return true;
+      });
+
+      // Agrupar por categoria na ordem definida
+      const grouped = {};
+      CATEGORIAS_ORDER.forEach(c => { grouped[c] = []; });
+      filtered.forEach(t => { if (grouped[t.categoria]) grouped[t.categoria].push(t); });
+
+      let html = '';
+      let visibleCount = 0;
+      const today = new Date(); today.setHours(0,0,0,0);
+
+      CATEGORIAS_ORDER.forEach(cat => {
+        const catTasks = grouped[cat];
+        if (!catTasks || catTasks.length === 0) return;
+
+        html += '<tr class="cat-row"><td colspan="8">' + escapeHtml(cat) + '</td></tr>';
+
+        catTasks.forEach(t => {
+          visibleCount++;
+          const rowCls = t.status === 'Concluido' ? 'row-concluido' :
+                         t.status === 'Atrasado' ? 'row-atrasado' :
+                         t.status === 'Em andamento' ? 'row-em-andamento' : '';
+          const stCls = 'status-' + t.status.toLowerCase().replace(/ /g, '-');
+
+          const eEmpty = !t.entrega ? ' empty' : '';
+          const rEmpty = !t.responsavel ? ' empty' : '';
+          const ppEmpty = !t.prazoPlanejado ? ' empty' : '';
+          const prEmpty = !t.prazoReal ? ' empty' : '';
+          const oEmpty = !t.observacoes ? ' empty' : '';
+
+          const ppDate = parseDate(t.prazoPlanejado);
+          const isVencida = ppDate && ppDate < today && t.status !== 'Concluido' && t.status !== 'Cancelado';
+          const vencidaCls = isVencida ? ' vencida' : '';
+
+          const statusOpts = ['Nao iniciado','Em andamento','Concluido','Atrasado','Cancelado'].map(s =>
+            '<option value="' + s + '"' + (t.status === s ? ' selected' : '') + '>' + s + '</option>'
+          ).join('');
+
+          html += '<tr class="' + rowCls + '" data-id="' + t.id + '">' +
+            '<td class="td-categoria">' + escapeHtml(t.categoria) + '</td>' +
+            '<td class="td-entrega"><span class="editable-cell' + eEmpty + '" onclick="startEdit(this,' + t.id + ',\'entrega\',\'text\')" title="' + escapeHtml(t.entrega) + '">' + (t.entrega ? escapeHtml(t.entrega) : 'Clicar para editar') + '</span></td>' +
+            '<td><span class="editable-cell' + rEmpty + '" onclick="startEdit(this,' + t.id + ',\'responsavel\',\'text\')" title="' + escapeHtml(t.responsavel) + '">' + (t.responsavel ? escapeHtml(t.responsavel) : 'Clicar para editar') + '</span></td>' +
+            '<td class="td-data' + vencidaCls + '"><span class="editable-cell' + ppEmpty + '" onclick="startEdit(this,' + t.id + ',\'prazoPlanejado\',\'date\')">' + (t.prazoPlanejado ? escapeHtml(t.prazoPlanejado) : 'Clicar para editar') + '</span></td>' +
+            '<td class="td-data"><span class="editable-cell' + prEmpty + '" onclick="startEdit(this,' + t.id + ',\'prazoReal\',\'date\')">' + (t.prazoReal ? escapeHtml(t.prazoReal) : 'Clicar para editar') + '</span></td>' +
+            '<td><select class="status-select ' + stCls + '" onchange="updateField(' + t.id + ',\'status\',this.value)" aria-label="Status">' + statusOpts + '</select></td>' +
+            '<td><span class="editable-cell' + oEmpty + '" onclick="startEdit(this,' + t.id + ',\'observacoes\',\'text\')" title="' + escapeHtml(t.observacoes) + '">' + (t.observacoes ? escapeHtml(t.observacoes) : 'Clicar para editar') + '</span></td>' +
+            '<td><div class="action-btns">' +
+              '<button class="btn-action" onclick="openModal(' + t.id + ')" title="Editar" aria-label="Editar">E</button>' +
+              '<button class="btn-action delete" onclick="requestDelete(' + t.id + ')" title="Excluir" aria-label="Excluir">X</button>' +
+            '</div></td>' +
+          '</tr>';
+        });
+      });
+
+      if (visibleCount === 0) {
+        html = '<tr><td colspan="8" class="empty-state"><p>Nenhuma tarefa encontrada</p></td></tr>';
+      }
+
+      document.getElementById('tableBody').innerHTML = html;
+      document.getElementById('resultsCount').textContent = 'Mostrando ' + visibleCount + ' de ' + tasks.length + ' tarefas';
+    }
+
+    // ============================================================
+    // ATUALIZAR DASHBOARD
+    // ============================================================
+    function updateDashboard() {
+      const counts = { 'Nao iniciado': 0, 'Em andamento': 0, 'Concluido': 0, 'Atrasado': 0, 'Cancelado': 0 };
+      tasks.forEach(t => { if (counts.hasOwnProperty(t.status)) counts[t.status]++; });
+
+      document.getElementById('countNaoIniciado').textContent = counts['Nao iniciado'];
+      document.getElementById('countEmAndamento').textContent = counts['Em andamento'];
+      document.getElementById('countConcluido').textContent = counts['Concluido'];
+      document.getElementById('countAtrasado').textContent = counts['Atrasado'];
+
+      const total = tasks.length;
+      const done = counts['Concluido'];
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+      document.getElementById('progressPercent').textContent = pct + '%';
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressDone').textContent = done + ' de ' + total + ' tarefas concluidas';
+      document.getElementById('progressRemain').textContent = (total - done) + ' restantes';
+    }
+
+    // ============================================================
+    // CONTAGEM DE DIAS
+    // ============================================================
+    function updateDaysCounter() {
+      const today = new Date(); today.setHours(0,0,0,0);
+      const diff = Math.ceil((EVENT_DATE - today) / (1000 * 60 * 60 * 24));
+      document.getElementById('daysNum').textContent = Math.max(0, diff);
+    }
+
+    // ============================================================
+    // EDIÇÃO INLINE
+    // ============================================================
+    function startEdit(el, id, field, type) {
+      if (el.querySelector('input')) return; // já está editando
+
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+
+      const current = task[field] || '';
+
+      if (type === 'date') {
+        const isoVal = dateToISO(current);
+        el.innerHTML = '<input class="inline-input" type="date" value="' + isoVal + '">';
+      } else {
+        el.innerHTML = '<input class="inline-input" type="text" value="' + escapeHtml(current) + '">';
+      }
+
+      const input = el.querySelector('input');
+      input.focus();
+      if (type === 'text') input.select();
+
+      const save = () => {
+        let val = input.value.trim();
+        if (type === 'date' && val) {
+          val = isoToDate(val);
+        }
+        if (val === current) { renderTable(); return; }
+        updateField(id, field, val);
+      };
+
+      input.addEventListener('blur', save);
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+        if (e.key === 'Escape') { renderTable(); }
+      });
+    }
+
+    function updateField(id, field, value) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      task[field] = value || '';
+      renderTable();
+      updateDashboard();
+      populateFilters();
+      showToast('Campo atualizado', 'success');
+    }
+
+    // ============================================================
+    // MODAL ADICIONAR / EDITAR
+    // ============================================================
+    function openModal(id) {
+      editingId = id || null;
+      const modal = document.getElementById('taskModal');
+
+      if (editingId) {
+        const t = tasks.find(x => x.id === editingId);
+        if (!t) return;
+        document.getElementById('modalTitle').textContent = 'Editar Tarefa';
+        document.getElementById('formCategoria').value = t.categoria;
+        document.getElementById('formEntrega').value = t.entrega;
+        document.getElementById('formResponsavel').value = t.responsavel;
+        document.getElementById('formPrazoPlanejado').value = dateToISO(t.prazoPlanejado);
+        document.getElementById('formPrazoReal').value = dateToISO(t.prazoReal);
+        document.getElementById('formStatus').value = t.status;
+        document.getElementById('formObservacoes').value = t.observacoes;
+      } else {
+        document.getElementById('modalTitle').textContent = 'Nova Tarefa';
+        document.getElementById('formCategoria').value = CATEGORIAS_ORDER[0];
+        document.getElementById('formEntrega').value = '';
+        document.getElementById('formResponsavel').value = '';
+        document.getElementById('formPrazoPlanejado').value = '';
+        document.getElementById('formPrazoReal').value = '';
+        document.getElementById('formStatus').value = 'Nao iniciado';
+        document.getElementById('formObservacoes').value = '';
+      }
+
+      modal.classList.add('active');
+      setTimeout(() => document.getElementById('formEntrega').focus(), 100);
+    }
+
+    function closeModal() {
+      document.getElementById('taskModal').classList.remove('active');
+      editingId = null;
+    }
+
+    function saveTask() {
+      const categoria = document.getElementById('formCategoria').value;
+      const entrega = document.getElementById('formEntrega').value.trim();
+      const responsavel = document.getElementById('formResponsavel').value.trim();
+      const prazoPlanejado = isoToDate(document.getElementById('formPrazoPlanejado').value);
+      const prazoReal = isoToDate(document.getElementById('formPrazoReal').value);
+      const status = document.getElementById('formStatus').value;
+      const observacoes = document.getElementById('formObservacoes').value.trim();
+
+      if (!entrega) {
+        showToast('Preencha o campo Entrega', 'error');
+        document.getElementById('formEntrega').focus();
+        return;
+      }
+
+      if (editingId) {
+        const t = tasks.find(x => x.id === editingId);
+        if (t) {
+          t.categoria = categoria;
+          t.entrega = entrega;
+          t.responsavel = responsavel;
+          t.prazoPlanejado = prazoPlanejado;
+          t.prazoReal = prazoReal;
+          t.status = status;
+          t.observacoes = observacoes;
+          showToast('Tarefa atualizada', 'success');
+        }
+      } else {
+        tasks.push({
+          id: nextId++,
+          categoria, entrega, responsavel, prazoPlanejado, prazoReal, status, observacoes
+        });
+        showToast('Tarefa criada', 'success');
+      }
+
+      closeModal();
+      populateFilters();
+      renderTable();
+      updateDashboard();
+    }
+
+    // ============================================================
+    // EXCLUSÃO E RESET
+    // ============================================================
+    function requestDelete(id) {
+      deleteTargetId = id;
+      confirmAction = 'delete';
+      const icon = document.getElementById('confirmIcon');
+      icon.textContent = 'X';
+      icon.classList.remove('warn');
+      document.getElementById('confirmText').textContent = 'Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.';
+      const btn = document.getElementById('confirmYesBtn');
+      btn.textContent = 'Excluir';
+      btn.classList.remove('warn');
+      document.getElementById('confirmModal').classList.add('active');
+    }
+
+    function requestReset() {
+      confirmAction = 'reset';
+      deleteTargetId = null;
+      const icon = document.getElementById('confirmIcon');
+      icon.textContent = '!';
+      icon.classList.add('warn');
+      document.getElementById('confirmText').textContent = 'Tem certeza que deseja resetar todos os dados para o estado inicial? Todas as edições serão perdidas.';
+      const btn = document.getElementById('confirmYesBtn');
+      btn.textContent = 'Resetar';
+      btn.classList.add('warn');
+      document.getElementById('confirmModal').classList.add('active');
+    }
+
+    function executeConfirm() {
+      if (confirmAction === 'delete' && deleteTargetId !== null) {
+        tasks = tasks.filter(t => t.id !== deleteTargetId);
+        showToast('Tarefa excluída', 'success');
+      } else if (confirmAction === 'reset') {
+        tasks = JSON.parse(JSON.stringify(INITIAL_TASKS));
+        nextId = Math.max(...tasks.map(t => t.id)) + 1;
+        populateFilters();
+        showToast('Dados resetados para o estado inicial', 'info');
+      }
+      closeConfirmModal();
+      renderTable();
+      updateDashboard();
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').classList.remove('active');
+      deleteTargetId = null;
+      confirmAction = null;
+    }
+
+    // ============================================================
+    // IMPORTAR DADOS (JSON)
+    // ============================================================
+    function triggerImport() {
+      document.getElementById('fileImport').value = '';
+      document.getElementById('fileImport').click();
+    }
+
+    function handleImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+
+          if (!data.tarefas || !Array.isArray(data.tarefas)) {
+            showToast('Arquivo inválido: campo "tarefas" não encontrado', 'error');
+            return;
+          }
+
+          const camposEditaveis = ['entrega','responsavel','prazoPlanejado','prazoReal','observacoes','status'];
+          let atualizadas = 0;
+          let ignoradas = 0;
+
+          data.tarefas.forEach(item => {
+            if (typeof item.id !== 'number') { ignoradas++; return; }
+            const task = tasks.find(t => t.id === item.id);
+            if (!task) { ignoradas++; return; }
+
+            camposEditaveis.forEach(campo => {
+              if (item.hasOwnProperty(campo) && typeof item[campo] === 'string') {
+                task[campo] = item[campo];
+              }
+            });
+            atualizadas++;
+          });
+
+          populateFilters();
+          renderTable();
+          updateDashboard();
+
+          let msg = 'Importação concluída: ' + atualizadas + ' tarefa(s) atualizada(s)';
+          if (ignoradas > 0) msg += ', ' + ignoradas + ' ignorada(s)';
+          showToast(msg, atualizadas > 0 ? 'success' : 'warning');
+
+        } catch (err) {
+          showToast('Erro ao ler o arquivo JSON: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // ============================================================
+    // EXPORTAR DADOS (JSON) — apenas campos editáveis
+    // ============================================================
+    function exportData() {
+      const camposEditaveis = ['id','entrega','responsavel','prazoPlanejado','prazoReal','observacoes','status'];
+      const exportObj = {
+        versao: 1,
+        dataExportacao: new Date().toISOString(),
+        descricao: 'Dados editáveis do Cadaver Lab IBRA/Medartis',
+        totalTarefas: tasks.length,
+        tarefas: tasks.map(t => {
+          const obj = {};
+          camposEditaveis.forEach(c => { obj[c] = t[c] || ''; });
+          return obj;
+        })
+      };
+
+      const json = JSON.stringify(exportObj, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cadaver_lab_dados_' + new Date().toISOString().slice(0,10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showToast('Dados exportados com sucesso (' + tasks.length + ' tarefas)', 'success');
+    }
+
+    // ============================================================
+    // EXPORTAR EXCEL
+    // ============================================================
+    function exportToExcel() {
+      const rows = tasks.map(t => ({
+        'Categoria': t.categoria,
+        'Entrega': t.entrega,
+        'Setor Responsável': t.responsavel,
+        'Prazo Planejado': t.prazoPlanejado,
+        'Prazo Real': t.prazoReal,
+        'Status': t.status,
+        'Observações': t.observacoes
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Tarefas');
+
+      // Ajustar largura das colunas
+      ws['!cols'] = [
+        { wch: 25 }, { wch: 35 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 50 }
+      ];
+
+      XLSX.writeFile(wb, 'cadaver_lab_' + new Date().toISOString().slice(0,10) + '.xlsx');
+      showToast('Excel exportado com sucesso', 'success');
+    }
+
+    // ============================================================
+    // EXPORTAR PDF
+    // ============================================================
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.text('Cadaver Lab IBRA / Medartis - Mão e Punho', 14, 15);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text('24 e 25 de agosto de 2026', 14, 21);
+      doc.text('Gerado em: ' + new Date().toLocaleDateString('pt-BR'), 14, 26);
+
+      const rows = tasks.map(t => [
+        t.categoria, t.entrega, t.responsavel,
+        t.prazoPlanejado, t.prazoReal, t.status, t.observacoes
+      ]);
+
+      doc.autoTable({
+        startY: 30,
+        head: [['Categoria', 'Entrega', 'Setor', 'Prazo Plan.', 'Prazo Real', 'Status', 'Observações']],
+        body: rows,
+        styles: { fontSize: 7, cellPadding: 2, overflow: 'linebreak' },
+        headStyles: { fillColor: [26, 26, 26], fontSize: 7, textColor: 255 },
+        columnStyles: {
+          0: { cellWidth: 28 },
+          1: { cellWidth: 45 },
+          2: { cellWidth: 22 },
+          3: { cellWidth: 20 },
+          4: { cellWidth: 20 },
+          5: { cellWidth: 20 },
+          6: { cellWidth: 'auto' }
+        },
+        didParseCell: function(data) {
+          if (data.section === 'body' && data.column.index === 5) {
+            const val = data.cell.raw;
+            if (val === 'Concluido') data.cell.styles.textColor = [45, 138, 78];
+            else if (val === 'Atrasado') data.cell.styles.textColor = [192, 57, 43];
+            else if (val === 'Em andamento') data.cell.styles.textColor = [184, 134, 11];
+          }
+        }
+      });
+
+      doc.save('cadaver_lab_' + new Date().toISOString().slice(0,10) + '.pdf');
+      showToast('PDF exportado com sucesso', 'success');
+    }
+
+    // ============================================================
+    // LIMPAR FILTROS
+    // ============================================================
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('filterCategoria').value = '';
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterResponsavel').value = '';
+      renderTable();
+    }
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function showToast(msg, type) {
+      type = type || 'info';
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      toast.textContent = msg;
+      container.appendChild(toast);
+      requestAnimationFrame(() => { toast.classList.add('show'); });
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 350);
+      }, 3500);
+    }
+
+    // ============================================================
+    // FECHAR MODAIS COM ESC E CLICK FORA
+    // ============================================================
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (document.getElementById('confirmModal').classList.contains('active')) {
+          closeConfirmModal();
+        } else if (document.getElementById('taskModal').classList.contains('active')) {
+          closeModal();
+        }
+      }
+    });
+
+    document.getElementById('taskModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('taskModal')) closeModal();
+    });
+    document.getElementById('confirmModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('confirmModal')) closeConfirmModal();
+    });
+
+    // ============================================================
+    // INICIALIZAÇÃO
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      populateFilters();
+      renderTable();
+      updateDashboard();
+      updateDaysCounter();
+    });
+  </script>
+</body>
+</html>

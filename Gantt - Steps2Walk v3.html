@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gantt - Projeto Cadaver Lab & Mutirão Neoortho</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'DM Sans', sans-serif; background: #f3f4f6; color: #1e293b; }
+        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
+        
+        :root {
+            --bg: #f3f4f6; --surface: #ffffff; --card: #ffffff; --border: #e2e8f0;
+            --text: #1e293b; --muted: #64748b; 
+            --accent: #00AEEF; 
+            --accent-dark: #5C2D91; 
+        }
+
+        .gantt-container { overflow: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); max-height: 70vh; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .gantt-chart { display: inline-flex; min-width: 100%; }
+        
+        .gantt-sidebar { position: sticky; left: 0; z-index: 10; background: var(--surface); border-right: 2px solid var(--border); width: 650px; min-width: 650px; }
+        .gantt-sidebar-header { position: sticky; top: 0; z-index: 16; background: #f8fafc; border-bottom: 2px solid var(--border); padding: 14px 16px; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: flex; }
+        
+        .sidebar-row { padding: 10px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; display: flex; align-items: center; height: 52px; }
+        .sidebar-row:hover { background: #f1f5f9; }
+        
+        .sidebar-cell { flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+        .sidebar-cell.main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; font-weight: 500; color: var(--text); }
+        .sidebar-cell .cdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .sidebar-cell.date { width: 110px; text-align: center; color: var(--muted); font-size: 11px; }
+        .sidebar-cell.date.realized { color: #00A651; font-weight: 600; }
+
+        .gantt-timeline { position: relative; }
+        .timeline-header { position: sticky; top: 0; z-index: 12; background: #f8fafc; border-bottom: 2px solid var(--border); height: 50px; }
+        .month-hdr { position: absolute; top: 0; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 600; border-right: 1px solid var(--border); border-left: 1px solid var(--border); color: var(--text); }
+        .week-hdr { position: absolute; top: 28px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 9.5px; color: var(--muted); border-right: 1px solid rgba(0,0,0,0.05); }
+
+        .timeline-body { position: relative; }
+        .timeline-row { position: relative; height: 52px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+        .timeline-row:hover { background: rgba(0,174,239,0.03); }
+        
+        .grid-line { position: absolute; top: 0; width: 1px; background: rgba(0,0,0,0.05); pointer-events: none; z-index: 0; }
+        
+        /* Nova linha indicadora de Hoje */
+        .today-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #ef4444; /* Vermelho */
+            z-index: 5;
+            pointer-events: none;
+            border-left: 1px dashed rgba(255,255,255,0.5);
+        }
+        .today-marker::after {
+            content: "Hoje";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ef4444;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 0 0 4px 4px;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        /* Fim da linha Hoje */
+
+        .gantt-bar { position: absolute; height: 20px; border-radius: 4px; display: flex; align-items: center; padding: 0 6px; font-size: 10px; font-weight: 600; color: #fff; cursor: pointer; overflow: hidden; white-space: nowrap; }
+        .gantt-bar.planned { top: 16px; z-index: 1; background: #ffffff; border: 2px solid; }
+        .gantt-bar.planned .bfill { opacity: 0.15; }
+        .gantt-bar.realized { top: 6px; height: 24px; z-index: 2; border: 1px solid rgba(0,0,0,0.2); box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        .gantt-bar.realized .bfill { opacity: 0.9; }
+        .gantt-bar .bfill { position: absolute; inset: 0; border-radius: 3px; }
+        .gantt-bar .btxt { position: relative; z-index: 1; text-shadow: 0 1px 2px rgba(0,0,0,0.3); color: #fff; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px 32px; width: 550px; max-width: 90vw; transform: translateY(20px); transition: transform 0.3s; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .modal-overlay.active .modal-box { transform: translateY(0); }
+        .fg { margin-bottom: 14px; }
+        .fg label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .fg input, .fg select { width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; outline: none; transition: border 0.2s; }
+        .fg input:focus, .fg select:focus { border-color: var(--accent); background: #fff; }
+
+        .toast-box { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast { padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff; animation: tIn 0.3s ease-out, tOut 0.3s ease-in 2.7s forwards; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .toast.success { background: #00A651; }
+        .toast.error { background: #E2183C; }
+        .toast.info { background: #00AEEF; }
+        @keyframes tIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes tOut { from { opacity: 1; } to { opacity: 0; } }
+
+        .dcheck { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; background: #fff; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
+        .dcheck:checked { background: #00A651; border-color: #00A651; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E"); background-size: 12px; background-position: center; background-repeat: no-repeat; }
+        
+        .ftag { padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--muted); transition: all 0.15s; white-space: nowrap; }
+        .ftag:hover { border-color: var(--accent); color: var(--accent); }
+        .ftag.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden">
+
+    <header class="sticky top-0 z-30 border-b bg-white/80" style="backdrop-filter: blur(12px);">
+        <div class="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight"><span style="color: var(--accent-dark);">Gantt</span> Cadaver Lab & Mutirão</h1>
+                <p class="text-sm mt-1 text-gray-500">Projeto Neoortho · Jun - Out 2026</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="btnSaveData" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-green-500 text-green-600 hover:bg-green-50">
+                    <i class="fas fa-floppy-disk"></i> Salvar
+                </button>
+                <button id="btnLoadData" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-blue-500 text-blue-600 hover:bg-blue-50">
+                    <i class="fas fa-folder-open"></i> Carregar
+                </button>
+                <div class="border-l border-gray-200 h-6 mx-2"></div>
+                <button id="btnDeliv" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-gray-200 text-gray-600">
+                    <i class="fas fa-clipboard-check text-xs"></i> Entregas
+                </button>
+                <button id="btnAdd" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all text-white" style="background: var(--accent-dark);">
+                    <i class="fas fa-plus text-xs"></i> Nova Atividade
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="border-b bg-white">
+        <div class="max-w-screen-2xl mx-auto px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2 overflow-x-auto pb-1" id="filterTags"></div>
+            <div class="flex items-center gap-3 flex-shrink-0 ml-4">
+                <span class="text-xs font-medium text-gray-500">Zoom</span>
+                <button id="zoomOut" class="w-7 h-7 rounded flex items-center justify-center bg-gray-100 border border-gray-200"><i class="fas fa-minus" style="font-size: 9px; color: #64748b;"></i></button>
+                <span id="zoomLvl" class="text-xs font-mono w-4 text-center">5</span>
+                <button id="zoomIn" class="w-7 h-7 rounded flex items-center justify-center bg-gray-100 border border-gray-200"><i class="fas fa-plus" style="font-size: 9px; color: #64748b;"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-screen-2xl mx-auto px-6 py-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="rounded-xl p-4 bg-white border border-gray-200 shadow-sm">
+                <div class="text-xs font-medium mb-1 text-gray-500">Total de Atividades</div>
+                <div class="text-3xl font-bold" style="color: var(--accent);" id="statTasks">0</div>
+            </div>
+            <div class="rounded-xl p-4 bg-white border border-gray-200 shadow-sm">
+                <div class="text-xs font-medium mb-1 text-gray-500">Áreas Envolvidas</div>
+                <div class="text-3xl font-bold" style="color: #003A70;" id="statAreas">0</div>
+            </div>
+            <div class="rounded-xl p-4 bg-white border border-gray-200 shadow-sm">
+                <div class="text-xs font-medium mb-1 text-gray-500">Duração do Projeto</div>
+                <div class="text-3xl font-bold" style="color: #F7941D;" id="statDays">0 dias</div>
+            </div>
+            <div class="rounded-xl p-4 bg-white border border-gray-200 shadow-sm">
+                <div class="text-xs font-medium mb-1 text-gray-500">Entregas Concluídas</div>
+                <div class="text-3xl font-bold" style="color: #00A651;" id="statDeliv">0/0</div>
+            </div>
+        </div>
+
+        <div class="gantt-container mb-8" id="ganttBox"></div>
+
+        <div id="delivSec" class="hidden mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-gray-800">Entregas Específicas da Neoortho</h2>
+                <div class="flex items-center gap-4">
+                    <button id="btnAddDeliv" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-white" style="background: var(--accent-dark);">
+                        <i class="fas fa-plus text-xs"></i> Nova Entrega
+                    </button>
+                    <div class="flex items-center gap-3">
+                        <span id="delivProgTxt" class="text-xs font-medium text-gray-500">0/0</span>
+                        <div class="h-2 w-32 rounded-full bg-gray-200"><div id="delivBar" class="h-full rounded-full" style="background: #00A651; width: 0%; transition: width 0.3s;"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="delivGrid"></div>
+        </div>
+
+        <div class="rounded-xl p-5 bg-white border border-gray-200 shadow-sm">
+            <h3 class="text-xs font-semibold mb-3 uppercase tracking-wider text-gray-500">Legenda - Áreas Exibidas no Gráfico</h3>
+            <div class="flex flex-wrap gap-x-6 gap-y-2" id="legendBox"></div>
+        </div>
+    </main>
+
+    <!-- Modal Único (Adapta para Tarefas e Entregas) -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <h3 class="text-lg font-bold mb-6 text-gray-800" id="modalTitle">Editar</h3>
+            <input type="hidden" id="editId">
+            <input type="hidden" id="editMode"> <!-- 'task' ou 'deliverable' -->
+            
+            <div class="fg">
+                <label id="labelName">Nome</label>
+                <input type="text" id="editName" placeholder="Nome da atividade">
+            </div>
+            <div class="fg">
+                <label>Responsável</label>
+                <input type="text" id="editResp" placeholder="Ex: Marketing Produto" list="respList">
+                <datalist id="respList"></datalist>
+            </div>
+            
+            <!-- Campos exclusivos de Tarefa -->
+            <div id="taskFields">
+                <div class="grid grid-cols-2 gap-4 pb-4 border-b border-gray-100">
+                    <div class="fg mb-0"><label class="text-blue-500">Planejado Início</label><input type="date" id="editStart"></div>
+                    <div class="fg mb-0"><label class="text-blue-500">Planejado Fim</label><input type="date" id="editEnd"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div class="fg"><label class="text-green-600">Realizado Início</label><input type="date" id="editStartReal"></div>
+                    <div class="fg"><label class="text-green-600">Realizado Fim</label><input type="date" id="editEndReal"></div>
+                </div>
+            </div>
+
+            <!-- Campo exclusivo de Entrega -->
+            <div id="deliverableFields" class="hidden mt-2">
+                <div class="fg flex items-center gap-3">
+                    <input type="checkbox" id="editDone" class="dcheck mt-1">
+                    <label for="editDone" class="text-sm font-medium text-gray-700 cursor-pointer">Marcar como concluída</label>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-8">
+                <button id="delBtn" class="px-4 py-2 rounded-lg text-xs font-medium bg-red-50 text-red-600 border border-red-100 hover:bg-red-100"><i class="fas fa-trash-alt mr-1"></i>Excluir</button>
+                <div class="flex gap-3">
+                    <button id="btnCancel" class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">Cancelar</button>
+                    <button id="btnSave" class="px-5 py-2 rounded-lg text-xs font-semibold text-white" style="background: var(--accent-dark);">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-box" id="toastBox"></div>
+
+    <script>
+        const DateUtils = {
+            MSPD: 86400000,
+            toDate(input) { if (!input) return null; if (input instanceof Date && !isNaN(input)) return input; if (typeof input === 'string') { const parts = input.split('-'); if (parts.length === 3) { const [y, m, d] = parts.map(Number); if (y > 0 && m > 0 && d > 0) return new Date(y, m - 1, d); } } return null; },
+            diffDays(dateA, dateB) { const dA = this.toDate(dateA); const dB = this.toDate(dateB); if (!dA || !dB) return 0; return Math.round((dB - dA) / this.MSPD); },
+            formatShort(date) { const d = this.toDate(date); if (!d) return '-'; return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }); },
+            toInputFormat(date) { const d = this.toDate(date); if (!d) return ''; const y = d.getFullYear(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); return `${y}-${m}-${day}`; }
+        };
+
+        const AppState = {
+            modalMode: 'task', // 'task' ou 'deliverable'
+            tasks: [
+                {id:5, name:"Definição dos faculty nacionais e internacionais", responsible:"Marketing Educação", start:"2026-06-04", end:"2026-06-19", startReal:"2026-06-04", endReal:"2026-06-15"},
+                {id:6, name:"Definição dos hospitais e instituições participantes", responsible:"Marketing Educação", start:"2026-06-04", end:"2026-06-19", startReal:"2026-06-04", endReal:"2026-06-15"},
+                {id:2, name:"Levantamento das necessidades do Cadaver Lab", responsible:"Marketing Produto", start:"2026-06-04", end:"2026-06-22", startReal:"2026-06-04", endReal:"2026-06-15"},
+                {id:3, name:"Entrega da lista preliminar de implantes", responsible:"Marketing Produto", start:"2026-06-04", end:"2026-06-22", startReal:"2026-06-04", endReal:"2026-06-15"},
+                {id:7, name:"Início da elaboração dos contratos", responsible:"Jurídico", start:"2026-06-04", end:"2026-07-10", startReal:"2026-06-04", endReal:"2026-06-15"},
+                {id:1, name:"Kick-off do projeto", responsible:"Todas as Áreas", start:"2026-06-17", end:"2026-06-17", startReal:"", endReal:""},
+                {id:4, name:"Aprovação da lista de materiais", responsible:"Marketing Educação", start:"2026-06-22", end:"2026-06-23", startReal:"", endReal:""},
+                {id:8, name:"Definição do programa científico", responsible:"Marketing Educação", start:"2026-06-23", end:"2026-06-30", startReal:"", endReal:""},
+                {id:9, name:"Aprovação orçamentária preliminar", responsible:"Marketing Educação", start:"2026-06-30", end:"2026-07-10", startReal:"", endReal:""},
+                {id:12, name:"Assinatura dos contratos principais", responsible:"Jurídico", start:"2026-07-10", end:"2026-07-30", startReal:"", endReal:""},
+                {id:13, name:"Confirmação dos participantes e faculty", responsible:"Marketing Educação", start:"2026-07-10", end:"2026-07-30", startReal:"", endReal:""},
+                {id:14, name:"Liberação da programação final", responsible:"Marketing Educação", start:"2026-07-10", end:"2026-07-30", startReal:"", endReal:""},
+                {id:15, name:"Produção dos implantes e instrumentais", responsible:"Industrial", start:"2026-07-10", end:"2026-09-18", startReal:"", endReal:""},
+                {id:19, name:"Elaboração dos contratos de doação", responsible:"Jurídico + Comercial + Marketing Educação", start:"2026-07-30", end:"2026-09-15", startReal:"", endReal:""},
+                {id:11, name:"Contratação dos fornecedores", responsible:"Marketing Eventos", start:"2026-07-31", end:"2026-08-30", startReal:"", endReal:""},
+                {id:10, name:"Divulgação oficial", responsible:"Marketing Eventos", start:"2026-07-31", end:"2026-09-30", startReal:"", endReal:""},
+                {id:16, name:"Definição dos instrumentadores participantes", responsible:"Marketing Educação + Comercial", start:"2026-09-01", end:"2026-09-25", startReal:"", endReal:""},
+                {id:17, name:"Aprovação dos materiais promocionais", responsible:"Marketing Educação + Marketing Eventos", start:"2026-09-05", end:"2026-09-30", startReal:"", endReal:""},
+                {id:20, name:"Emissão da documentação fiscal preliminar", responsible:"Fiscal", start:"2026-09-07", end:"2026-09-30", startReal:"", endReal:""},
+                {id:18, name:"Conferência da produção dos kits cirúrgicos", responsible:"Marketing Produto + Marketing Educação", start:"2026-09-22", end:"2026-09-30", startReal:"", endReal:""},
+                {id:21, name:"Separação dos kits do Cadaver Lab", responsible:"Marketing Produto + Marketing Educação", start:"2026-09-22", end:"2026-09-30", startReal:"", endReal:""},
+                {id:22, name:"Separação dos kits do Mutirão", responsible:"Comercial", start:"2026-09-22", end:"2026-09-30", startReal:"", endReal:""},
+                {id:24, name:"Conferência de implantes e equipamentos", responsible:"Marketing Produto + Marketing Educação", start:"2026-09-29", end:"2026-09-29", startReal:"", endReal:""},
+                {id:23, name:"Reunião operacional final com todas as áreas", responsible:"Todas as Áreas", start:"2026-10-01", end:"2026-10-01", startReal:"", endReal:""},
+                {id:25, name:"Envio dos materiais para o local do evento", responsible:"Comercial", start:"2026-10-01", end:"2026-10-02", startReal:"", endReal:""},
+                {id:27, name:"Definições das equipes e alinhamento operacional", responsible:"Marketing Produto + Marketing Educação", start:"2026-10-02", end:"2026-10-02", startReal:"", endReal:""},
+                {id:50, name:"Jantar com os Faculties para Alinhamento", responsible:"Marketing Produto + Comercial + Marketing Educação", start:"2026-10-02", end:"2026-10-02", startReal:"", endReal:""},
+                {id:28, name:"Visita à fábrica, transfer e coquetel", responsible:"Marketing Eventos + Marketing Educação + Industrial", start:"2026-10-05", end:"2026-10-05", startReal:"", endReal:""},
+                {id:26, name:"Montagem do material promocional", responsible:"Marketing Eventos + Marketing Educação", start:"2026-10-05", end:"2026-10-07", startReal:"", endReal:""},
+                {id:29, name:"Cadaver Lab", responsible:"Marketing Educação + Marketing Produto", start:"2026-10-06", end:"2026-10-06", startReal:"", endReal:""},
+                {id:30, name:"Mutirão Cirúrgico (Dia 1)", responsible:"Comercial + Marketing Produto", start:"2026-10-08", end:"2026-10-08", startReal:"", endReal:""},
+                {id:31, name:"Mutirão Cirúrgico (Dia 2)", responsible:"Comercial + Marketing Produto", start:"2026-10-09", end:"2026-10-09", startReal:"", endReal:""},
+                {id:32, name:"Inventário e retorno dos materiais", responsible:"Marketing Produto + Comercial + Marketing Educação", start:"2026-10-14", end:"2026-10-14", startReal:"", endReal:""},
+                {id:34, name:"Relatório final do projeto", responsible:"Marketing Educação", start:"2026-10-14", end:"2026-10-14", startReal:"", endReal:""},
+                {id:33, name:"Consolidação dos custos", responsible:"Financeiro + Controladoria", start:"2026-10-17", end:"2026-10-17", startReal:"", endReal:""}
+            ],
+            deliverables: [
+                {id:1, item:"Implantes para Cadaver Lab", responsible:"Marketing Produto + Industrial", done:false},
+                {id:2, item:"Instrumentais para Cadaver Lab", responsible:"Marketing Produto + Industrial", done:false},
+                {id:3, item:"Equipamentos para Cadaver Lab", responsible:"Marketing Produto", done:false},
+                {id:4, item:"Blocos e canetas", responsible:"Marketing Eventos", done:false},
+                {id:5, item:"Toucas cirúrgicas", responsible:"Marketing Eventos", done:false},
+                {id:6, item:"Backdrop", responsible:"Marketing Eventos", done:false},
+                {id:7, item:"Coffee Break", responsible:"Marketing Eventos", done:false},
+                {id:8, item:"Transfer para visita à fábrica", responsible:"Marketing Eventos", done:false},
+                {id:9, item:"Coquetel", responsible:"Marketing Eventos", done:false},
+                {id:10, item:"Implantes para o mutirão", responsible:"Marketing Produto + Industrial", done:false},
+                {id:11, item:"Instrumentais para o mutirão", responsible:"Marketing Produto + Industrial", done:false},
+                {id:12, item:"Equipamentos cirúrgicos", responsible:"Marketing Produto", done:false},
+                {id:13, item:"Instrumentadores", responsible:"Comercial", done:false},
+                {id:14, item:"Controle de materiais no centro cirúrgico", responsible:"Comercial + Supply Chain", done:false},
+                {id:15, item:"Controle dos gastos cirúrgicos", responsible:"Financeiro + Controladoria", done:false},
+                {id:16, item:"Contratos e doações", responsible:"Jurídico", done:false},
+                {id:17, item:"Notas fiscais e remessas", responsible:"Fiscal", done:false},
+                {id:18, item:"Logística dos materiais", responsible:"Supply Chain", done:false}
+            ],
+            dayWidth: 5,
+            filterArea: "Todos",
+            nextId: 51,
+            nextDelivId: 50, // Controle de ID para entregas
+            timelineStart: new Date(2026, 5, 1), 
+            timelineEnd: new Date(2026, 9, 31),  
+            totalDays: 0,
+            areaColors: {
+                "Marketing Educação": "#00AEEF", "Marketing Produto": "#003A70", "Marketing Eventos": "#E2183C",
+                "Comercial": "#F7941D", "Industrial": "#FDB913", "Jurídico": "#5C2D91",
+                "Financeiro + Controladoria": "#8DC63F", "Supply Chain": "#00A651", 
+                "Líder do Projeto": "#5C2D91", "Fiscal": "#BCBEC0", "Todas as Áreas": "#58595B", "Controladoria": "#8DC63F", "Financeiro": "#8DC63F"
+            }
+        };
+
+        AppState.totalDays = DateUtils.diffDays(AppState.timelineStart, AppState.timelineEnd) + 1;
+
+        const Storage = {
+            KEYS: { tasks: 'neoortho_gantt_tasks_v4', deliverables: 'neoortho_gantt_delivs_v4' },
+            save() { try { localStorage.setItem(this.KEYS.tasks, JSON.stringify(AppState.tasks)); localStorage.setItem(this.KEYS.deliverables, JSON.stringify(AppState.deliverables)); UI.toast("Progresso salvo com sucesso!", "success"); } catch (e) { UI.toast("Erro ao salvar dados.", "error"); } },
+            load() { try { const savedTasks = localStorage.getItem(this.KEYS.tasks); const savedDelivs = localStorage.getItem(this.KEYS.deliverables); if (savedTasks) { AppState.tasks = JSON.parse(savedTasks); AppState.nextId = AppState.tasks.reduce((max, t) => Math.max(max, t.id), 0) + 1; } if (savedDelivs) { AppState.deliverables = JSON.parse(savedDelivs); AppState.nextDelivId = AppState.deliverables.reduce((max, d) => Math.max(max, d.id), 0) + 1; } if (savedTasks || savedDelivs) { App.renderAll(); UI.toast("Dados carregados.", "info"); } else UI.toast("Nenhum salvamento encontrado.", "info"); } catch (e) { UI.toast("Erro ao carregar.", "error"); } },
+            autoLoad() { try { const savedTasks = localStorage.getItem(this.KEYS.tasks); const savedDelivs = localStorage.getItem(this.KEYS.deliverables); if (savedTasks) { AppState.tasks = JSON.parse(savedTasks); AppState.nextId = AppState.tasks.reduce((max, t) => Math.max(max, t.id), 0) + 1; } if (savedDelivs) { AppState.deliverables = JSON.parse(savedDelivs); AppState.nextDelivId = AppState.deliverables.reduce((max, d) => Math.max(max, d.id), 0) + 1; } } catch (e) {} }
+        };
+
+        const Stats = {
+            render() { const ft = Filter.getFiltered(); const doneCount = AppState.deliverables.filter(d => d.done).length; const areasSet = new Set(); ft.forEach(t => t.responsible.split("+").forEach(a => { const trimmed = a.trim(); if (trimmed !== "Todas as Áreas") areasSet.add(trimmed); })); document.getElementById('statTasks').textContent = ft.length; document.getElementById('statAreas').textContent = areasSet.size; document.getElementById('statDays').textContent = `${AppState.totalDays} dias`; document.getElementById('statDeliv').textContent = `${doneCount}/${AppState.deliverables.length}`; }
+        };
+
+        const Filter = {
+            getAllAreas() { const s = new Set(); AppState.tasks.forEach(t => t.responsible.split("+").forEach(a => s.add(a.trim()))); return ["Todos", ...Array.from(s).sort()]; },
+            getFiltered() { let result = [...AppState.tasks]; result.sort((a, b) => { const dateA = DateUtils.toDate(a.start); const dateB = DateUtils.toDate(b.start); if (!dateA && !dateB) return a.id - b.id; if (!dateA) return 1; if (!dateB) return -1; if (dateA.getTime() !== dateB.getTime()) return dateA - dateB; const endA = DateUtils.toDate(a.end); const endB = DateUtils.toDate(b.end); if (endA && endB && endA.getTime() !== endB.getTime()) return endA - endB; return a.id - b.id; }); if (AppState.filterArea === "Todos") return result; return result.filter(t => t.responsible.includes(AppState.filterArea)); },
+            set(area) { AppState.filterArea = area; App.renderAll(); },
+            render() { const areas = this.getAllAreas(); document.getElementById('filterTags').innerHTML = areas.map(a => { const isActive = AppState.filterArea === a; const col = a === "Todos" ? 'var(--accent)' : Gantt.getColor(a); return `<button class="ftag${isActive ? ' active' : ''}" data-area="${a}" ${isActive ? `style="background:${col};border-color:${col};color:#fff;"` : ''}>${a}</button>`; }).join(''); }
+        };
+
+        const Gantt = {
+            getColor(resp) { for (const [area, color] of Object.entries(AppState.areaColors)) { if (resp.includes(area)) return color; } return "#58595B"; },
+            changeZoom(delta) { AppState.dayWidth = Math.max(2, Math.min(20, AppState.dayWidth + delta)); document.getElementById('zoomLvl').textContent = AppState.dayWidth; this.render(); },
+            render() { try { const ft = Filter.getFiltered(); const tw = AppState.totalDays * AppState.dayWidth; const rh = 52; const totalH = ft.length * rh; const headerHTML = this.buildHeader(tw); const gridHTML = this.buildGrid(tw, totalH); const { sidebarHTML, rowsHTML } = this.buildRows(ft, tw, rh); const box = document.getElementById('ganttBox'); const st = box.scrollTop, sl = box.scrollLeft; box.innerHTML = `<div class="gantt-chart"><div class="gantt-sidebar"><div class="gantt-sidebar-header"><span style="flex:1;">Atividade</span><span style="width:110px; text-align:center;">Planejado</span><span style="width:110px; text-align:center;">Realizado</span></div>${sidebarHTML}</div><div class="gantt-timeline" style="width:${tw}px;min-width:${tw}px;">${headerHTML}<div class="timeline-body" style="width:${tw}px;min-width:${tw}px;position:relative;"><div style="position:absolute;top:0;left:0;width:${tw}px;height:${totalH}px;pointer-events:none;z-index:0;">${gridHTML}</div><div style="position:relative;z-index:1;">${rowsHTML}</div></div></div></div>`; box.scrollTop = st; box.scrollLeft = sl; } catch (error) { UI.toast("Erro ao desenhar o gráfico.", "error"); } },
+            buildHeader(tw) { const mn = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']; let mhdr = '', whdr = ''; let cur = new Date(AppState.timelineStart); while (cur <= AppState.timelineEnd) { const y = cur.getFullYear(), m = cur.getMonth(); const ms = new Date(y, m, 1), me = new Date(y, m+1, 0); const es = ms < AppState.timelineStart ? AppState.timelineStart : ms; const ee = me > AppState.timelineEnd ? AppState.timelineEnd : me; const l = DateUtils.diffDays(AppState.timelineStart, es) * AppState.dayWidth; const w = (DateUtils.diffDays(es, ee) + 1) * AppState.dayWidth; mhdr += `<div class="month-hdr" style="left:${l}px;width:${w}px;">${mn[m]} ${y}</div>`; cur = new Date(y, m+1, 1); } for (let d=0; d<AppState.totalDays; d++) { const dt = new Date(AppState.timelineStart.getTime() + d * DateUtils.MSPD); if (dt.getDay() === 1) whdr += `<div class="week-hdr" style="left:${d*AppState.dayWidth}px;width:${7*AppState.dayWidth}px;">${dt.getDate()}/${dt.getMonth()+1}</div>`; } return `<div class="timeline-header" style="width:${tw}px;min-width:${tw}px;">${mhdr}${whdr}</div>`; },
+            buildGrid(tw, totalH) { 
+                let html = ''; 
+                // Linhas de grade e fins de semana
+                for (let d=0; d<AppState.totalDays; d++) { 
+                    const dt = new Date(AppState.timelineStart.getTime() + d * DateUtils.MSPD); 
+                    if (dt.getDay() === 1) html += `<div class="grid-line" style="left:${d*AppState.dayWidth}px;height:${totalH}px;"></div>`; 
+                    if (dt.getDay() === 0 || dt.getDay() === 6) html += `<div style="position:absolute;left:${d*AppState.dayWidth}px;top:0;width:${AppState.dayWidth}px;height:${totalH}px;background:rgba(0,0,0,0.02);pointer-events:none;"></div>`; 
+                }
+
+                // --- LÍNHA "HOJE" ---
+                const today = new Date();
+                today.setHours(0,0,0,0); // Normalizar para meia-noite para comparação correta
+                const diffToday = DateUtils.diffDays(AppState.timelineStart, today);
+                
+                // Verifica se hoje está dentro do range do gráfico
+                if (diffToday >= 0 && diffToday < AppState.totalDays) {
+                    const leftPos = diffToday * AppState.dayWidth;
+                    html += `<div class="today-marker" style="left:${leftPos}px; height:${totalH}px;"></div>`;
+                }
+                // ---------------------
+
+                return html; 
+            },
+            buildRows(ft, tw, rh) { let sidebarHTML = '', rowsHTML = ''; ft.forEach(t => { const col = this.getColor(t.responsible); const startD = DateUtils.toDate(t.start); const endD = DateUtils.toDate(t.end); if (!startD || !endD) return; const so = DateUtils.diffDays(AppState.timelineStart, startD) * AppState.dayWidth; const dur = DateUtils.diffDays(startD, endD) + 1; const bw = Math.max(dur * AppState.dayWidth, AppState.dayWidth); const dateLabelPlanned = DateUtils.formatShort(startD) + (startD.getTime() !== endD.getTime() ? ' — ' + DateUtils.formatShort(endD) : ''); let isRealized = false, soReal = 0, bwReal = 0, dateLabelReal = "Pendente"; const realStartD = DateUtils.toDate(t.startReal); const realEndD = DateUtils.toDate(t.endReal); if (realStartD && realEndD) { isRealized = true; soReal = DateUtils.diffDays(AppState.timelineStart, realStartD) * AppState.dayWidth; const durReal = DateUtils.diffDays(realStartD, realEndD) + 1; bwReal = Math.max(durReal * AppState.dayWidth, AppState.dayWidth); dateLabelReal = DateUtils.formatShort(realStartD) + (realStartD.getTime() !== realEndD.getTime() ? ' — ' + DateUtils.formatShort(realEndD) : ''); } sidebarHTML += `<div class="sidebar-row" data-id="${t.id}"><div class="sidebar-cell main"><div class="cdot" style="background:${col};"></div><span title="${t.name}">${t.name}</span></div><div class="sidebar-cell date" title="${dateLabelPlanned}">${dateLabelPlanned}</div><div class="sidebar-cell date realized ${isRealized ? '' : 'text-gray-400 font-normal'}" title="${dateLabelReal}">${dateLabelReal}</div></div>`; rowsHTML += `<div class="timeline-row" data-id="${t.id}" style="height:${rh}px;"><div class="gantt-bar planned" style="left:${so}px;width:${bw}px;border-color:${col};" title="Planejado: ${t.name}\n${dateLabelPlanned}\n${t.responsible}"><div class="bfill" style="background:${col};"></div></div>`; if (isRealized) { rowsHTML += `<div class="gantt-bar realized" style="left:${soReal}px;width:${bwReal}px;" title="Realizado: ${t.name}\n${dateLabelReal}\n${t.responsible}"><div class="bfill" style="background:${col};"></div><span class="btxt">${bwReal > 60 ? t.name.substring(0, Math.floor(bwReal/6))+'...' : ''}</span></div>`; } rowsHTML += `</div>`; }); return { sidebarHTML, rowsHTML }; }
+        };
+
+        const Deliverables = {
+            toggle(id) { const d = AppState.deliverables.find(x => x.id === id); if (d) { d.done = !d.done; App.renderAll(); UI.toast(d.done ? `"${d.item}" concluída!` : `"${d.item}" reaberta`, 'success'); } },
+            render() { 
+                const doneCount = AppState.deliverables.filter(d => d.done).length; const total = AppState.deliverables.length; 
+                document.getElementById('delivProgTxt').textContent = `${doneCount}/${total}`; 
+                document.getElementById('delivBar').style.width = (total > 0 ? (doneCount / total * 100) : 0) + '%'; 
+                document.getElementById('delivGrid').innerHTML = AppState.deliverables.map(d => { 
+                    const col = Gantt.getColor(d.responsible); 
+                    return `<div class="flex items-start gap-3 rounded-lg p-3 transition-all border bg-white ${d.done ? 'opacity-50' : ''}" style="border-color: var(--border); cursor: pointer;" onclick="Modal.openEditDeliverable(${d.id})" title="Clique para editar">
+                        <input type="checkbox" class="dcheck mt-1" ${d.done ? 'checked' : ''} data-deliv-id="${d.id}" onclick="event.stopPropagation(); Deliverables.toggle(${d.id})" style="border-color:${col}40;">
+                        <div class="flex-1 min-w-0">
+                            <div class="text-xs font-medium ${d.done ? 'line-through text-gray-400' : 'text-gray-800'}">${d.item}</div>
+                            <div class="text-xs mt-1 text-gray-500">${d.responsible}</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-pen text-gray-300 hover:text-gray-500" style="font-size:10px;"></i>
+                            <div style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0;"></div>
+                        </div>
+                    </div>`; 
+                }).join(''); 
+            }
+        };
+
+        const Modal = {
+            // Alterna os campos do Modal para o Modo Tarefa
+            openAdd() { 
+                AppState.modalMode = 'task'; 
+                document.getElementById('editId').value = ''; 
+                document.getElementById('editName').value = ''; 
+                document.getElementById('editResp').value = ''; 
+                document.getElementById('editStart').value = '2026-06-17'; 
+                document.getElementById('editEnd').value = '2026-06-17'; 
+                document.getElementById('editStartReal').value = ''; 
+                document.getElementById('editEndReal').value = ''; 
+                document.getElementById('modalTitle').textContent = 'Nova Atividade'; 
+                document.getElementById('labelName').textContent = 'Atividade';
+                document.getElementById('taskFields').classList.remove('hidden'); 
+                document.getElementById('deliverableFields').classList.add('hidden'); 
+                document.getElementById('delBtn').style.display = 'none'; 
+                document.getElementById('editModal').classList.add('active'); 
+            },
+            openEdit(id) { 
+                AppState.modalMode = 'task'; 
+                const t = AppState.tasks.find(x => x.id === id); if (!t) return; 
+                document.getElementById('editId').value = t.id; 
+                document.getElementById('editName').value = t.name; 
+                document.getElementById('editResp').value = t.responsible; 
+                document.getElementById('editStart').value = DateUtils.toInputFormat(t.start); 
+                document.getElementById('editEnd').value = DateUtils.toInputFormat(t.end); 
+                document.getElementById('editStartReal').value = DateUtils.toInputFormat(t.startReal); 
+                document.getElementById('editEndReal').value = DateUtils.toInputFormat(t.endReal); 
+                document.getElementById('modalTitle').textContent = 'Editar Atividade'; 
+                document.getElementById('labelName').textContent = 'Atividade';
+                document.getElementById('taskFields').classList.remove('hidden'); 
+                document.getElementById('deliverableFields').classList.add('hidden'); 
+                document.getElementById('delBtn').style.display = ''; 
+                document.getElementById('editModal').classList.add('active'); 
+            },
+            // Alterna os campos do Modal para o Modo Entrega
+            openAddDeliverable() { 
+                AppState.modalMode = 'deliverable'; 
+                document.getElementById('editId').value = ''; 
+                document.getElementById('editName').value = ''; 
+                document.getElementById('editResp').value = ''; 
+                document.getElementById('editDone').checked = false; 
+                document.getElementById('modalTitle').textContent = 'Nova Entrega'; 
+                document.getElementById('labelName').textContent = 'Item de Entrega';
+                document.getElementById('taskFields').classList.add('hidden'); 
+                document.getElementById('deliverableFields').classList.remove('hidden'); 
+                document.getElementById('delBtn').style.display = 'none'; 
+                document.getElementById('editModal').classList.add('active'); 
+            },
+            openEditDeliverable(id) { 
+                AppState.modalMode = 'deliverable'; 
+                const d = AppState.deliverables.find(x => x.id === id); if (!d) return; 
+                document.getElementById('editId').value = d.id; 
+                document.getElementById('editName').value = d.item; 
+                document.getElementById('editResp').value = d.responsible; 
+                document.getElementById('editDone').checked = d.done; 
+                document.getElementById('modalTitle').textContent = 'Editar Entrega'; 
+                document.getElementById('labelName').textContent = 'Item de Entrega';
+                document.getElementById('taskFields').classList.add('hidden'); 
+                document.getElementById('deliverableFields').classList.remove('hidden'); 
+                document.getElementById('delBtn').style.display = ''; 
+                document.getElementById('editModal').classList.add('active'); 
+            },
+            close() { document.getElementById('editModal').classList.remove('active'); },
+            
+            // Lógica de Salvar Unificada
+            save() { 
+                const idStr = document.getElementById('editId').value; 
+                const name = document.getElementById('editName').value.trim(); 
+                const resp = document.getElementById('editResp').value.trim(); 
+
+                if (!name || !resp) { UI.toast("Preencha Nome e Responsável.", "error"); return; }
+
+                if (AppState.modalMode === 'task') {
+                    const startStr = document.getElementById('editStart').value; const endStr = document.getElementById('editEnd').value; const startRealStr = document.getElementById('editStartReal').value; const endRealStr = document.getElementById('editEndReal').value; 
+                    if (!startStr || !endStr) { UI.toast("Preencha as datas de planejamento.", "error"); return; } 
+                    if (!DateUtils.toDate(startStr) || !DateUtils.toDate(endStr)) { UI.toast("Data de planejamento inválida.", "error"); return; } 
+                    if (new Date(startStr) > new Date(endStr)) { UI.toast("Fim do planejado não pode ser antes do início.", "error"); return; } 
+                    if ((startRealStr && !endRealStr) || (!startRealStr && endRealStr)) { UI.toast("Preencha início e fim do realizado, ou deixe ambos vazios.", "error"); return; } 
+                    if (startRealStr && endRealStr) { if (!DateUtils.toDate(startRealStr) || !DateUtils.toDate(endRealStr)) { UI.toast("Data realizada inválida.", "error"); return; } if (new Date(startRealStr) > new Date(endRealStr)) { UI.toast("Fim do realizado não pode ser antes do início.", "error"); return; } } 
+                    if (idStr) { const idNum = parseInt(idStr, 10); const taskIndex = AppState.tasks.findIndex(t => t.id === idNum); if (taskIndex !== -1) { AppState.tasks[taskIndex].name = name; AppState.tasks[taskIndex].responsible = resp; AppState.tasks[taskIndex].start = startStr; AppState.tasks[taskIndex].end = endStr; AppState.tasks[taskIndex].startReal = startRealStr; AppState.tasks[taskIndex].endReal = endRealStr; } UI.toast("Atividade atualizada!"); } else { AppState.tasks.push({ id: AppState.nextId++, name, responsible: resp, start: startStr, end: endStr, startReal: startRealStr, endReal: endRealStr }); UI.toast("Nova atividade adicionada!"); }
+                } 
+                else if (AppState.modalMode === 'deliverable') {
+                    const done = document.getElementById('editDone').checked;
+                    if (idStr) { const idNum = parseInt(idStr, 10); const delIndex = AppState.deliverables.findIndex(d => d.id === idNum); if (delIndex !== -1) { AppState.deliverables[delIndex].item = name; AppState.deliverables[delIndex].responsible = resp; AppState.deliverables[delIndex].done = done; } UI.toast("Entrega atualizada!"); } else { AppState.deliverables.push({ id: AppState.nextDelivId++, item: name, responsible: resp, done: done }); UI.toast("Nova entrega adicionada!"); }
+                }
+                Modal.close(); App.renderAll(); 
+            },
+            // Lógica de Excluir Unificada
+            deleteItem() { 
+                const idStr = document.getElementById('editId').value; 
+                if (idStr && confirm("Tem certeza que deseja excluir?")) { 
+                    const idNum = parseInt(idStr, 10); 
+                    if (AppState.modalMode === 'task') { AppState.tasks = AppState.tasks.filter(x => x.id !== idNum); UI.toast("Atividade removida."); } 
+                    else if (AppState.modalMode === 'deliverable') { AppState.deliverables = AppState.deliverables.filter(x => x.id !== idNum); UI.toast("Entrega removida."); } 
+                    Modal.close(); App.renderAll(); 
+                } 
+            }
+        };
+
+        const UI = {
+            toast(msg, type = 'success') { const el = document.createElement('div'); el.className = `toast ${type}`; el.textContent = msg; document.getElementById('toastBox').appendChild(el); setTimeout(() => el.remove(), 3200); },
+            toggleDeliverables() { const sec = document.getElementById('delivSec'); const btn = document.getElementById('btnDeliv'); const isHidden = sec.classList.contains('hidden'); if (isHidden) { sec.classList.remove('hidden'); btn.style.borderColor = '#00A651'; btn.style.color = '#00A651'; } else { sec.classList.add('hidden'); btn.style.borderColor = ''; btn.style.color = ''; } },
+            renderLegend() { const ft = Filter.getFiltered(); const activeAreas = new Set(); ft.forEach(t => t.responsible.split("+").forEach(a => { const trimmed = a.trim(); if (trimmed !== "Todas as Áreas") activeAreas.add(trimmed); })); const legendItems = Object.entries(AppState.areaColors).filter(([area]) => activeAreas.has(area)); document.getElementById('legendBox').innerHTML = legendItems.map(([a, c]) => `<div class="flex items-center gap-2"><div style="width:12px;height:12px;border-radius:3px;background:${c};border:1px solid rgba(0,0,0,0.1);"></div><span class="text-xs text-gray-600">${a}</span></div>`).join(''); },
+            renderDatalist() { const areas = Filter.getAllAreas().filter(a => a !== "Todos"); document.getElementById('respList').innerHTML = areas.map(a => `<option value="${a}">`).join(''); }
+        };
+
+        const App = {
+            renderAll() { Stats.render(); Filter.render(); Gantt.render(); Deliverables.render(); UI.renderLegend(); UI.renderDatalist(); },
+            bindEvents() { 
+                document.getElementById('btnDeliv').addEventListener('click', UI.toggleDeliverables); 
+                document.getElementById('btnAdd').addEventListener('click', Modal.openAdd); 
+                document.getElementById('btnAddDeliv').addEventListener('click', Modal.openAddDeliverable); // Novo botão
+                document.getElementById('btnSaveData').addEventListener('click', () => Storage.save()); 
+                document.getElementById('btnLoadData').addEventListener('click', () => Storage.load()); 
+                document.getElementById('filterTags').addEventListener('click', (e) => { const btn = e.target.closest('.ftag'); if (btn && btn.dataset.area) Filter.set(btn.dataset.area); }); 
+                document.getElementById('zoomIn').addEventListener('click', () => Gantt.changeZoom(1)); 
+                document.getElementById('zoomOut').addEventListener('click', () => Gantt.changeZoom(-1)); 
+                document.getElementById('ganttBox').addEventListener('click', (e) => { const row = e.target.closest('.timeline-row') || e.target.closest('.sidebar-row'); if (row && row.dataset.id) Modal.openEdit(parseInt(row.dataset.id, 10)); }); 
+                document.getElementById('delivGrid').addEventListener('click', (e) => { if (e.target.classList.contains('dcheck')) { const id = parseInt(e.target.dataset.delivId, 10); if (!isNaN(id)) Deliverables.toggle(id); } }); 
+                document.getElementById('btnCancel').addEventListener('click', Modal.close); 
+                document.getElementById('btnSave').addEventListener('click', Modal.save); 
+                document.getElementById('delBtn').addEventListener('click', Modal.deleteItem); // Nome alterado
+                document.getElementById('editModal').addEventListener('click', (e) => { if (e.target === e.currentTarget) Modal.close(); }); 
+            },
+            init() { this.bindEvents(); Storage.autoLoad(); this.renderAll(); }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => App.init());
+    </script>
+</body>
+</html>

@@ -1,0 +1,1604 @@
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curso Essential - Gestão de Projetos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    :root {
+      --primary: #1a1a2e;
+      --primary-dark: #0f0f1e;
+      --primary-light: #3a3a5e;
+      --accent: #c9963b;
+      --accent-light: #e8c06a;
+      --accent-bg: #fdf6e8;
+      --accent-border: #f0d890;
+      --bg: #f3f3f3;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #777777;
+      --border: #e0e0e0;
+      --border-light: #ececec;
+      --success: #2d8a4e;
+      --success-bg: #edf7f0;
+      --success-border: #c1e6cb;
+      --warning: #b8860b;
+      --warning-bg: #fef9ed;
+      --warning-border: #f0ddb8;
+      --danger: #c0392b;
+      --danger-bg: #fcf0ee;
+      --danger-border: #f0c4be;
+      --cancel: #888888;
+      --cancel-bg: #f6f6f6;
+      --cancel-border: #e0e0e0;
+      --import-color: #2d7a6e;
+      --import-bg: #edf7f5;
+      --import-border: #b8e0d8;
+      --export-color: #6a5a10;
+      --export-bg: #fdf8ed;
+      --export-border: #e8d88a;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.08);
+      --shadow-xl: 0 16px 48px rgba(0,0,0,0.1);
+      --radius-sm: 5px;
+      --radius: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.012) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--primary-dark);
+      padding: 0 24px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+      border-bottom: 1px solid #333;
+    }
+    .header-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-mark {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 900; color: var(--primary-dark);
+      letter-spacing: -1px; flex-shrink: 0; border: 2px solid var(--accent-light);
+    }
+    .header-title { color: #fff; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
+    .header-title span { color: var(--accent-light); }
+    .header-subtitle { color: rgba(255,255,255,0.45); font-size: 13px; font-weight: 400; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn-header {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap; text-decoration: none;
+    }
+    .btn-header svg { flex-shrink: 0; }
+    .btn-header:active { transform: translateY(0); }
+    .btn-import { border: 1px solid var(--import-border); background: rgba(45,122,110,0.1); color: #8fd4c8; }
+    .btn-import:hover { background: rgba(45,122,110,0.2); border-color: #8fd4c8; color: #b0e8de; transform: translateY(-1px); }
+    .btn-export-data { border: 1px solid var(--export-border); background: rgba(106,90,16,0.1); color: #d4c870; }
+    .btn-export-data:hover { background: rgba(106,90,16,0.2); border-color: #d4c870; color: #e8de90; transform: translateY(-1px); }
+    .btn-excel { border: 1px solid #555; background: transparent; color: #ccc; }
+    .btn-excel:hover { background: rgba(255,255,255,0.08); border-color: #777; color: #fff; transform: translateY(-1px); }
+    .btn-pdf { border: 1px solid #555; background: transparent; color: #ccc; }
+    .btn-pdf:hover { background: rgba(255,255,255,0.08); border-color: #777; color: #fff; transform: translateY(-1px); }
+    .header-sep { width: 1px; height: 24px; background: #444; flex-shrink: 0; }
+
+    main { position: relative; z-index: 1; max-width: 1440px; margin: 0 auto; padding: 24px; }
+
+    /* BANNER DE DATAS */
+    .date-banner {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1a1a3e 100%);
+      border-radius: var(--radius-xl);
+      padding: 0;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid #2a2a4e;
+      overflow: hidden;
+      position: relative;
+    }
+    .date-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -10%;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(201,150,59,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .date-banner-top {
+      padding: 24px 32px 20px;
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 24px; flex-wrap: wrap;
+    }
+    .date-banner-info h2 {
+      color: #fff; font-size: 18px; font-weight: 800;
+      margin-bottom: 8px; letter-spacing: -0.3px;
+    }
+    .date-banner-info h2 span { color: var(--accent-light); }
+    .date-banner-info .tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .info-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.65);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .info-tag strong { color: var(--accent-light); font-weight: 700; }
+    .date-banner-form {
+      display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap;
+    }
+    .date-field { display: flex; flex-direction: column; gap: 4px; }
+    .date-field label {
+      font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4);
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .date-field input[type="date"] {
+      padding: 9px 14px; border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif;
+      font-size: 14px; font-weight: 600; color: #fff;
+      background: rgba(255,255,255,0.08); outline: none;
+      transition: all 0.2s; min-width: 165px;
+    }
+    .date-field input[type="date"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(201,150,59,0.15);
+      background: rgba(255,255,255,0.12);
+    }
+    .date-field input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+    .btn-generate {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 24px; border: none; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      color: var(--primary-dark); font-family: 'Outfit', sans-serif;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      transition: all 0.25s; white-space: nowrap; letter-spacing: -0.2px;
+    }
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(201,150,59,0.35);
+    }
+    .btn-generate:active { transform: translateY(0); }
+    .btn-generate svg { flex-shrink: 0; }
+    .date-banner-bottom {
+      padding: 0 32px 20px;
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    }
+    .timeline-mini {
+      display: flex; align-items: center; gap: 6px; flex: 1; min-width: 280px;
+    }
+    .timeline-mini-label {
+      font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.35);
+      text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+    }
+    .timeline-mini-bar {
+      flex: 1; height: 6px; background: rgba(255,255,255,0.08);
+      border-radius: 3px; overflow: hidden; position: relative;
+    }
+    .timeline-mini-fill {
+      height: 100%; border-radius: 3px; transition: width 0.8s ease;
+      background: linear-gradient(90deg, var(--danger), var(--warning), var(--accent), var(--success));
+    }
+    .timeline-mini-markers {
+      display: flex; justify-content: space-between; width: 100%;
+      position: absolute; top: -2px;
+    }
+    .timeline-marker {
+      width: 2px; height: 10px; border-radius: 1px;
+      background: rgba(255,255,255,0.2);
+    }
+    .timeline-mini-info {
+      font-size: 12px; color: rgba(255,255,255,0.55);
+      font-weight: 500; white-space: nowrap;
+    }
+    .timeline-mini-info strong { color: var(--accent-light); font-weight: 700; }
+
+    /* DASHBOARD */
+    .dashboard { margin-bottom: 24px; }
+    .dashboard-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
+    }
+    .dashboard-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+    .days-counter {
+      display: flex; align-items: center; gap: 8px; padding: 6px 16px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      font-size: 13px; font-weight: 500; color: var(--text); box-shadow: var(--shadow-sm);
+    }
+    .days-counter .days-num { font-weight: 800; font-size: 16px; color: var(--primary); }
+    .stat-cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 20px; }
+    .stat-card {
+      background: var(--card); border-radius: var(--radius-lg); padding: 20px;
+      border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .stat-card.nao-iniciado::before { background: var(--cancel); }
+    .stat-card.em-andamento::before { background: var(--warning); }
+    .stat-card.concluido::before { background: var(--success); }
+    .stat-card.atrasado::before { background: var(--danger); }
+    .stat-card.cancelado::before { background: #aaa; }
+    .stat-icon {
+      width: 38px; height: 38px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px;
+    }
+    .nao-iniciado .stat-icon { background: var(--cancel-bg); color: var(--cancel); border: 1px solid var(--cancel-border); }
+    .em-andamento .stat-icon { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+    .concluido .stat-icon { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+    .atrasado .stat-icon { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+    .cancelado .stat-icon { background: #f0f0f0; color: #999; border: 1px solid #ddd; }
+    .stat-number { font-size: 30px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+    .nao-iniciado .stat-number { color: var(--cancel); }
+    .em-andamento .stat-number { color: var(--warning); }
+    .concluido .stat-number { color: var(--success); }
+    .atrasado .stat-number { color: var(--danger); }
+    .cancelado .stat-number { color: #999; }
+    .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+    .progress-section {
+      background: var(--card); border-radius: var(--radius-lg);
+      padding: 20px 24px; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);
+    }
+    .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .progress-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .progress-percent { font-size: 20px; font-weight: 900; color: var(--primary); }
+    .progress-bar-track { width: 100%; height: 10px; background: var(--border-light); border-radius: 5px; overflow: hidden; }
+    .progress-bar-fill {
+      height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 5px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
+    }
+    .progress-bar-fill::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+      animation: shimmer 2.5s infinite;
+    }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .progress-details { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+
+    /* TOOLBAR */
+    .toolbar {
+      background: var(--card); border-radius: var(--radius-lg); padding: 16px 20px;
+      border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .search-box { position: relative; flex: 1; min-width: 200px; }
+    .search-box input {
+      width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text);
+      background: var(--bg); transition: all 0.2s; outline: none;
+    }
+    .search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,26,46,0.06); background: #fff; }
+    .search-box input::placeholder { color: var(--text-muted); }
+    .filter-select {
+      padding: 9px 30px 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text);
+      background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23777' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 10px center;
+      appearance: none; cursor: pointer; transition: all 0.2s; outline: none; min-width: 140px;
+    }
+    .filter-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,26,46,0.06); }
+    .btn-add {
+      display: inline-flex; align-items: center; gap: 8px; padding: 9px 20px;
+      background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-add:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .btn-add:active { transform: translateY(0); }
+    .btn-clear-filters {
+      padding: 9px 14px; background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 13px; cursor: pointer;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-clear-filters:hover { background: var(--bg); color: var(--text); border-color: var(--text-muted); }
+    .btn-reset {
+      padding: 9px 14px; background: transparent; color: var(--warning);
+      border: 1px solid var(--warning-border); border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 13px; cursor: pointer;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-reset:hover { background: var(--warning-bg); border-color: var(--warning); }
+    .results-count { font-size: 12px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+
+    /* TABELA */
+    .table-wrapper {
+      background: var(--card); border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); overflow: hidden;
+    }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; min-width: 1020px; }
+    thead { background: var(--primary-dark); position: sticky; top: 0; z-index: 10; }
+    thead th {
+      padding: 14px 16px; font-size: 11px; font-weight: 700;
+      color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.8px;
+      text-align: left; white-space: nowrap; border-bottom: 2px solid #2a2a4e;
+    }
+    thead th:first-child { padding-left: 20px; }
+    thead th:last-child { text-align: center; width: 90px; }
+    .cat-row td {
+      padding: 10px 20px; background: linear-gradient(90deg, #f7f5f0 0%, #fafafa 100%);
+      font-size: 11px; font-weight: 800; color: var(--primary);
+      text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--border);
+    }
+    .cat-row td::before {
+      content: ''; display: inline-block; width: 8px; height: 8px;
+      background: var(--accent); border-radius: 2px; margin-right: 12px; vertical-align: middle;
+    }
+    tbody tr { transition: background 0.15s; border-bottom: 1px solid var(--border-light); }
+    tbody tr:not(.cat-row):hover { background: rgba(201,150,59,0.02); }
+    tbody tr.row-atrasado { border-left: 3px solid var(--danger); }
+    tbody tr.row-concluido { border-left: 3px solid var(--success); }
+    tbody tr.row-em-andamento { border-left: 3px solid var(--warning); }
+    tbody td { padding: 10px 16px; font-size: 13px; color: var(--text); vertical-align: middle; }
+    tbody td:first-child { padding-left: 20px; }
+    tbody td:last-child { text-align: center; }
+    .td-categoria { font-weight: 700; color: var(--primary-light); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    .td-entrega { font-weight: 500; max-width: 220px; }
+    .td-data { white-space: nowrap; font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .td-data.vencida { color: var(--danger); font-weight: 700; }
+    .td-offset { white-space: nowrap; font-size: 11px; color: var(--accent); font-weight: 700; text-align: center; width: 60px; }
+    .editable-cell {
+      cursor: pointer; border-radius: 3px; padding: 3px 6px; margin: -3px -6px;
+      transition: background 0.15s; min-height: 22px; display: inline-block;
+      max-width: 100%; word-break: break-word;
+    }
+    .editable-cell:hover { background: #f0ece4; }
+    .editable-cell.empty { color: #bbb; font-style: italic; font-weight: 400; }
+    .inline-input {
+      width: 100%; padding: 4px 8px; border: 2px solid var(--primary); border-radius: 3px;
+      font-family: 'Outfit', sans-serif; font-size: 13px; color: var(--text);
+      background: #fff; outline: none; box-shadow: 0 0 0 3px rgba(26,26,46,0.06);
+    }
+    .inline-input[type="date"] { min-width: 130px; }
+    .status-select {
+      padding: 5px 24px 5px 10px; border: 1px solid transparent; border-radius: 4px;
+      font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; appearance: none; background-repeat: no-repeat;
+      background-position: right 7px center; background-size: 8px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cpath fill='%23currentColor' d='M4 6L0 2h8z'/%3E%3C/svg%3E");
+      outline: none; transition: all 0.2s; white-space: nowrap;
+    }
+    .status-select:focus { box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+    .status-nao-iniciado { background-color: var(--cancel-bg); color: var(--cancel); border-color: var(--cancel-border); }
+    .status-em-andamento { background-color: var(--warning-bg); color: var(--warning); border-color: var(--warning-border); }
+    .status-concluido { background-color: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+    .status-atrasado { background-color: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+    .status-cancelado { background-color: var(--cancel-bg); color: #999; border-color: var(--cancel-border); text-decoration: line-through; }
+    .action-btns { display: flex; gap: 4px; justify-content: center; }
+    .btn-action {
+      width: 28px; height: 28px; border: 1px solid var(--border); background: #fff;
+      border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 11px; color: var(--text-muted);
+      transition: all 0.15s; font-family: 'Outfit', sans-serif; font-weight: 600;
+    }
+    .btn-action:hover { border-color: var(--primary); color: var(--text); background: #f5f5f5; }
+    .btn-action.delete:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
+    .empty-state { padding: 60px 20px; text-align: center; color: var(--text-muted); }
+    .empty-state p { font-size: 15px; font-weight: 500; }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
+      z-index: 1000; display: none; align-items: center; justify-content: center;
+      padding: 20px; opacity: 0; transition: opacity 0.25s;
+    }
+    .modal-overlay.active { display: flex; opacity: 1; }
+    .modal {
+      background: var(--card); border-radius: var(--radius-xl); width: 100%;
+      max-width: 560px; max-height: 90vh; overflow-y: auto;
+      box-shadow: var(--shadow-xl); transform: translateY(20px);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .modal-overlay.active .modal { transform: translateY(0); }
+    .modal-header { padding: 24px 28px 0; display: flex; align-items: center; justify-content: space-between; }
+    .modal-title { font-size: 20px; font-weight: 800; color: var(--text); }
+    .modal-close {
+      width: 34px; height: 34px; border: 1px solid var(--border); background: #fff;
+      border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 16px; color: var(--text-muted);
+      transition: all 0.15s; font-family: 'Outfit', sans-serif;
+    }
+    .modal-close:hover { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+    .modal-body { padding: 20px 28px 28px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block; font-size: 11px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+    }
+    .form-input, .form-textarea, .form-select {
+      width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text);
+      background: #fff; outline: none; transition: all 0.2s;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,26,46,0.05);
+    }
+    .form-textarea { resize: vertical; min-height: 70px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 8px; }
+    .btn-modal {
+      padding: 10px 24px; border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; border: none;
+    }
+    .btn-modal.primary { background: var(--primary); color: #fff; }
+    .btn-modal.primary:hover { background: var(--primary-light); }
+    .btn-modal.secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    .btn-modal.secondary:hover { background: var(--border-light); }
+
+    /* MODAL CONFIRMAÇÃO */
+    .confirm-modal .modal { max-width: 420px; text-align: center; }
+    .confirm-icon {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--danger-bg); color: var(--danger);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 800; margin: 0 auto 16px;
+      border: 2px solid var(--danger-border);
+    }
+    .confirm-icon.warn { background: var(--warning-bg); color: var(--warning); border-color: var(--warning-border); }
+    .confirm-text { font-size: 15px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+    .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+    .btn-confirm-yes {
+      padding: 10px 28px; background: var(--danger); color: #fff; border: none;
+      border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif;
+      font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-confirm-yes:hover { background: #a93226; }
+    .btn-confirm-yes.warn { background: var(--warning); }
+    .btn-confirm-yes.warn:hover { background: #9a7509; }
+
+    /* TOAST */
+    #toastContainer {
+      position: fixed; top: 80px; right: 20px; z-index: 2000;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast {
+      padding: 12px 20px; border-radius: var(--radius); font-size: 13px; font-weight: 500;
+      color: #fff; box-shadow: var(--shadow-lg); transform: translateX(120%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; align-items: center; gap: 10px; max-width: 420px;
+    }
+    .toast.show { transform: translateX(0); }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    .toast.info { background: var(--primary); }
+    .toast.warning { background: var(--warning); }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in { animation: fadeInUp 0.5s ease-out both; }
+    .animate-in:nth-child(1) { animation-delay: 0.05s; }
+    .animate-in:nth-child(2) { animation-delay: 0.1s; }
+    .animate-in:nth-child(3) { animation-delay: 0.15s; }
+    .animate-in:nth-child(4) { animation-delay: 0.2s; }
+    .animate-in:nth-child(5) { animation-delay: 0.25s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+    @media (max-width: 1200px) { .stat-cards { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 1024px) { .stat-cards { grid-template-columns: repeat(2, 1fr); } .date-banner-top { flex-direction: column; } }
+    @media (max-width: 768px) {
+      header { padding: 0 16px; }
+      .header-inner { padding: 12px 0; }
+      .header-title { font-size: 17px; }
+      .header-subtitle { font-size: 12px; }
+      .btn-header span.label-text { display: none; }
+      .btn-header { padding: 8px 10px; }
+      main { padding: 16px; }
+      .date-banner-top { padding: 16px 20px 14px; }
+      .date-banner-bottom { padding: 0 20px 16px; }
+      .date-banner-form { width: 100%; }
+      .date-field { flex: 1; min-width: 140px; }
+      .stat-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat-card { padding: 14px; }
+      .stat-number { font-size: 24px; }
+      .toolbar { padding: 12px; gap: 8px; }
+      .search-box { min-width: 100%; order: -1; }
+      .filter-select { min-width: 0; flex: 1; }
+      .results-count { margin-left: 0; width: 100%; }
+      .form-row { grid-template-columns: 1fr; }
+      .modal-body { padding: 16px 20px 20px; }
+      .modal-header { padding: 20px 20px 0; }
+    }
+    @media (max-width: 480px) {
+      .stat-cards { grid-template-columns: 1fr; }
+      .header-mark { width: 38px; height: 38px; font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <input type="file" id="fileImport" accept=".json" style="display:none" onchange="handleImport(event)">
+
+  <header>
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="header-mark">E</div>
+        <div>
+          <div class="header-title">Curso <span>Essential</span> — Planejamento</div>
+          <div class="header-subtitle">Publico Interno e Externo | Aptus + Modus</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="btn-header btn-import" onclick="triggerImport()" aria-label="Importar dados">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span class="label-text">IMPORTAR</span>
+        </button>
+        <button class="btn-header btn-export-data" onclick="exportData()" aria-label="Exportar dados">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span class="label-text">EXPORTAR</span>
+        </button>
+        <div class="header-sep"></div>
+        <button class="btn-header btn-excel" onclick="exportToExcel()" aria-label="Exportar Excel"><span class="label-text">EXCEL</span></button>
+        <button class="btn-header btn-pdf" onclick="exportToPDF()" aria-label="Exportar PDF"><span class="label-text">PDF</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- BANNER DE DATAS -->
+    <div class="date-banner">
+      <div class="date-banner-top">
+        <div class="date-banner-info">
+          <h2>Curso <span>Essential</span> — Aptus & Modus</h2>
+          <div class="tag-row">
+            <div class="info-tag"><strong>Dia 1</strong> Aptus Teoria</div>
+            <div class="info-tag"><strong>Dia 2</strong> Aptus Hands-On</div>
+            <div class="info-tag"><strong>Dia 3</strong> Modus Teoria</div>
+            <div class="info-tag"><strong>Dia 4</strong> Modus Hands-On</div>
+            <div class="info-tag"><strong>Publico</strong> Interno + Externo</div>
+          </div>
+        </div>
+        <div class="date-banner-form">
+          <div class="date-field">
+            <label>Inicio do Curso</label>
+            <input type="date" id="eventStartDate">
+          </div>
+          <div class="date-field">
+            <label>Fim do Curso</label>
+            <input type="date" id="eventEndDate">
+          </div>
+          <button class="btn-generate" onclick="generateTimeline()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            GERAR CRONOGRAMA
+          </button>
+        </div>
+      </div>
+      <div class="date-banner-bottom">
+        <div class="timeline-mini">
+          <span class="timeline-mini-label">Timeline</span>
+          <div class="timeline-mini-bar">
+            <div class="timeline-mini-fill" id="timelineFill" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="timeline-mini-info" id="timelineInfo">
+          Defina as datas e clique em <strong>Gerar Cronograma</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section class="dashboard">
+      <div class="dashboard-top">
+        <span class="dashboard-label">Painel de Controle</span>
+        <div class="days-counter" id="daysCounter">
+          <span>Faltam</span>
+          <span class="days-num" id="daysNum">--</span>
+          <span>dias</span>
+        </div>
+      </div>
+      <div class="stat-cards" id="statCards">
+        <div class="stat-card nao-iniciado animate-in"><div class="stat-icon">NI</div><div class="stat-number" id="countNaoIniciado">0</div><div class="stat-label">Nao iniciadas</div></div>
+        <div class="stat-card em-andamento animate-in"><div class="stat-icon">EA</div><div class="stat-number" id="countEmAndamento">0</div><div class="stat-label">Em andamento</div></div>
+        <div class="stat-card concluido animate-in"><div class="stat-icon">OK</div><div class="stat-number" id="countConcluido">0</div><div class="stat-label">Concluidas</div></div>
+        <div class="stat-card atrasado animate-in"><div class="stat-icon">AT</div><div class="stat-number" id="countAtrasado">0</div><div class="stat-label">Atrasadas</div></div>
+        <div class="stat-card cancelado animate-in"><div class="stat-icon">CA</div><div class="stat-number" id="countCancelado">0</div><div class="stat-label">Canceladas</div></div>
+      </div>
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="progress-title">Progresso Geral</span>
+          <span class="progress-percent" id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="progressBar" style="width: 0%;"></div></div>
+        <div class="progress-details">
+          <span id="progressDone">0 de 0 tarefas concluidas</span>
+          <span id="progressRemain">0 restantes</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOOLBAR -->
+    <section class="toolbar">
+      <div class="search-box"><input type="text" id="searchInput" placeholder="Pesquisar por palavra-chave..." oninput="renderTable()"></div>
+      <select class="filter-select" id="filterCategoria" onchange="renderTable()" aria-label="Filtrar por categoria"></select>
+      <select class="filter-select" id="filterStatus" onchange="renderTable()" aria-label="Filtrar por status">
+        <option value="">Todos os status</option>
+        <option value="Nao iniciado">Nao iniciado</option>
+        <option value="Em andamento">Em andamento</option>
+        <option value="Concluido">Concluido</option>
+        <option value="Atrasado">Atrasado</option>
+        <option value="Cancelado">Cancelado</option>
+      </select>
+      <select class="filter-select" id="filterResponsavel" onchange="renderTable()" aria-label="Filtrar por responsavel"></select>
+      <button class="btn-clear-filters" onclick="clearFilters()">Limpar</button>
+      <button class="btn-reset" onclick="requestReset()">Resetar</button>
+      <button class="btn-add" onclick="openModal()">+ Nova Tarefa</button>
+      <span class="results-count" id="resultsCount"></span>
+    </section>
+
+    <!-- TABELA -->
+    <section class="table-wrapper">
+      <div class="table-scroll">
+        <table id="taskTable" role="grid">
+          <thead>
+            <tr>
+              <th>Categoria</th>
+              <th>Entrega</th>
+              <th>Responsavel</th>
+              <th>Offset</th>
+              <th>Prazo Planejado</th>
+              <th>Prazo Real</th>
+              <th>Status</th>
+              <th>Observacoes</th>
+              <th>Acoes</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL ADICIONAR / EDITAR -->
+  <div class="modal-overlay" id="taskModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Nova Tarefa</div>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fechar">X</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Categoria</label><select class="form-select" id="formCategoria"></select></div>
+        <div class="form-group"><label class="form-label">Entrega</label><input class="form-input" type="text" id="formEntrega" placeholder="Descricao da entrega"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Responsavel</label><input class="form-input" type="text" id="formResponsavel" placeholder="Setor ou pessoa"></div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" id="formStatus">
+              <option value="Nao iniciado">Nao iniciado</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Concluido">Concluido</option>
+              <option value="Atrasado">Atrasado</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Offset (dias relativos)</label><input class="form-input" type="number" id="formOffset" placeholder="Ex: -30 para 30 dias antes"></div>
+          <div class="form-group"><label class="form-label">Prazo Real</label><input class="form-input" type="date" id="formPrazoReal"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Observacoes</label><textarea class="form-textarea" id="formObservacoes" placeholder="Detalhes, links, notas"></textarea></div>
+        <div class="modal-actions">
+          <button class="btn-modal secondary" onclick="closeModal()">Cancelar</button>
+          <button class="btn-modal primary" onclick="saveTask()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMAÇÃO -->
+  <div class="modal-overlay confirm-modal" id="confirmModal">
+    <div class="modal">
+      <div class="modal-body" style="padding-top:32px;">
+        <div class="confirm-icon" id="confirmIcon">X</div>
+        <div class="confirm-text" id="confirmText">Tem certeza?</div>
+        <div class="confirm-actions">
+          <button class="btn-modal secondary" onclick="closeConfirmModal()">Cancelar</button>
+          <button class="btn-confirm-yes" id="confirmYesBtn" onclick="executeConfirm()">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script>
+    // ============================================================
+    // CATEGORIAS
+    // ============================================================
+    const CATEGORIAS_ORDER = [
+      'DEFINICAO E ESCOPO', 'DATAS E LOCAL', 'PROFESSORES',
+      'PROGRAMA CIENTIFICO', 'PRODUTOS E INSTRUMENTAIS',
+      'INSCRICOES E PARTICIPANTES', 'INFRAESTRUTURA',
+      'MATERIAIS E SUPRIMENTOS', 'DIA 1 - APTUS TEORIA',
+      'DIA 2 - APTUS HANDS-ON', 'DIA 3 - MODUS TEORIA',
+      'DIA 4 - MODUS HANDS-ON', 'POS-EVENTO'
+    ];
+
+    // Data do evento (dinâmica)
+    let EVENT_DATE = null;
+
+    // ============================================================
+    // TAREFAS COM OFFSETS (dias relativos ao dia 1 do curso)
+    // Negativo = antes do evento, 0 = dia 1, positivo = após
+    // ============================================================
+    const TASK_TEMPLATES = [
+      // ── DEFINIÇÃO E ESCOPO ──
+      { id:1,   categoria:'DEFINICAO E ESCOPO', entrega:'Objetivos do curso definidos', responsavel:'Educacao', offset:-60, status:'Nao iniciado', observacoes:'Capacitar equipe interna e parceiros externos nas linhas Aptus e Modus' },
+      { id:2,   categoria:'DEFINICAO E ESCOPO', entrega:'Publico-alvo mapeado', responsavel:'Educacao/Comercial', offset:-57, status:'Nao iniciado', observacoes:'Interno: representantes e treinadores. Externo: cirurgioes parceiros' },
+      { id:3,   categoria:'DEFINICAO E ESCOPO', entrega:'Carga horaria e formato aprovados', responsavel:'Educacao', offset:-54, status:'Nao iniciado', observacoes:'4 dias — 2 teoria + 2 hands-on. 8h/dia' },
+      { id:4,   categoria:'DEFINICAO E ESCOPO', entrega:'Escopo dos modulos aprovado', responsavel:'Educacao/Produto', offset:-50, status:'Nao iniciado', observacoes:'Aptus: Mao, Punho, Cotovelo, Pe, Clavicula. Modus: Midface, Mandibula, Ortognatica' },
+      { id:5,   categoria:'DEFINICAO E ESCOPO', entrega:'Orcamento aprovado', responsavel:'Financeiro', offset:-45, status:'Nao iniciado', observacoes:'Inclui professores, local, produtos, materiais, transporte e hospedagem' },
+      { id:6,   categoria:'DEFINICAO E ESCOPO', entrega:'Cronograma macro aprovado', responsavel:'Educacao', offset:-42, status:'Nao iniciado', observacoes:'Semanas de preparacao, revisoes e execucao' },
+
+      // ── DATAS E LOCAL ──
+      { id:7,   categoria:'DATAS E LOCAL', entrega:'Datas confirmadas com diretoria', responsavel:'Educacao/Diretoria', offset:-40, status:'Nao iniciado', observacoes:'Definir 4 dias consecutivos' },
+      { id:8,   categoria:'DATAS E LOCAL', entrega:'Cotacao de espacos', responsavel:'Eventos', offset:-35, status:'Nao iniciado', observacoes:'3 orcamentos — laboratorio com mesas cirurgicas' },
+      { id:9,   categoria:'DATAS E LOCAL', entrega:'Reserva do local confirmada', responsavel:'Eventos', offset:-30, status:'Nao iniciado', observacoes:'Local com sala de aula e laboratorio anatomico' },
+      { id:10,  categoria:'DATAS E LOCAL', entrega:'Contrato do espaco assinado', responsavel:'Juridico', offset:-25, status:'Nao iniciado', observacoes:'Em analise juridica' },
+      { id:11,  categoria:'DATAS E LOCAL', entrega:'Layout das salas definido', responsavel:'Eventos/Educacao', offset:-10, status:'Nao iniciado', observacoes:'Sala teorica + 8-10 estacoes cirurgicas' },
+      { id:12,  categoria:'DATAS E LOCAL', entrega:'Visita tecnica ao local', responsavel:'Eventos/Logistica', offset:-7, status:'Nao iniciado', observacoes:'Verificar infraestrutura, eletrica, climatizacao' },
+
+      // ── PROFESSORES ──
+      { id:13,  categoria:'PROFESSORES', entrega:'Lista de professores convidados', responsavel:'Educacao', offset:-55, status:'Nao iniciado', observacoes:'Especialistas em mao, CMF e ortognatica' },
+      { id:14,  categoria:'PROFESSORES', entrega:'Confirmacao de presenca', responsavel:'Educacao', offset:-40, status:'Nao iniciado', observacoes:'Todos confirmados' },
+      { id:15,  categoria:'PROFESSORES', entrega:'Passagens aereas emitidas', responsavel:'Logistica', offset:-25, status:'Nao iniciado', observacoes:'Chegar 1 dia antes, sair 1 dia depois' },
+      { id:16,  categoria:'PROFESSORES', entrega:'Hospedagem reservada', responsavel:'Logistica', offset:-20, status:'Nao iniciado', observacoes:'Hotel proximo ao local' },
+      { id:17,  categoria:'PROFESSORES', entrega:'Alimentacao professores organizada', responsavel:'Logistica', offset:-8, status:'Nao iniciado', observacoes:'Almocos, coffees e jantares' },
+      { id:18,  categoria:'PROFESSORES', entrega:'Transporte local organizado', responsavel:'Logistica', offset:-3, status:'Nao iniciado', observacoes:'Transfer aeroporto/hotel/local' },
+      { id:19,  categoria:'PROFESSORES', entrega:'Briefing pre-evento com professores', responsavel:'Educacao', offset:-2, status:'Nao iniciado', observacoes:'Alinhamento do conteudo, dinamicas e avaliacao' },
+
+      // ── PROGRAMA CIENTÍFICO ──
+      { id:20,  categoria:'PROGRAMA CIENTIFICO', entrega:'Programa Dia 1 — Aptus Teoria definido', responsavel:'Educacao/Produto', offset:-40, status:'Nao iniciado', observacoes:'Parafusos, CCS, SpeedTip, Hexadrive, Aptus Hand/Radio Distal/Artrodese' },
+      { id:21,  categoria:'PROGRAMA CIENTIFICO', entrega:'Programa Dia 2 — Aptus Hands-On definido', responsavel:'Educacao/Produto', offset:-40, status:'Nao iniciado', observacoes:'Ulna Shortening, Radio Distal, Clavicle, Cotovelo, Pe' },
+      { id:22,  categoria:'PROGRAMA CIENTIFICO', entrega:'Programa Dia 3 — Modus Teoria definido', responsavel:'Educacao/Produto', offset:-38, status:'Nao iniciado', observacoes:'Midface, Mandible Trauma, Mandible Reco' },
+      { id:23,  categoria:'PROGRAMA CIENTIFICO', entrega:'Programa Dia 4 — Modus Hands-On definido', responsavel:'Educacao/Produto', offset:-38, status:'Nao iniciado', observacoes:'Ortognatica, IMF, Chave 90, Transbucal, Fechamento' },
+      { id:24,  categoria:'PROGRAMA CIENTIFICO', entrega:'Material de revisao pre-estudo enviado', responsavel:'Educacao', offset:-14, status:'Nao iniciado', observacoes:'PDF com conteudo base para estudo previo' },
+      { id:25,  categoria:'PROGRAMA CIENTIFICO', entrega:'Apresentacoes PowerPoint preparadas', responsavel:'Educacao/Produto', offset:-8, status:'Nao iniciado', observacoes:'Revisao com professores em andamento' },
+      { id:26,  categoria:'PROGRAMA CIENTIFICO', entrega:'Dinamicas e Role Play preparados', responsavel:'Educacao', offset:-6, status:'Nao iniciado', observacoes:'Dinamicas de fixacao e role play de vendas' },
+      { id:27,  categoria:'PROGRAMA CIENTIFICO', entrega:'Avaliacoes elaboradas', responsavel:'Educacao', offset:-4, status:'Nao iniciado', observacoes:'Prova por dia — 20 questoes cada' },
+      { id:28,  categoria:'PROGRAMA CIENTIFICO', entrega:'Cronograma final impresso', responsavel:'Eventos', offset:-2, status:'Nao iniciado', observacoes:'Horarios detalhados de cada sessao' },
+
+      // ── PRODUTOS E INSTRUMENTAIS ──
+      { id:29,  categoria:'PRODUTOS E INSTRUMENTAIS', entrega:'Lista de produtos Medartis necessarios', responsavel:'Educacao/Produto', offset:-35, status:'Nao iniciado', observacoes:'Mapeamento por modulo e por estacao' },
+      { id:30,  categoria:'PRODUTOS E INSTRUMENTAIS', entrega:'Instrumentais Aptus separados', responsavel:'Produto/Estoque', offset:-18, status:'Nao iniciado', observacoes:'Hand, Radio Distal, Artrodese, Clavicle, Elbow, Foot, CCS' },
+      { id:31,  categoria:'PRODUTOS E INSTRUMENTAIS', entrega:'Instrumentais Modus separados', responsavel:'Produto/Estoque', offset:-18, status:'Nao iniciado', observacoes:'Midface, Mandible Trauma, Mandible Reco, Ortognatica' },
+      { id:32,  categoria:'PRODUTOS E INSTRUMENTAIS', entrega:'Parafusos e placas por estacao', responsavel:'Produto/Estoque', offset:-10, status:'Nao iniciado', observacoes:'Kits completos para 8-10 estacoes' },
+      { id:33,  categoria:'PRODUTOS E INSTRUMENTAIS', entrega:'Materiais de demonstracao', responsavel:'Produto', offset:-6, status:'Nao iniciado', observacoes:'Amostras de titanio, anodizacao, SpeedTip, Hexadrive' },
+      { id:34,  categoria:'PRODUTOS E INSTRUMENTAIS', entrega:'Codificacao de cores preparada', responsavel:'Produto', offset:-6, status:'Nao iniciado', observacoes:'Explicacao visual do sistema de cores Medartis' },
+      { id:35,  categoria:'PRODUTOS E INSTRUMENTAIS', entrega:'Checklist de produtos conferido', responsavel:'Produto/Educacao', offset:-2, status:'Nao iniciado', observacoes:'Conferencia final antes do envio' },
+
+      // ── INSCRIÇÕES E PARTICIPANTES ──
+      { id:36,  categoria:'INSCRICOES E PARTICIPANTES', entrega:'Formulario de inscricao online', responsavel:'Educacao/Eventos', offset:-35, status:'Nao iniciado', observacoes:'Google Forms — dados pessoais, regiao, experiencia' },
+      { id:37,  categoria:'INSCRICOES E PARTICIPANTES', entrega:'Divulgacao interna', responsavel:'RH/Comercial', offset:-30, status:'Nao iniciado', observacoes:'E-mail para todos os representantes e treinadores' },
+      { id:38,  categoria:'INSCRICOES E PARTICIPANTES', entrega:'Divulgacao externa', responsavel:'Comercial', offset:-28, status:'Nao iniciado', observacoes:'Convites para cirurgioes parceiros e KOLs' },
+      { id:39,  categoria:'INSCRICOES E PARTICIPANTES', entrega:'Lista de inscritos consolidada', responsavel:'Educacao', offset:-12, status:'Nao iniciado', observacoes:'Acompanhamento semanal de inscricoes' },
+      { id:40,  categoria:'INSCRICOES E PARTICIPANTES', entrega:'Selecao de participantes', responsavel:'Educacao/Diretoria', offset:-8, status:'Nao iniciado', observacoes:'Criterio: regiao, perfil, ordem de inscricao' },
+      { id:41,  categoria:'INSCRICOES E PARTICIPANTES', entrega:'Confirmacao final aos selecionados', responsavel:'Educacao', offset:-4, status:'Nao iniciado', observacoes:'E-mail com detalhes logisticos' },
+      { id:42,  categoria:'INSCRICOES E PARTICIPANTES', entrega:'Crachas e credenciais impressos', responsavel:'Eventos', offset:-2, status:'Nao iniciado', observacoes:'Diferenciar interno/externo por cor' },
+
+      // ── INFRAESTRUTURA ──
+      { id:43,  categoria:'INFRAESTRUTURA', entrega:'Mesas cirurgicas para Hands-On', responsavel:'Logistica/Evento', offset:-12, status:'Nao iniciado', observacoes:'8-10 estacoes com pinças e acessorios' },
+      { id:44,  categoria:'INFRAESTRUTURA', entrega:'Projetor e tela configurados', responsavel:'Eventos', offset:-4, status:'Nao iniciado', observacoes:'Sala teorica + laboratorio' },
+      { id:45,  categoria:'INFRAESTRUTURA', entrega:'Sistema de som e microfone', responsavel:'Eventos', offset:-4, status:'Nao iniciado', observacoes:'Microfone sem fio para professor' },
+      { id:46,  categoria:'INFRAESTRUTURA', entrega:'Iluminacao adequada verificada', responsavel:'Logistica', offset:-3, status:'Nao iniciado', observacoes:'Iluminacao cirurgica nas estacoes' },
+      { id:47,  categoria:'INFRAESTRUTURA', entrega:'Climatizacao verificada', responsavel:'Logistica', offset:-3, status:'Nao iniciado', observacoes:'Ar condicionado funcionando' },
+      { id:48,  categoria:'INFRAESTRUTURA', entrega:'Instalacao eletrica para motores', responsavel:'Logistica', offset:-2, status:'Nao iniciado', observacoes:'Tomadas em cada estacao para motores cirurgicos' },
+      { id:49,  categoria:'INFRAESTRUTURA', entrega:'Sinalizacao e identificacao', responsavel:'Eventos', offset:-1, status:'Nao iniciado', observacoes:'Placas: sala, coffees, banheiros' },
+      { id:50,  categoria:'INFRAESTRUTURA', entrega:'Area de coffee break organizada', responsavel:'Eventos', offset:-1, status:'Nao iniciado', observacoes:'3 coffees por dia' },
+      { id:51,  categoria:'INFRAESTRUTURA', entrega:'Area de almoco definida', responsavel:'Eventos', offset:-1, status:'Nao iniciado', observacoes:'Restaurante ou buffet no local' },
+
+      // ── MATERIAIS E SUPRIMENTOS ──
+      { id:52,  categoria:'MATERIAIS E SUPRIMENTOS', entrega:'Material didatico impresso', responsavel:'Eventos/Educacao', offset:-10, status:'Nao iniciado', observacoes:'Roteiros cirurgicos, guias de produto, programa' },
+      { id:53,  categoria:'MATERIAIS E SUPRIMENTOS', entrega:'Kits participantes (caderno, caneta, programa)', responsavel:'Eventos', offset:-6, status:'Nao iniciado', observacoes:'Personalizado com marca Medartis' },
+      { id:54,  categoria:'MATERIAIS E SUPRIMENTOS', entrega:'EPIs para Hands-On', responsavel:'Supply Chain', offset:-8, status:'Nao iniciado', observacoes:'Luvas cirurgicas, oculos de protecao, mascaras' },
+      { id:55,  categoria:'MATERIAIS E SUPRIMENTOS', entrega:'Materiais descartaveis cirurgicos', responsavel:'Supply Chain', offset:-5, status:'Nao iniciado', observacoes:'Campos cirurgicos, compressas, fios' },
+      { id:56,  categoria:'MATERIAIS E SUPRIMENTOS', entrega:'Produtos de limpeza e desinfeccao', responsavel:'Supply Chain', offset:-5, status:'Nao iniciado', observacoes:'Alcool, hipoclorito, sabao cirurgico' },
+      { id:57,  categoria:'MATERIAIS E SUPRIMENTOS', entrega:'Brindes e materiais de marca', responsavel:'Marketing', offset:-4, status:'Nao iniciado', observacoes:'Camisetas, canecas, pens Medartis' },
+      { id:58,  categoria:'MATERIAIS E SUPRIMENTOS', entrega:'Modelo de certificado aprovado', responsavel:'Educacao', offset:-10, status:'Nao iniciado', observacoes:'Certificado de conclusao do curso Essential' },
+
+      // ── DIA 1 — APTUS TEORIA (offset 0) ──
+      { id:59,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Credenciamento preparado', responsavel:'Eventos', offset:0, status:'Nao iniciado', observacoes:'08:30 — Lista de presenca e crachas' },
+      { id:60,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Material de abertura pronto', responsavel:'Educacao', offset:0, status:'Nao iniciado', observacoes:'Apresentacao de abertura + Introducao Medartis/IBRA' },
+      { id:61,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao Parafuso Interfragmentario vs Deslizante', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'10:45 — Slides e demonstracao' },
+      { id:62,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao Titanio, Anodizacao e Bloqueio', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'10:55 — Tecnologias Medartis' },
+      { id:63,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao SpeedTip e Hexadrive', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'11:10 — Demonstracao pratica' },
+      { id:64,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao Parafuso CCS', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'11:35 — Conceito e aplicacao' },
+      { id:65,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao Aptus Hand + Radio Distal + Artrodese', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'13:00–15:05 — 3 modulos sequenciais' },
+      { id:66,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Role Play executado', responsavel:'Educacao/Professor', offset:0, status:'Nao iniciado', observacoes:'15:25–16:05 — Simulacao de venda' },
+      { id:67,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Avaliacao Dia 1 aplicada', responsavel:'Educacao', offset:0, status:'Nao iniciado', observacoes:'16:05–16:45 — 20 questoes' },
+      { id:68,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Fotos e registros Dia 1', responsavel:'Marketing', offset:0, status:'Nao iniciado', observacoes:'Fotos das sessoes e participantes' },
+
+      // ── DIA 2 — APTUS HANDS-ON (offset 1) ──
+      { id:69,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Revisao principais pontos Dia 1', responsavel:'Educacao', offset:1, status:'Nao iniciado', observacoes:'08:30 — Recapitulacao interativa' },
+      { id:70,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Ulna Shortening', responsavel:'Professor', offset:1, status:'Nao iniciado', observacoes:'09:15 — Teoria + tecnica cirurgica' },
+      { id:71,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Hands-On Ulna Shortening + Radio Distal', responsavel:'Professor/Educacao', offset:1, status:'Nao iniciado', observacoes:'09:30–10:15 — Pratica nas estacoes' },
+      { id:72,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Codificacao de cores Medartis', responsavel:'Produto', offset:1, status:'Nao iniciado', observacoes:'10:30 — Explicacao do sistema' },
+      { id:73,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Aptus Clavicle', responsavel:'Professor', offset:1, status:'Nao iniciado', observacoes:'10:50 — Teoria e indicacoes' },
+      { id:74,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Hands-On Clavicle', responsavel:'Professor/Educacao', offset:1, status:'Nao iniciado', observacoes:'11:15–12:00 — Pratica nas estacoes' },
+      { id:75,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Anatomia do Cotovelo + APTUS Elbow', responsavel:'Professor', offset:1, status:'Nao iniciado', observacoes:'13:00–13:40 — Anatomia + sistema' },
+      { id:76,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Placa Banda de Tensao — Olecrano', responsavel:'Professor', offset:1, status:'Nao iniciado', observacoes:'13:40–14:25 — Tecnica especifica' },
+      { id:77,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Anatomia do Pe + APTUS Foot', responsavel:'Professor', offset:1, status:'Nao iniciado', observacoes:'14:30–15:05 — Foot + Hallux + Calcaneo' },
+      { id:78,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Dinamica de fixacao', responsavel:'Educacao', offset:1, status:'Nao iniciado', observacoes:'15:05–15:20 — Atividade interativa' },
+      { id:79,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Novidades Medartis', responsavel:'Produto', offset:1, status:'Nao iniciado', observacoes:'15:20–15:35 — Lancamentos e roadmap' },
+      { id:80,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Avaliacao Dia 2 aplicada', responsavel:'Educacao', offset:1, status:'Nao iniciado', observacoes:'15:35–16:20 — 20 questoes' },
+      { id:81,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Limpeza e organizacao das estacoes', responsavel:'Logistica', offset:1, status:'Nao iniciado', observacoes:'Pos-hands-on — descontaminacao' },
+
+      // ── DIA 3 — MODUS TEORIA (offset 2) ──
+      { id:82,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Credenciamento Dia 3 preparado', responsavel:'Eventos', offset:2, status:'Nao iniciado', observacoes:'08:30 — Verificar presenca' },
+      { id:83,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Material de abertura Modus', responsavel:'Educacao', offset:2, status:'Nao iniciado', observacoes:'Introducao Medartis + IBRA (foco CMF)' },
+      { id:84,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Revisao pre-estudo', responsavel:'Educacao', offset:2, status:'Nao iniciado', observacoes:'10:00 — Discussao do material enviado' },
+      { id:85,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Sessao Midface', responsavel:'Professor', offset:2, status:'Nao iniciado', observacoes:'10:45 — Anatomia, indicacoes, tecnica' },
+      { id:86,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Hands-On Midface', responsavel:'Professor/Educacao', offset:2, status:'Nao iniciado', observacoes:'11:35–12:00 — Pratica nas estacoes' },
+      { id:87,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Sessao Mandible Trauma', responsavel:'Professor', offset:2, status:'Nao iniciado', observacoes:'13:00–13:40 — Fraturas mandibulares' },
+      { id:88,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Sessao Mandible Reco', responsavel:'Professor', offset:2, status:'Nao iniciado', observacoes:'13:40–14:20 — Reconstrucao mandibular' },
+      { id:89,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Dinamica CMF', responsavel:'Educacao', offset:2, status:'Nao iniciado', observacoes:'14:20–14:50 — Atividade interativa' },
+      { id:90,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Hands-On Mandible', responsavel:'Professor/Educacao', offset:2, status:'Nao iniciado', observacoes:'14:50–15:30 — Pratica nas estacoes' },
+      { id:91,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Avaliacao Dia 3 aplicada', responsavel:'Educacao', offset:2, status:'Nao iniciado', observacoes:'15:50–16:20 — 20 questoes' },
+
+      // ── DIA 4 — MODUS HANDS-ON (offset 3) ──
+      { id:92,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Revisao principais pontos Dia 3', responsavel:'Educacao', offset:3, status:'Nao iniciado', observacoes:'08:30 — Recapitulacao interativa' },
+      { id:93,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Sessao Ortognatica', responsavel:'Professor', offset:3, status:'Nao iniciado', observacoes:'09:00–09:40 — Planejamento e tecnica' },
+      { id:94,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Dinamica Ortognatica', responsavel:'Educacao', offset:3, status:'Nao iniciado', observacoes:'09:40–10:10 — Atividade pratica' },
+      { id:95,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Sessao IMF / Chave 90 / Transbucal', responsavel:'Professor', offset:3, status:'Nao iniciado', observacoes:'10:25–10:55 — Tecnicas de fixacao' },
+      { id:96,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Hands-On Ortognatica', responsavel:'Professor/Educacao', offset:3, status:'Nao iniciado', observacoes:'10:55–11:30 — Pratica nas estacoes' },
+      { id:97,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Sessao Concorrencia', responsavel:'Comercial/Produto', offset:3, status:'Nao iniciado', observacoes:'11:30–12:00 — Comparativo com concorrentes' },
+      { id:98,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Dinamica de vendas CMF', responsavel:'Educacao', offset:3, status:'Nao iniciado', observacoes:'13:00–14:00 — Simulacao com cenarios reais' },
+      { id:99,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Sessao Fechamento', responsavel:'Professor/Educacao', offset:3, status:'Nao iniciado', observacoes:'14:00–14:40 — Consideracoes finais' },
+      { id:100, categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Avaliacao Dia 4 aplicada', responsavel:'Educacao', offset:3, status:'Nao iniciado', observacoes:'14:40–15:20 — 20 questoes + avaliacao geral' },
+      { id:101, categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Encerramento formal', responsavel:'Educacao/Diretoria', offset:3, status:'Nao iniciado', observacoes:'15:20–16:00 — Discursos, fotos, entregas' },
+      { id:102, categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Limpeza final das estacoes', responsavel:'Logistica', offset:3, status:'Nao iniciado', observacoes:'Desmontagem e descontaminacao completa' },
+      { id:103, categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Retorno de instrumentais ao estoque', responsavel:'Produto/Logistica', offset:4, status:'Nao iniciado', observacoes:'Inventario e devolucao' },
+
+      // ── PÓS-EVENTO ──
+      { id:104, categoria:'POS-EVENTO', entrega:'Correcao das avaliacoes', responsavel:'Educacao', offset:5, status:'Nao iniciado', observacoes:'4 provas — resultado individual e geral' },
+      { id:105, categoria:'POS-EVENTO', entrega:'Emissao de certificados', responsavel:'Educacao', offset:10, status:'Nao iniciado', observacoes:'Digital e/ou impresso para todos' },
+      { id:106, categoria:'POS-EVENTO', entrega:'Envio de fotos e materiais', responsavel:'Marketing/Educacao', offset:10, status:'Nao iniciado', observacoes:'Link com galeria e apresentacoes' },
+      { id:107, categoria:'POS-EVENTO', entrega:'Pesquisa de satisfacao enviada', responsavel:'Educacao', offset:6, status:'Nao iniciado', observacoes:'Google Forms — NPS, conteudo, infra, professores' },
+      { id:108, categoria:'POS-EVENTO', entrega:'Relatorio de avaliacao consolidado', responsavel:'Educacao', offset:17, status:'Nao iniciado', observacoes:'Media por dia, por modulo, por professor' },
+      { id:109, categoria:'POS-EVENTO', entrega:'Relatorio financeiro', responsavel:'Financeiro', offset:24, status:'Nao iniciado', observacoes:'Custo real vs. orcado — por categoria' },
+      { id:110, categoria:'POS-EVENTO', entrega:'Follow-up com participantes externos', responsavel:'Comercial', offset:17, status:'Nao iniciado', observacoes:'Agradecimento + proximo passo comercial' },
+      { id:111, categoria:'POS-EVENTO', entrega:'Registro de leads (publico externo)', responsavel:'Comercial/CRM', offset:10, status:'Nao iniciado', observacoes:'Input no CRM com perfil e interesse' },
+      { id:112, categoria:'POS-EVENTO', entrega:'Licoes aprendidas documentadas', responsavel:'Educacao', offset:24, status:'Nao iniciado', observacoes:'O que funcionou, o que melhorar' },
+      { id:113, categoria:'POS-EVENTO', entrega:'Devolucao/confirmacao de materiais', responsavel:'Produto/Logistica', offset:10, status:'Nao iniciado', observacoes:'Conferir se todos os instrumentais retornaram' },
+      { id:114, categoria:'POS-EVENTO', entrega:'Pagamento de fornecedores', responsavel:'Financeiro', offset:24, status:'Nao iniciado', observacoes:'Local, transporte, alimentacao, materiais' },
+      { id:115, categoria:'POS-EVENTO', entrega:'Agradecimento formal a professores', responsavel:'Educacao', offset:10, status:'Nao iniciado', observacoes:'E-mail + certificado de professor convidado' }
+    ];
+
+    // ============================================================
+    // ESTADO
+    // ============================================================
+    let tasks = [];
+    let nextId = 200;
+    let editingId = null;
+    let confirmAction = null;
+    let deleteTargetId = null;
+
+    // ============================================================
+    // UTILITÁRIOS
+    // ============================================================
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+    function dateToISO(d) {
+      if (!d || !d.includes('/')) return '';
+      const p = d.split('/');
+      if (p.length !== 3) return '';
+      return p[2] + '-' + p[1].padStart(2,'0') + '-' + p[0].padStart(2,'0');
+    }
+    function isoToDate(iso) {
+      if (!iso || !iso.includes('-')) return '';
+      const p = iso.split('-');
+      if (p.length !== 3) return '';
+      return p[2] + '/' + p[1] + '/' + p[0];
+    }
+    function parseDate(d) {
+      if (!d) return null;
+      if (d.includes('/')) {
+        const p = d.split('/').map(Number);
+        if (p.length !== 3 || p.some(isNaN)) return null;
+        return new Date(p[2], p[1] - 1, p[0]);
+      }
+      if (d.includes('-')) {
+        const p = d.split('-').map(Number);
+        if (p.length !== 3 || p.some(isNaN)) return null;
+        return new Date(p[0], p[1] - 1, p[2]);
+      }
+      return null;
+    }
+    function formatDate(date) {
+      if (!date) return '';
+      const d = date.getDate().toString().padStart(2,'0');
+      const m = (date.getMonth()+1).toString().padStart(2,'0');
+      return d + '/' + m + '/' + date.getFullYear();
+    }
+    function addDays(date, days) {
+      const result = new Date(date);
+      result.setDate(result.getDate() + days);
+      return result;
+    }
+    function offsetLabel(off) {
+      if (off === 0) return 'DIA 1';
+      if (off === 1) return 'DIA 2';
+      if (off === 2) return 'DIA 3';
+      if (off === 3) return 'DIA 4';
+      if (off < 0) return off + 'd';
+      return '+' + off + 'd';
+    }
+
+    // ============================================================
+    // GERAR CRONOGRAMA
+    // ============================================================
+    function generateTimeline() {
+      const startStr = document.getElementById('eventStartDate').value;
+      const endStr = document.getElementById('eventEndDate').value;
+
+      if (!startStr) {
+        showToast('Defina a data de inicio do curso', 'warning');
+        return;
+      }
+      if (!endStr) {
+        showToast('Defina a data de fim do curso', 'warning');
+        return;
+      }
+
+      const startDate = parseDate(startStr);
+      const endDate = parseDate(endStr);
+
+      if (!startDate || !endDate) {
+        showToast('Datas invalidas', 'error');
+        return;
+      }
+      if (endDate <= startDate) {
+        showToast('A data de fim deve ser posterior ao inicio', 'warning');
+        return;
+      }
+
+      const diffDays = Math.round((endDate - startDate) / (1000*60*60*24));
+      if (diffDays < 3) {
+        showToast('O curso precisa de pelo menos 4 dias (inicio a fim)', 'warning');
+        return;
+      }
+
+      EVENT_DATE = startDate;
+      const today = new Date(); today.setHours(0,0,0,0);
+
+      // Gerar tarefas a partir dos templates
+      tasks = TASK_TEMPLATES.map(t => {
+        const plannedDate = addDays(startDate, t.offset);
+        const plannedStr = formatDate(plannedDate);
+
+        // Status automatico baseado na data de hoje
+        let autoStatus = t.status;
+        if (plannedDate < today && autoStatus === 'Nao iniciado') {
+          autoStatus = 'Atrasado';
+        }
+
+        return {
+          id: t.id,
+          categoria: t.categoria,
+          entrega: t.entrega,
+          responsavel: t.responsavel,
+          offset: t.offset,
+          prazoPlanejado: plannedStr,
+          prazoReal: '',
+          status: autoStatus,
+          observacoes: t.observacoes
+        };
+      });
+
+      nextId = Math.max(...tasks.map(t => t.id)) + 1;
+
+      // Salvar no localStorage
+      localStorage.setItem('essential_tasks', JSON.stringify(tasks));
+      localStorage.setItem('essential_start', startStr);
+      localStorage.setItem('essential_end', endStr);
+
+      // Atualizar tudo
+      updateDaysCounter();
+      updateTimelineBar();
+      populateFilters();
+      renderTable();
+      updateDashboard();
+
+      // Contar atrasadas
+      const atrasadas = tasks.filter(t => t.status === 'Atrasado').length;
+      const msg = 'Cronograma gerado! ' + tasks.length + ' tarefas de ' + formatDate(startDate) + ' a ' + formatDate(endDate);
+      if (atrasadas > 0) {
+        showToast(msg + ' — ' + atrasadas + ' tarefas atrasadas', 'warning');
+      } else {
+        showToast(msg, 'success');
+      }
+    }
+
+    // ============================================================
+    // TIMELINE BAR
+    // ============================================================
+    function updateTimelineBar() {
+      if (!EVENT_DATE) return;
+      const today = new Date(); today.setHours(0,0,0,0);
+
+      // Encontrar min e max dos offsets
+      const offsets = tasks.map(t => t.offset);
+      const minOff = Math.min(...offsets);
+      const maxOff = Math.max(...offsets);
+      const range = maxOff - minOff;
+
+      if (range <= 0) return;
+
+      const todayOff = Math.round((today - EVENT_DATE) / (1000*60*60*24));
+      const pct = Math.max(0, Math.min(100, ((todayOff - minOff) / range) * 100));
+
+      document.getElementById('timelineFill').style.width = pct + '%';
+
+      const before = tasks.filter(t => t.offset < 0).length;
+      const during = tasks.filter(t => t.offset >= 0 && t.offset <= 3).length;
+      const after = tasks.filter(t => t.offset > 3).length;
+
+      document.getElementById('timelineInfo').innerHTML =
+        '<strong>' + before + '</strong> antes &nbsp;|&nbsp; <strong>' + during + '</strong> durante &nbsp;|&nbsp; <strong>' + after + '</strong> pos-evento';
+    }
+
+    // ============================================================
+    // LOCALSTORAGE
+    // ============================================================
+    function loadFromStorage() {
+      try {
+        const saved = localStorage.getItem('essential_tasks');
+        const savedStart = localStorage.getItem('essential_start');
+        const savedEnd = localStorage.getItem('essential_end');
+
+        if (savedStart) document.getElementById('eventStartDate').value = savedStart;
+        if (savedEnd) document.getElementById('eventEndDate').value = savedEnd;
+
+        if (savedStart && saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            tasks = parsed;
+            nextId = Math.max(...tasks.map(t => t.id)) + 1;
+            EVENT_DATE = parseDate(savedStart);
+            return;
+          }
+        }
+      } catch(e) {}
+    }
+    function saveToStorage() {
+      try {
+        localStorage.setItem('essential_tasks', JSON.stringify(tasks));
+        localStorage.setItem('essential_start', document.getElementById('eventStartDate').value);
+        localStorage.setItem('essential_end', document.getElementById('eventEndDate').value);
+      } catch(e) {}
+    }
+
+    // ============================================================
+    // POPULAR FILTROS
+    // ============================================================
+    function populateFilters() {
+      const catSel = document.getElementById('filterCategoria');
+      const curCat = catSel.value;
+      catSel.innerHTML = '<option value="">Todas as categorias</option>';
+      CATEGORIAS_ORDER.forEach(c => {
+        catSel.innerHTML += '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>';
+      });
+      catSel.value = curCat;
+
+      const respSel = document.getElementById('filterResponsavel');
+      const curResp = respSel.value;
+      const resps = [...new Set(tasks.map(t => t.responsavel).filter(Boolean))].sort();
+      respSel.innerHTML = '<option value="">Todos os responsaveis</option>';
+      resps.forEach(r => {
+        respSel.innerHTML += '<option value="' + escapeHtml(r) + '">' + escapeHtml(r) + '</option>';
+      });
+      respSel.value = curResp;
+
+      const formCat = document.getElementById('formCategoria');
+      formCat.innerHTML = '';
+      CATEGORIAS_ORDER.forEach(c => {
+        formCat.innerHTML += '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>';
+      });
+    }
+
+    // ============================================================
+    // RENDERIZAR TABELA
+    // ============================================================
+    function renderTable() {
+      if (tasks.length === 0) {
+        document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-state"><p>Defina as datas do curso e clique em "Gerar Cronograma" para comecar</p></td></tr>';
+        document.getElementById('resultsCount').textContent = '';
+        return;
+      }
+
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const catFilter = document.getElementById('filterCategoria').value;
+      const statusFilter = document.getElementById('filterStatus').value;
+      const respFilter = document.getElementById('filterResponsavel').value;
+
+      const filtered = tasks.filter(t => {
+        if (catFilter && t.categoria !== catFilter) return false;
+        if (statusFilter && t.status !== statusFilter) return false;
+        if (respFilter && t.responsavel !== respFilter) return false;
+        if (search) {
+          const hay = [t.entrega, t.responsavel, t.observacoes, t.categoria, t.prazoPlanejado, t.prazoReal].join(' ').toLowerCase();
+          if (!hay.includes(search)) return false;
+        }
+        return true;
+      });
+
+      const grouped = {};
+      CATEGORIAS_ORDER.forEach(c => { grouped[c] = []; });
+      filtered.forEach(t => { if (grouped[t.categoria]) grouped[t.categoria].push(t); });
+
+      let html = '';
+      let visibleCount = 0;
+      const today = new Date(); today.setHours(0,0,0,0);
+
+      CATEGORIAS_ORDER.forEach(cat => {
+        const catTasks = grouped[cat];
+        if (!catTasks || catTasks.length === 0) return;
+
+        html += '<tr class="cat-row"><td colspan="9">' + escapeHtml(cat) + '</td></tr>';
+
+        catTasks.forEach(t => {
+          visibleCount++;
+          const rowCls = t.status === 'Concluido' ? 'row-concluido' :
+                         t.status === 'Atrasado' ? 'row-atrasado' :
+                         t.status === 'Em andamento' ? 'row-em-andamento' : '';
+          const stCls = 'status-' + t.status.toLowerCase().replace(/ /g, '-');
+
+          const eEmpty = !t.entrega ? ' empty' : '';
+          const rEmpty = !t.responsavel ? ' empty' : '';
+          const prEmpty = !t.prazoReal ? ' empty' : '';
+          const oEmpty = !t.observacoes ? ' empty' : '';
+
+          const ppDate = parseDate(t.prazoPlanejado);
+          const isVencida = ppDate && ppDate < today && t.status !== 'Concluido' && t.status !== 'Cancelado';
+          const vencidaCls = isVencida ? ' vencida' : '';
+
+          const statusOpts = ['Nao iniciado','Em andamento','Concluido','Atrasado','Cancelado'].map(s =>
+            '<option value="' + s + '"' + (t.status === s ? ' selected' : '') + '>' + s + '</option>'
+          ).join('');
+
+          const offVal = t.offset !== undefined ? t.offset : '';
+          const offDisplay = offVal !== '' ? offsetLabel(offVal) : '';
+
+          html += '<tr class="' + rowCls + '" data-id="' + t.id + '">' +
+            '<td class="td-categoria">' + escapeHtml(t.categoria) + '</td>' +
+            '<td class="td-entrega"><span class="editable-cell' + eEmpty + '" onclick="startEdit(this,' + t.id + ',\'entrega\',\'text\')" title="' + escapeHtml(t.entrega) + '">' + (t.entrega ? escapeHtml(t.entrega) : 'Clicar para editar') + '</span></td>' +
+            '<td><span class="editable-cell' + rEmpty + '" onclick="startEdit(this,' + t.id + ',\'responsavel\',\'text\')">' + (t.responsavel ? escapeHtml(t.responsavel) : 'Clicar para editar') + '</span></td>' +
+            '<td class="td-offset">' + offDisplay + '</td>' +
+            '<td class="td-data' + vencidaCls + '">' + (t.prazoPlanejado ? escapeHtml(t.prazoPlanejado) : '--') + '</td>' +
+            '<td class="td-data"><span class="editable-cell' + prEmpty + '" onclick="startEdit(this,' + t.id + ',\'prazoReal\',\'date\')">' + (t.prazoReal ? escapeHtml(t.prazoReal) : 'Clicar para editar') + '</span></td>' +
+            '<td><select class="status-select ' + stCls + '" onchange="updateField(' + t.id + ',\'status\',this.value)" aria-label="Status">' + statusOpts + '</select></td>' +
+            '<td><span class="editable-cell' + oEmpty + '" onclick="startEdit(this,' + t.id + ',\'observacoes\',\'text\')" title="' + escapeHtml(t.observacoes) + '">' + (t.observacoes ? escapeHtml(t.observacoes) : 'Clicar para editar') + '</span></td>' +
+            '<td><div class="action-btns">' +
+              '<button class="btn-action" onclick="openModal(' + t.id + ')" title="Editar" aria-label="Editar">E</button>' +
+              '<button class="btn-action delete" onclick="requestDelete(' + t.id + ')" title="Excluir" aria-label="Excluir">X</button>' +
+            '</div></td>' +
+          '</tr>';
+        });
+      });
+
+      if (visibleCount === 0) {
+        html = '<tr><td colspan="9" class="empty-state"><p>Nenhuma tarefa encontrada</p></td></tr>';
+      }
+
+      document.getElementById('tableBody').innerHTML = html;
+      document.getElementById('resultsCount').textContent = 'Mostrando ' + visibleCount + ' de ' + tasks.length + ' tarefas';
+    }
+
+    // ============================================================
+    // DASHBOARD
+    // ============================================================
+    function updateDashboard() {
+      const counts = { 'Nao iniciado': 0, 'Em andamento': 0, 'Concluido': 0, 'Atrasado': 0, 'Cancelado': 0 };
+      tasks.forEach(t => { if (counts.hasOwnProperty(t.status)) counts[t.status]++; });
+
+      document.getElementById('countNaoIniciado').textContent = counts['Nao iniciado'];
+      document.getElementById('countEmAndamento').textContent = counts['Em andamento'];
+      document.getElementById('countConcluido').textContent = counts['Concluido'];
+      document.getElementById('countAtrasado').textContent = counts['Atrasado'];
+      document.getElementById('countCancelado').textContent = counts['Cancelado'];
+
+      const total = tasks.length;
+      const done = counts['Concluido'];
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+      document.getElementById('progressPercent').textContent = pct + '%';
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressDone').textContent = done + ' de ' + total + ' tarefas concluidas';
+      document.getElementById('progressRemain').textContent = (total - done) + ' restantes';
+    }
+
+    // ============================================================
+    // CONTADOR DE DIAS
+    // ============================================================
+    function updateDaysCounter() {
+      if (!EVENT_DATE) {
+        document.getElementById('daysNum').textContent = '--';
+        return;
+      }
+      const today = new Date(); today.setHours(0,0,0,0);
+      const diff = Math.ceil((EVENT_DATE - today) / (1000 * 60 * 60 * 24));
+      const el = document.getElementById('daysNum');
+      const counter = document.getElementById('daysCounter');
+      if (diff > 0) {
+        el.textContent = diff;
+        counter.querySelector('span:first-child').textContent = 'Faltam';
+        counter.querySelector('span:last-child').textContent = 'dias';
+      } else if (diff === 0) {
+        el.textContent = 'HOJE';
+        counter.querySelector('span:first-child').textContent = '';
+        counter.querySelector('span:last-child').textContent = '';
+      } else {
+        el.textContent = Math.abs(diff);
+        counter.querySelector('span:first-child').textContent = 'Ha';
+        counter.querySelector('span:last-child').textContent = 'dias';
+      }
+    }
+
+    // ============================================================
+    // EDIÇÃO INLINE
+    // ============================================================
+    function startEdit(cell, id, field, type) {
+      if (cell.querySelector('.inline-input')) return;
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+
+      const currentVal = task[field] || '';
+      let inputVal = type === 'date' ? dateToISO(currentVal) : currentVal;
+
+      const input = document.createElement('input');
+      input.className = 'inline-input';
+      input.type = type;
+      input.value = inputVal;
+
+      cell.textContent = '';
+      cell.classList.remove('empty');
+      cell.appendChild(input);
+      input.focus();
+
+      function commit() {
+        let newVal = input.value.trim();
+        if (type === 'date' && newVal) newVal = isoToDate(newVal);
+        task[field] = newVal;
+        saveToStorage();
+        renderTable();
+        updateDashboard();
+        populateFilters();
+      }
+
+      input.addEventListener('blur', commit);
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+        if (e.key === 'Escape') { input.value = type === 'date' ? dateToISO(currentVal) : currentVal; input.blur(); }
+      });
+    }
+
+    function updateField(id, field, value) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      task[field] = value;
+      saveToStorage();
+      renderTable();
+      updateDashboard();
+    }
+
+    // ============================================================
+    // MODAL
+    // ============================================================
+    function openModal(id) {
+      editingId = id || null;
+      const title = document.getElementById('modalTitle');
+
+      if (editingId) {
+        title.textContent = 'Editar Tarefa';
+        const t = tasks.find(x => x.id === editingId);
+        if (!t) return;
+        document.getElementById('formCategoria').value = t.categoria;
+        document.getElementById('formEntrega').value = t.entrega;
+        document.getElementById('formResponsavel').value = t.responsavel;
+        document.getElementById('formStatus').value = t.status;
+        document.getElementById('formOffset').value = t.offset !== undefined ? t.offset : '';
+        document.getElementById('formPrazoReal').value = dateToISO(t.prazoReal);
+        document.getElementById('formObservacoes').value = t.observacoes;
+      } else {
+        title.textContent = 'Nova Tarefa';
+        document.getElementById('formCategoria').value = CATEGORIAS_ORDER[0];
+        document.getElementById('formEntrega').value = '';
+        document.getElementById('formResponsavel').value = '';
+        document.getElementById('formStatus').value = 'Nao iniciado';
+        document.getElementById('formOffset').value = '';
+        document.getElementById('formPrazoReal').value = '';
+        document.getElementById('formObservacoes').value = '';
+      }
+
+      document.getElementById('taskModal').classList.add('active');
+      setTimeout(() => document.getElementById('formEntrega').focus(), 100);
+    }
+
+    function closeModal() {
+      document.getElementById('taskModal').classList.remove('active');
+      editingId = null;
+    }
+
+    function saveTask() {
+      const cat = document.getElementById('formCategoria').value;
+      const entrega = document.getElementById('formEntrega').value.trim();
+      const resp = document.getElementById('formResponsavel').value.trim();
+      const status = document.getElementById('formStatus').value;
+      const offsetVal = document.getElementById('formOffset').value;
+      const pr = isoToDate(document.getElementById('formPrazoReal').value);
+      const obs = document.getElementById('formObservacoes').value.trim();
+
+      if (!entrega) { showToast('Preencha o campo Entrega', 'warning'); return; }
+
+      const offset = offsetVal !== '' ? parseInt(offsetVal) : 0;
+      let pp = '';
+      if (EVENT_DATE) pp = formatDate(addDays(EVENT_DATE, offset));
+
+      if (editingId) {
+        const t = tasks.find(x => x.id === editingId);
+        if (t) {
+          t.categoria = cat;
+          t.entrega = entrega;
+          t.responsavel = resp;
+          t.status = status;
+          t.offset = offset;
+          t.prazoPlanejado = pp;
+          t.prazoReal = pr;
+          t.observacoes = obs;
+        }
+        showToast('Tarefa atualizada', 'success');
+      } else {
+        tasks.push({ id: nextId++, categoria: cat, entrega: entrega, responsavel: resp, offset: offset, prazoPlanejado: pp, prazoReal: pr, status: status, observacoes: obs });
+        showToast('Tarefa criada', 'success');
+      }
+
+      saveToStorage();
+      closeModal();
+      renderTable();
+      updateDashboard();
+      populateFilters();
+    }
+
+    // ============================================================
+    // EXCLUIR / RESETAR
+    // ============================================================
+    function requestDelete(id) {
+      deleteTargetId = id;
+      confirmAction = 'delete';
+      document.getElementById('confirmIcon').className = 'confirm-icon';
+      document.getElementById('confirmIcon').textContent = 'X';
+      document.getElementById('confirmText').textContent = 'Tem certeza que deseja excluir esta tarefa?';
+      document.getElementById('confirmYesBtn').className = 'btn-confirm-yes';
+      document.getElementById('confirmModal').classList.add('active');
+    }
+
+    function requestReset() {
+      confirmAction = 'reset';
+      document.getElementById('confirmIcon').className = 'confirm-icon warn';
+      document.getElementById('confirmIcon').textContent = '!';
+      document.getElementById('confirmText').textContent = 'Tem certeza que deseja resetar? Defina as datas e gere o cronograma novamente.';
+      document.getElementById('confirmYesBtn').className = 'btn-confirm-yes warn';
+      document.getElementById('confirmModal').classList.add('active');
+    }
+
+    function executeConfirm() {
+      if (confirmAction === 'delete' && deleteTargetId !== null) {
+        tasks = tasks.filter(t => t.id !== deleteTargetId);
+        deleteTargetId = null;
+        saveToStorage();
+        renderTable();
+        updateDashboard();
+        populateFilters();
+        showToast('Tarefa excluida', 'info');
+      } else if (confirmAction === 'reset') {
+        tasks = [];
+        EVENT_DATE = null;
+        localStorage.removeItem('essential_tasks');
+        localStorage.removeItem('essential_start');
+        localStorage.removeItem('essential_end');
+        document.getElementById('eventStartDate').value = '';
+        document.getElementById('eventEndDate').value = '';
+        document.getElementById('timelineFill').style.width = '0%';
+        document.getElementById('timelineInfo').innerHTML = 'Defina as datas e clique em <strong>Gerar Cronograma</strong>';
+        renderTable();
+        updateDashboard();
+        updateDaysCounter();
+        showToast('Dados resetados', 'warning');
+      }
+      closeConfirmModal();
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').classList.remove('active');
+      confirmAction = null;
+      deleteTargetId = null;
+    }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('filterCategoria').value = '';
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterResponsavel').value = '';
+      renderTable();
+    }
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function showToast(msg, type) {
+      type = type || 'info';
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      toast.textContent = msg;
+      container.appendChild(toast);
+      requestAnimationFrame(() => { toast.classList.add('show'); });
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 350);
+      }, 3500);
+    }
+
+    // ============================================================
+    // IMPORTAR / EXPORTAR
+    // ============================================================
+    function triggerImport() { document.getElementById('fileImport').click(); }
+    function handleImport(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (Array.isArray(data) && data.length > 0) {
+            tasks = data;
+            nextId = Math.max(...tasks.map(t => t.id)) + 1;
+            saveToStorage();
+            populateFilters();
+            renderTable();
+            updateDashboard();
+            showToast('Dados importados (' + data.length + ' tarefas)', 'success');
+          } else { showToast('Arquivo invalido', 'error'); }
+        } catch(err) { showToast('Erro ao ler: ' + err.message, 'error'); }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
+    function exportData() {
+      if (tasks.length === 0) { showToast('Nenhum dado para exportar', 'warning'); return; }
+      const blob = new Blob([JSON.stringify(tasks, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'essential_' + new Date().toISOString().slice(0,10) + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('JSON exportado', 'success');
+    }
+
+    function exportToExcel() {
+      if (tasks.length === 0) { showToast('Nenhum dado para exportar', 'warning'); return; }
+      try {
+        const rows = tasks.map(t => ({
+          'Categoria': t.categoria, 'Entrega': t.entrega, 'Responsavel': t.responsavel,
+          'Offset (dias)': t.offset, 'Prazo Planejado': t.prazoPlanejado,
+          'Prazo Real': t.prazoReal, 'Status': t.status, 'Observacoes': t.observacoes
+        }));
+        const ws = XLSX.utils.json_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Essential');
+        XLSX.writeFile(wb, 'essential_' + new Date().toISOString().slice(0,10) + '.xlsx');
+        showToast('Excel exportado', 'success');
+      } catch(err) { showToast('Erro: ' + err.message, 'error'); }
+    }
+
+    function exportToPDF() {
+      if (tasks.length === 0) { showToast('Nenhum dado para exportar', 'warning'); return; }
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('l', 'mm', 'a4');
+        const startD = document.getElementById('eventStartDate').value;
+        const endD = document.getElementById('eventEndDate').value;
+        doc.setFontSize(16);
+        doc.text('Curso Essential — Cronograma', 14, 15);
+        doc.setFontSize(10);
+        doc.text('Periodo: ' + isoToDate(startD) + ' a ' + isoToDate(endD) + ' | Gerado: ' + new Date().toLocaleDateString('pt-BR'), 14, 22);
+
+        const rows = tasks.map(t => [t.categoria, t.entrega, t.responsavel, offsetLabel(t.offset), t.prazoPlanejado, t.prazoReal, t.status, t.observacoes]);
+
+        doc.autoTable({
+          startY: 28,
+          head: [['Categoria', 'Entrega', 'Responsavel', 'Offset', 'Prazo Planejado', 'Prazo Real', 'Status', 'Observacoes']],
+          body: rows,
+          styles: { fontSize: 6.5, font: 'helvetica', cellPadding: 2 },
+          headStyles: { fillColor: [26, 26, 46], textColor: 255, fontSize: 7, fontStyle: 'bold' },
+          columnStyles: { 0: { cellWidth: 26, fontStyle: 'bold' }, 1: { cellWidth: 46 }, 2: { cellWidth: 24 }, 3: { cellWidth: 14 }, 4: { cellWidth: 20 }, 5: { cellWidth: 20 }, 6: { cellWidth: 18 }, 7: { cellWidth: 'auto' } },
+          alternateRowStyles: { fillColor: [248, 248, 248] },
+          didParseCell: function(data) {
+            if (data.section === 'body' && data.column.index === 6) {
+              const v = data.cell.raw;
+              if (v === 'Concluido') data.cell.styles.textColor = [45, 138, 78];
+              else if (v === 'Atrasado') data.cell.styles.textColor = [192, 57, 43];
+              else if (v === 'Em andamento') data.cell.styles.textColor = [184, 134, 11];
+            }
+          }
+        });
+        doc.save('essential_' + new Date().toISOString().slice(0,10) + '.pdf');
+        showToast('PDF exportado', 'success');
+      } catch(err) { showToast('Erro: ' + err.message, 'error'); }
+    }
+
+    // ============================================================
+    // FECHAR MODAIS
+    // ============================================================
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        if (document.getElementById('confirmModal').classList.contains('active')) closeConfirmModal();
+        else if (document.getElementById('taskModal').classList.contains('active')) closeModal();
+      }
+    });
+    document.getElementById('taskModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+    document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target === this) closeConfirmModal(); });
+
+    // ============================================================
+    // INICIALIZAR
+    // ============================================================
+    function init() {
+      loadFromStorage();
+      populateFilters();
+      renderTable();
+      updateDashboard();
+      updateDaysCounter();
+      if (EVENT_DATE) updateTimelineBar();
+    }
+    init();
+  </script>
+</body>
+</html>
