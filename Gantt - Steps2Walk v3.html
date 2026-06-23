@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gantt - Projeto Cadaver Lab & Mutirão Neoortho</title>
+    <title>Gantt - Cadaver Lab IBRA / Medartis Mão e Punho</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -44,13 +44,12 @@
         
         .grid-line { position: absolute; top: 0; width: 1px; background: rgba(0,0,0,0.05); pointer-events: none; z-index: 0; }
         
-        /* Nova linha indicadora de Hoje */
         .today-marker {
             position: absolute;
             top: 0;
             bottom: 0;
             width: 2px;
-            background-color: #ef4444; /* Vermelho */
+            background-color: #ef4444;
             z-index: 5;
             pointer-events: none;
             border-left: 1px dashed rgba(255,255,255,0.5);
@@ -70,7 +69,6 @@
             white-space: nowrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        /* Fim da linha Hoje */
 
         .gantt-bar { position: absolute; height: 20px; border-radius: 4px; display: flex; align-items: center; padding: 0 6px; font-size: 10px; font-weight: 600; color: #fff; cursor: pointer; overflow: hidden; white-space: nowrap; }
         .gantt-bar.planned { top: 16px; z-index: 1; background: #ffffff; border: 2px solid; }
@@ -115,8 +113,8 @@
     <header class="sticky top-0 z-30 border-b bg-white/80" style="backdrop-filter: blur(12px);">
         <div class="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight"><span style="color: var(--accent-dark);">Gantt</span> Cadaver Lab & Mutirão</h1>
-                <p class="text-sm mt-1 text-gray-500">Projeto Neoortho · Jun - Out 2026</p>
+                <h1 class="text-2xl font-bold tracking-tight"><span style="color: var(--accent-dark);">Gantt</span> <span id="headerTitle">Cadaver Lab IBRA / Medartis</span></h1>
+                <p class="text-sm mt-1 text-gray-500" id="headerSub">24 e 25 de agosto de 2026</p>
             </div>
             <div class="flex items-center gap-2">
                 <button id="btnTranslate" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-purple-500 text-purple-600 hover:bg-purple-50">
@@ -204,7 +202,7 @@
         <div class="modal-box">
             <h3 class="text-lg font-bold mb-6 text-gray-800" id="modalTitle">Editar</h3>
             <input type="hidden" id="editId">
-            <input type="hidden" id="editMode"> <!-- 'task' ou 'deliverable' -->
+            <input type="hidden" id="editMode">
             
             <div class="fg">
                 <label id="labelName">Nome</label>
@@ -216,7 +214,6 @@
                 <datalist id="respList"></datalist>
             </div>
             
-            <!-- Campos exclusivos de Tarefa -->
             <div id="taskFields">
                 <div class="grid grid-cols-2 gap-4 pb-4 border-b border-gray-100">
                     <div class="fg mb-0"><label class="text-blue-500">Planejado Início</label><input type="date" id="editStart"></div>
@@ -228,7 +225,6 @@
                 </div>
             </div>
 
-            <!-- Campo exclusivo de Entrega -->
             <div id="deliverableFields" class="hidden mt-2">
                 <div class="fg flex items-center gap-3">
                     <input type="checkbox" id="editDone" class="dcheck mt-1">
@@ -256,122 +252,60 @@
 
         var L = {
           pt: {
-            title: 'Gantt Cadaver Lab & Mutirão',
-            subtitle: 'Projeto Neoortho · Jun - Out 2026',
-            btnSave: 'Salvar',
-            btnLoad: 'Carregar',
-            btnExport: 'Exportar',
-            btnDeliv: 'Entregas',
-            btnAdd: 'Nova Atividade',
-            statTasks: 'Total de Atividades',
-            statAreas: 'Áreas Envolvidas',
-            statDays: 'Duração do Projeto',
-            statDeliv: 'Entregas Concluídas',
-            zoom: 'Zoom',
-            legendTitle: 'Legenda - Áreas Exibidas no Gráfico',
-            delivTitle: 'Entregas Específicas da Neoortho',
-            btnAddDeliv: 'Nova Entrega',
-            modalTitleTask: 'Editar Atividade',
-            modalTitleDeliv: 'Editar Entrega',
-            labelName: 'Nome',
-            labelActivity: 'Atividade',
-            labelItem: 'Item de Entrega',
-            labelResp: 'Responsável',
-            labelPlannedStart: 'Planejado Início',
-            labelPlannedEnd: 'Planejado Fim',
-            labelRealStart: 'Realizado Início',
-            labelRealEnd: 'Realizado Fim',
-            labelDone: 'Marcar como concluída',
-            btnDelete: 'Excluir',
-            btnCancel: 'Cancelar',
-            btnSaveChanges: 'Salvar Alterações',
-            toastSaved: 'Progresso salvo com sucesso!',
-            toastLoaded: 'Dados carregados.',
-            toastNoData: 'Nenhum salvamento encontrado.',
-            toastExported: 'Dados exportados com sucesso!',
-            toastError: 'Erro ao salvar dados.',
-            toastLoadError: 'Erro ao carregar.',
-            toastExportError: 'Erro ao exportar dados.',
-            toastActivityUpdated: 'Atividade atualizada!',
-            toastActivityAdded: 'Nova atividade adicionada!',
-            toastDelivUpdated: 'Entrega atualizada!',
-            toastDelivAdded: 'Nova entrega adicionada!',
-            toastActivityRemoved: 'Atividade removida.',
-            toastDelivRemoved: 'Entrega removida.',
-            toastDelivDone: ' concluída!',
-            toastDelivReopened: ' reaberta',
-            toastFillFields: 'Preencha Nome e Responsável.',
-            toastFillDates: 'Preencha as datas de planejamento.',
-            toastInvalidDate: 'Data de planejamento inválida.',
-            toastInvalidEnd: 'Fim do planejado não pode ser antes do início.',
+            title: 'Gantt Cadaver Lab IBRA / Medartis',
+            subtitle: '24 e 25 de agosto de 2026',
+            btnSave: 'Salvar', btnLoad: 'Carregar', btnExport: 'Exportar',
+            btnDeliv: 'Entregas', btnAdd: 'Nova Atividade',
+            statTasks: 'Total de Atividades', statAreas: 'Áreas Envolvidas',
+            statDays: 'Duração do Projeto', statDeliv: 'Entregas Concluídas',
+            zoom: 'Zoom', legendTitle: 'Legenda - Áreas Exibidas no Gráfico',
+            delivTitle: 'Entregas Específicas da Neoortho', btnAddDeliv: 'Nova Entrega',
+            modalTitleTask: 'Editar Atividade', modalTitleDeliv: 'Editar Entrega',
+            labelName: 'Nome', labelActivity: 'Atividade', labelItem: 'Item de Entrega',
+            labelResp: 'Responsável', labelPlannedStart: 'Planejado Início', labelPlannedEnd: 'Planejado Fim',
+            labelRealStart: 'Realizado Início', labelRealEnd: 'Realizado Fim', labelDone: 'Marcar como concluída',
+            btnDelete: 'Excluir', btnCancel: 'Cancelar', btnSaveChanges: 'Salvar Alterações',
+            toastSaved: 'Progresso salvo com sucesso!', toastLoaded: 'Dados carregados.',
+            toastNoData: 'Nenhum salvamento encontrado.', toastExported: 'Dados exportados com sucesso!',
+            toastError: 'Erro ao salvar dados.', toastLoadError: 'Erro ao carregar.',
+            toastExportError: 'Erro ao exportar dados.', toastActivityUpdated: 'Atividade atualizada!',
+            toastActivityAdded: 'Nova atividade adicionada!', toastDelivUpdated: 'Entrega atualizada!',
+            toastDelivAdded: 'Nova entrega adicionada!', toastActivityRemoved: 'Atividade removida.',
+            toastDelivRemoved: 'Entrega removida.', toastDelivDone: ' concluída!', toastDelivReopened: ' reaberta',
+            toastFillFields: 'Preencha Nome e Responsável.', toastFillDates: 'Preencha as datas de planejamento.',
+            toastInvalidDate: 'Data de planejamento inválida.', toastInvalidEnd: 'Fim do planejado não pode ser antes do início.',
             toastFillRealDates: 'Preencha início e fim do realizado, ou deixe ambos vazios.',
-            toastInvalidRealDate: 'Data realizada inválida.',
-            toastInvalidRealEnd: 'Fim do realizado não pode ser antes do início.',
-            toastDrawError: 'Erro ao desenhar o gráfico.',
-            confirmDelete: 'Tem certeza que deseja excluir?',
-            activity: 'Atividade',
-            planned: 'Planejado',
-            realized: 'Realizado',
-            pending: 'Pendente'
+            toastInvalidRealDate: 'Data realizada inválida.', toastInvalidRealEnd: 'Fim do realizado não pode ser antes do início.',
+            toastDrawError: 'Erro ao desenhar o gráfico.', confirmDelete: 'Tem certeza que deseja excluir?',
+            activity: 'Atividade', planned: 'Planejado', realized: 'Realizado', pending: 'Pendente'
           },
           en: {
-            title: 'Gantt Cadaver Lab & Mutirão',
-            subtitle: 'Neoortho Project · Jun - Oct 2026',
-            btnSave: 'Save',
-            btnLoad: 'Load',
-            btnExport: 'Export',
-            btnDeliv: 'Deliverables',
-            btnAdd: 'New Activity',
-            statTasks: 'Total Activities',
-            statAreas: 'Areas Involved',
-            statDays: 'Project Duration',
-            statDeliv: 'Completed Deliverables',
-            zoom: 'Zoom',
-            legendTitle: 'Legend - Areas Displayed in Chart',
-            delivTitle: 'Neoortho Specific Deliverables',
-            btnAddDeliv: 'New Deliverable',
-            modalTitleTask: 'Edit Activity',
-            modalTitleDeliv: 'Edit Deliverable',
-            labelName: 'Name',
-            labelActivity: 'Activity',
-            labelItem: 'Deliverable Item',
-            labelResp: 'Responsible',
-            labelPlannedStart: 'Planned Start',
-            labelPlannedEnd: 'Planned End',
-            labelRealStart: 'Actual Start',
-            labelRealEnd: 'Actual End',
-            labelDone: 'Mark as completed',
-            btnDelete: 'Delete',
-            btnCancel: 'Cancel',
-            btnSaveChanges: 'Save Changes',
-            toastSaved: 'Progress saved successfully!',
-            toastLoaded: 'Data loaded.',
-            toastNoData: 'No save data found.',
-            toastExported: 'Data exported successfully!',
-            toastError: 'Error saving data.',
-            toastLoadError: 'Error loading data.',
-            toastExportError: 'Error exporting data.',
-            toastActivityUpdated: 'Activity updated!',
-            toastActivityAdded: 'New activity added!',
-            toastDelivUpdated: 'Deliverable updated!',
-            toastDelivAdded: 'New deliverable added!',
-            toastActivityRemoved: 'Activity removed.',
-            toastDelivRemoved: 'Deliverable removed.',
-            toastDelivDone: ' completed!',
-            toastDelivReopened: ' reopened',
-            toastFillFields: 'Please fill Name and Responsible.',
-            toastFillDates: 'Please fill the planning dates.',
-            toastInvalidDate: 'Invalid planning date.',
-            toastInvalidEnd: 'Planned end cannot be before start.',
+            title: 'Gantt Cadaver Lab IBRA / Medartis',
+            subtitle: 'August 24-25, 2026',
+            btnSave: 'Save', btnLoad: 'Load', btnExport: 'Export',
+            btnDeliv: 'Deliverables', btnAdd: 'New Activity',
+            statTasks: 'Total Activities', statAreas: 'Areas Involved',
+            statDays: 'Project Duration', statDeliv: 'Completed Deliverables',
+            zoom: 'Zoom', legendTitle: 'Legend - Areas Displayed in Chart',
+            delivTitle: 'Neoortho Specific Deliverables', btnAddDeliv: 'New Deliverable',
+            modalTitleTask: 'Edit Activity', modalTitleDeliv: 'Edit Deliverable',
+            labelName: 'Name', labelActivity: 'Activity', labelItem: 'Deliverable Item',
+            labelResp: 'Responsible', labelPlannedStart: 'Planned Start', labelPlannedEnd: 'Planned End',
+            labelRealStart: 'Actual Start', labelRealEnd: 'Actual End', labelDone: 'Mark as completed',
+            btnDelete: 'Delete', btnCancel: 'Cancel', btnSaveChanges: 'Save Changes',
+            toastSaved: 'Progress saved successfully!', toastLoaded: 'Data loaded.',
+            toastNoData: 'No save data found.', toastExported: 'Data exported successfully!',
+            toastError: 'Error saving data.', toastLoadError: 'Error loading data.',
+            toastExportError: 'Error exporting data.', toastActivityUpdated: 'Activity updated!',
+            toastActivityAdded: 'New activity added!', toastDelivUpdated: 'Deliverable updated!',
+            toastDelivAdded: 'New deliverable added!', toastActivityRemoved: 'Activity removed.',
+            toastDelivRemoved: 'Deliverable removed.', toastDelivDone: ' completed!', toastDelivReopened: ' reopened',
+            toastFillFields: 'Please fill Name and Responsible.', toastFillDates: 'Please fill the planning dates.',
+            toastInvalidDate: 'Invalid planning date.', toastInvalidEnd: 'Planned end cannot be before start.',
             toastFillRealDates: 'Fill both actual start and end, or leave both empty.',
-            toastInvalidRealDate: 'Invalid actual date.',
-            toastInvalidRealEnd: 'Actual end cannot be before start.',
-            toastDrawError: 'Error drawing chart.',
-            confirmDelete: 'Are you sure you want to delete?',
-            activity: 'Activity',
-            planned: 'Planned',
-            realized: 'Actual',
-            pending: 'Pending'
+            toastInvalidRealDate: 'Invalid actual date.', toastInvalidRealEnd: 'Actual end cannot be before start.',
+            toastDrawError: 'Error drawing chart.', confirmDelete: 'Are you sure you want to delete?',
+            activity: 'Activity', planned: 'Planned', realized: 'Actual', pending: 'Pending'
           }
         };
 
@@ -386,259 +320,232 @@
         };
 
         const AppState = {
-            modalMode: 'task', // 'task' ou 'deliverable'
+            modalMode: 'task',
             tasks: [
-                {id:5, name:"Definição dos faculty nacionais e internacionais", responsible:"Marketing Educação", start:"2026-06-04", end:"2026-06-19", startReal:"2026-06-04", endReal:"2026-06-15"},
-                {id:6, name:"Definição dos hospitais e instituições participantes", responsible:"Marketing Educação", start:"2026-06-04", end:"2026-06-19", startReal:"2026-06-04", endReal:"2026-06-15"},
-                {id:2, name:"Levantamento das necessidades do Cadaver Lab", responsible:"Marketing Produto", start:"2026-06-04", end:"2026-06-22", startReal:"2026-06-04", endReal:"2026-06-15"},
-                {id:3, name:"Entrega da lista preliminar de implantes", responsible:"Marketing Produto", start:"2026-06-04", end:"2026-06-22", startReal:"2026-06-04", endReal:"2026-06-15"},
-                {id:7, name:"Início da elaboração dos contratos", responsible:"Jurídico", start:"2026-06-04", end:"2026-07-10", startReal:"2026-06-04", endReal:"2026-06-15"},
-                {id:1, name:"Kick-off do projeto", responsible:"Todas as Áreas", start:"2026-06-17", end:"2026-06-17", startReal:"", endReal:""},
-                {id:4, name:"Aprovação da lista de materiais", responsible:"Marketing Educação", start:"2026-06-22", end:"2026-06-23", startReal:"", endReal:""},
-                {id:8, name:"Definição do programa científico", responsible:"Marketing Educação", start:"2026-06-23", end:"2026-06-30", startReal:"", endReal:""},
-                {id:9, name:"Aprovação orçamentária preliminar", responsible:"Marketing Educação", start:"2026-06-30", end:"2026-07-10", startReal:"", endReal:""},
-                {id:12, name:"Assinatura dos contratos principais", responsible:"Jurídico", start:"2026-07-10", end:"2026-07-30", startReal:"", endReal:""},
-                {id:13, name:"Confirmação dos participantes e faculty", responsible:"Marketing Educação", start:"2026-07-10", end:"2026-07-30", startReal:"", endReal:""},
-                {id:14, name:"Liberação da programação final", responsible:"Marketing Educação", start:"2026-07-10", end:"2026-07-30", startReal:"", endReal:""},
-                {id:15, name:"Produção dos implantes e instrumentais", responsible:"Industrial", start:"2026-07-10", end:"2026-09-18", startReal:"", endReal:""},
-                {id:19, name:"Elaboração dos contratos de doação", responsible:"Jurídico + Comercial + Marketing Educação", start:"2026-07-30", end:"2026-09-15", startReal:"", endReal:""},
-                {id:11, name:"Contratação dos fornecedores", responsible:"Marketing Eventos", start:"2026-07-31", end:"2026-08-30", startReal:"", endReal:""},
-                {id:10, name:"Divulgação oficial", responsible:"Marketing Eventos", start:"2026-07-31", end:"2026-09-30", startReal:"", endReal:""},
-                {id:16, name:"Definição dos instrumentadores participantes", responsible:"Marketing Educação + Comercial", start:"2026-09-01", end:"2026-09-25", startReal:"", endReal:""},
-                {id:17, name:"Aprovação dos materiais promocionais", responsible:"Marketing Educação + Marketing Eventos", start:"2026-09-05", end:"2026-09-30", startReal:"", endReal:""},
-                {id:20, name:"Emissão da documentação fiscal preliminar", responsible:"Fiscal", start:"2026-09-07", end:"2026-09-30", startReal:"", endReal:""},
-                {id:18, name:"Conferência da produção dos kits cirúrgicos", responsible:"Marketing Produto + Marketing Educação", start:"2026-09-22", end:"2026-09-30", startReal:"", endReal:""},
-                {id:21, name:"Separação dos kits do Cadaver Lab", responsible:"Marketing Produto + Marketing Educação", start:"2026-09-22", end:"2026-09-30", startReal:"", endReal:""},
-                {id:22, name:"Separação dos kits do Mutirão", responsible:"Comercial", start:"2026-09-22", end:"2026-09-30", startReal:"", endReal:""},
-                {id:24, name:"Conferência de implantes e equipamentos", responsible:"Marketing Produto + Marketing Educação", start:"2026-09-29", end:"2026-09-29", startReal:"", endReal:""},
-                {id:23, name:"Reunião operacional final com todas as áreas", responsible:"Todas as Áreas", start:"2026-10-01", end:"2026-10-01", startReal:"", endReal:""},
-                {id:25, name:"Envio dos materiais para o local do evento", responsible:"Comercial", start:"2026-10-01", end:"2026-10-02", startReal:"", endReal:""},
-                {id:27, name:"Definições das equipes e alinhamento operacional", responsible:"Marketing Produto + Marketing Educação", start:"2026-10-02", end:"2026-10-02", startReal:"", endReal:""},
-                {id:50, name:"Jantar com os Faculties para Alinhamento", responsible:"Marketing Produto + Comercial + Marketing Educação", start:"2026-10-02", end:"2026-10-02", startReal:"", endReal:""},
-                {id:28, name:"Visita à fábrica, transfer e coquetel", responsible:"Marketing Eventos + Marketing Educação + Industrial", start:"2026-10-05", end:"2026-10-05", startReal:"", endReal:""},
-                {id:26, name:"Montagem do material promocional", responsible:"Marketing Eventos + Marketing Educação", start:"2026-10-05", end:"2026-10-07", startReal:"", endReal:""},
-                {id:29, name:"Cadaver Lab", responsible:"Marketing Educação + Marketing Produto", start:"2026-10-06", end:"2026-10-06", startReal:"", endReal:""},
-                {id:30, name:"Mutirão Cirúrgico (Dia 1)", responsible:"Comercial + Marketing Produto", start:"2026-10-08", end:"2026-10-08", startReal:"", endReal:""},
-                {id:31, name:"Mutirão Cirúrgico (Dia 2)", responsible:"Comercial + Marketing Produto", start:"2026-10-09", end:"2026-10-09", startReal:"", endReal:""},
-                {id:32, name:"Inventário e retorno dos materiais", responsible:"Marketing Produto + Comercial + Marketing Educação", start:"2026-10-14", end:"2026-10-14", startReal:"", endReal:""},
-                {id:34, name:"Relatório final do projeto", responsible:"Marketing Educação", start:"2026-10-14", end:"2026-10-14", startReal:"", endReal:""},
-                {id:33, name:"Consolidação dos custos", responsible:"Financeiro + Controladoria", start:"2026-10-17", end:"2026-10-17", startReal:"", endReal:""}
+                {id:4, name:"Quantidade confirmada", responsavel:"Educação/Produto", start:"2026-05-05", end:"2026-05-05", startReal:"2026-05-05", endReal:"2026-05-05"},
+                {id:5, name:"Importação concluída", responsavel:"Supply Chain", start:"2026-07-17", end:"2026-07-17", startReal:"", endReal:""},
+                {id:6, name:"Transporte confirmado", responsavel:"Logística", start:"2026-07-31", end:"2026-07-31", startReal:"", endReal:""},
+                {id:7, name:"Recebimento confirmado", responsavel:"Logística", start:"2026-08-17", end:"2026-08-17", startReal:"", endReal:""},
+                {id:1, name:"Contrato Universidade Positivo", responsavel:"Jurídico", start:"2026-07-10", end:"2026-07-10", startReal:"2026-07-08", endReal:"2026-07-08"},
+                {id:2, name:"Contrato fornecedores", responsavel:"Jurídico", start:"2026-06-30", end:"2026-06-30", startReal:"2026-06-30", endReal:"2026-06-30"},
+                {id:27, name:"Motores cirúrgicos", responsavel:"Educação/Produto", start:"2026-07-30", end:"2026-07-30", startReal:"", endReal:""},
+                {id:28, name:"Arco em C", responsavel:"Educação/Produto", start:"2026-07-30", end:"2026-07-30", startReal:"2026-05-29", endReal:"2026-05-29"},
+                {id:29, name:"Instrumentais Medartis", responsavel:"Educação/Produto", start:"2026-08-21", end:"2026-08-21", startReal:"", endReal:""},
+                {id:30, name:"Instrumentais apoio", responsavel:"Educação/Produto", start:"2026-06-05", end:"2026-06-05", startReal:"2026-06-05", endReal:"2026-06-05"},
+                {id:50, name:"Materiais de demonstração", responsavel:"Educação/Produto", start:"2026-08-21", end:"2026-08-21", startReal:"", endReal:""},
+                {id:51, name:"Cotação espaço evento", responsavel:"Eventos", start:"2026-03-15", end:"2026-03-15", startReal:"2026-03-10", endReal:"2026-03-10"},
+                {id:52, name:"Reserva local confirmada", responsavel:"Eventos", start:"2026-04-30", end:"2026-04-30", startReal:"2026-04-28", endReal:"2026-04-28"},
+                {id:53, name:"Layout sala cirúrgica", responsavel:"Eventos", start:"2026-06-30", end:"2026-06-30", startReal:"", endReal:""},
+                {id:54, name:"Sinalização e identificação", responsavel:"Eventos", start:"2026-08-20", end:"2026-08-20", startReal:"", endReal:""},
+                {id:55, name:"Montagem mesas cirúrgicas", responsavel:"Logística", start:"2026-08-21", end:"2026-08-21", startReal:"", endReal:""},
+                {id:56, name:"Iluminação sala cirúrgica", responsavel:"Logística", start:"2026-08-20", end:"2026-08-20", startReal:"", endReal:""},
+                {id:57, name:"Ventilação e climatização", responsavel:"Logística", start:"2026-08-20", end:"2026-08-20", startReal:"", endReal:""},
+                {id:58, name:"Instalação elétrica", responsavel:"Logística", start:"2026-08-20", end:"2026-08-20", startReal:"", endReal:""},
+                {id:59, name:"Limpeza e preparo do espaço", responsavel:"IBRA", start:"2026-08-21", end:"2026-08-21", startReal:"", endReal:""},
+                {id:60, name:"Formulário inscrição online", responsavel:"Educação/Eventos", start:"2026-04-01", end:"2026-04-01", startReal:"2026-03-28", endReal:"2026-03-28"},
+                {id:61, name:"Lista participantes confirmados", responsavel:"Educação/Eventos", start:"2026-08-10", end:"2026-08-10", startReal:"", endReal:""},
+                {id:62, name:"Crachás e materiais participantes", responsavel:"Eventos", start:"2026-08-18", end:"2026-08-18", startReal:"", endReal:""},
+                {id:63, name:"Emissão certificados", responsavel:"Educação/Eventos", start:"2026-08-30", end:"2026-08-30", startReal:"", endReal:""},
+                {id:64, name:"Materiais descartáveis cirúrgicos", responsavel:"Supply Chain", start:"2026-08-10", end:"2026-08-10", startReal:"", endReal:""},
+                {id:65, name:"Produtos de limpeza e desinfecção", responsavel:"Supply Chain", start:"2026-08-15", end:"2026-08-15", startReal:"", endReal:""},
+                {id:66, name:"EPIs para participantes", responsavel:"Supply Chain", start:"2026-08-15", end:"2026-08-15", startReal:"", endReal:""},
+                {id:67, name:"Materiais escritório e sinalização", responsavel:"Logística", start:"2026-08-18", end:"2026-08-18", startReal:"", endReal:""},
+                {id:68, name:"Kits participantes", responsavel:"Educação", start:"2026-08-20", end:"2026-08-20", startReal:"", endReal:""},
+                {id:69, name:"Confirmação presença professores", responsavel:"Educação", start:"2026-04-30", end:"2026-04-30", startReal:"", endReal:""},
+                {id:70, name:"Passagens aéreas professores", responsavel:"Logística", start:"2026-06-30", end:"2026-06-30", startReal:"", endReal:""},
+                {id:71, name:"Hospedagem professores", responsavel:"Logística", start:"2026-08-10", end:"2026-08-10", startReal:"", endReal:""},
+                {id:72, name:"Transporte local professores", responsavel:"Logística", start:"2026-08-23", end:"2026-08-23", startReal:"", endReal:""},
+                {id:73, name:"Definição programa científico", responsavel:"Educação", start:"2026-04-30", end:"2026-04-30", startReal:"2026-04-22", endReal:"2026-04-22"},
+                {id:74, name:"Apresentações PowerPoint", responsavel:"Educação", start:"2026-08-15", end:"2026-08-15", startReal:"", endReal:""},
+                {id:75, name:"Material didático impresso", responsavel:"Eventos", start:"2026-08-18", end:"2026-08-18", startReal:"", endReal:""},
+                {id:76, name:"Cronograma finalizado", responsavel:"Educação/Eventos", start:"2026-08-20", end:"2026-08-20", startReal:"", endReal:""}
             ],
             deliverables: [
-                {id:1, item:"Implantes para Cadaver Lab", responsible:"Marketing Produto + Industrial", done:false},
-                {id:2, item:"Instrumentais para Cadaver Lab", responsible:"Marketing Produto + Industrial", done:false},
-                {id:3, item:"Equipamentos para Cadaver Lab", responsible:"Marketing Produto", done:false},
-                {id:4, item:"Blocos e canetas", responsible:"Marketing Eventos", done:false},
-                {id:5, item:"Toucas cirúrgicas", responsible:"Marketing Eventos", done:false},
-                {id:6, item:"Backdrop", responsible:"Marketing Eventos", done:false},
-                {id:7, item:"Coffee Break", responsible:"Marketing Eventos", done:false},
-                {id:8, item:"Transfer para visita à fábrica", responsible:"Marketing Eventos", done:false},
-                {id:9, item:"Coquetel", responsible:"Marketing Eventos", done:false},
-                {id:10, item:"Implantes para o mutirão", responsible:"Marketing Produto + Industrial", done:false},
-                {id:11, item:"Instrumentais para o mutirão", responsible:"Marketing Produto + Industrial", done:false},
-                {id:12, item:"Equipamentos cirúrgicos", responsible:"Marketing Produto", done:false},
-                {id:13, item:"Instrumentadores", responsible:"Comercial", done:false},
-                {id:14, item:"Controle de materiais no centro cirúrgico", responsible:"Comercial + Supply Chain", done:false},
-                {id:15, item:"Controle dos gastos cirúrgicos", responsible:"Financeiro + Controladoria", done:false},
-                {id:16, item:"Contratos e doações", responsible:"Jurídico", done:false},
-                {id:17, item:"Notas fiscais e remessas", responsible:"Fiscal", done:false},
-                {id:18, item:"Logística dos materiais", responsible:"Supply Chain", done:false}
+                {id:1, name:"Cadáveres confirmados (10 peças)", responsavel:"Educação/Produto", done:true},
+                {id:2, name:"Importação concluída", responsavel:"Supply Chain", done:false},
+                {id:3, name:"Transporte confirmado", responsavel:"Logística", done:false},
+                {id:4, name:"Contrato Universidade Positivo", responsavel:"Jurídico", done:false},
+                {id:5, name:"Contrato fornecedores", responsavel:"Jurídico", done:true},
+                {id:6, name:"Motores cirúrgicos", responsavel:"Educação/Produto", done:false},
+                {id:7, name:"Arco em C (empréstimo GE)", responsavel:"Educação/Produto", done:true},
+                {id:8, name:"Instrumentais Medartis", responsavel:"Educação/Produto", done:false},
+                {id:9, name:"Layout sala cirúrgica (8 estações)", responsavel:"Eventos", done:false},
+                {id:10, name:"Mesas cirúrgicas montadas", responsavel:"Logística", done:false},
+                {id:11, name:"Iluminação e ventilação OK", responsavel:"Logística", done:false},
+                {id:12, name:"Instalação elétrica", responsavel:"Logística", done:false},
+                {id:13, name:"Lista participantes confirmados", responsavel:"Educação/Eventos", done:false},
+                {id:14, name:"Materiais descartáveis", responsavel:"Supply Chain", done:false},
+                {id:15, name:"EPIs para participantes", responsavel:"Supply Chain", done:false},
+                {id:16, name:"Kits participantes", responsavel:"Educação", done:false},
+                {id:17, name:"Passagens e hospedagem professores", responsavel:"Logística", done:false},
+                {id:18, name:"Cronograma finalizado", responsavel:"Educação/Eventos", done:false}
             ],
             dayWidth: 5,
             filterArea: "Todos",
-            nextId: 51,
-            nextDelivId: 50, // Controle de ID para entregas
-            timelineStart: new Date(2026, 5, 1), 
-            timelineEnd: new Date(2026, 9, 31),  
+            nextId: 77,
+            nextDelivId: 19,
+            timelineStart: new Date(2026, 2, 1),
+            timelineEnd: new Date(2026, 7, 31),
             totalDays: 0,
             areaColors: {
-                "Marketing Educação": "#00AEEF", "Marketing Produto": "#003A70", "Marketing Eventos": "#E2183C",
-                "Comercial": "#F7941D", "Industrial": "#FDB913", "Jurídico": "#5C2D91",
-                "Financeiro + Controladoria": "#8DC63F", "Supply Chain": "#00A651", 
-                "Líder do Projeto": "#5C2D91", "Fiscal": "#BCBEC0", "Todas as Áreas": "#58595B", "Controladoria": "#8DC63F", "Financeiro": "#8DC63F"
+                "Educação/Produto": "#00AEEF", "Educação": "#00AEEF", "Educação/Eventos": "#00AEEF",
+                "Supply Chain": "#E2183C", "Logística": "#F7941D",
+                "Jurídico": "#5C2D91", "Eventos": "#003A70",
+                "IBRA": "#FDB913"
             }
         };
 
         AppState.totalDays = DateUtils.diffDays(AppState.timelineStart, AppState.timelineEnd) + 1;
 
         const Storage = {
-            KEYS: { tasks: 'neoortho_gantt_tasks_v4', deliverables: 'neoortho_gantt_delivs_v4' },
-            save() { try { localStorage.setItem(this.KEYS.tasks, JSON.stringify(AppState.tasks)); localStorage.setItem(this.KEYS.deliverables, JSON.stringify(AppState.deliverables)); UI.toast("Progresso salvo com sucesso!", "success"); } catch (e) { UI.toast("Erro ao salvar dados.", "error"); } },
-            load() { try { const savedTasks = localStorage.getItem(this.KEYS.tasks); const savedDelivs = localStorage.getItem(this.KEYS.deliverables); if (savedTasks) { AppState.tasks = JSON.parse(savedTasks); AppState.nextId = AppState.tasks.reduce((max, t) => Math.max(max, t.id), 0) + 1; } if (savedDelivs) { AppState.deliverables = JSON.parse(savedDelivs); AppState.nextDelivId = AppState.deliverables.reduce((max, d) => Math.max(max, d.id), 0) + 1; } if (savedTasks || savedDelivs) { App.renderAll(); UI.toast("Dados carregados.", "info"); } else UI.toast("Nenhum salvamento encontrado.", "info"); } catch (e) { UI.toast("Erro ao carregar.", "error"); } },
+            KEYS: { tasks: 'gantt_hw_tasks_v1', deliverables: 'gantt_hw_delivs_v1' },
+            save() { try { localStorage.setItem(this.KEYS.tasks, JSON.stringify(AppState.tasks)); localStorage.setItem(this.KEYS.deliverables, JSON.stringify(AppState.deliverables)); UI.toast(t('toastSaved'), "success"); } catch (e) { UI.toast(t('toastError'), "error"); } },
+            saveSilent() { try { localStorage.setItem(this.KEYS.tasks, JSON.stringify(AppState.tasks)); localStorage.setItem(this.KEYS.deliverables, JSON.stringify(AppState.deliverables)); } catch (e) {} },
+            load() { try { const savedTasks = localStorage.getItem(this.KEYS.tasks); const savedDelivs = localStorage.getItem(this.KEYS.deliverables); if (savedTasks) { AppState.tasks = JSON.parse(savedTasks); AppState.nextId = AppState.tasks.reduce((max, t) => Math.max(max, t.id), 0) + 1; } if (savedDelivs) { AppState.deliverables = JSON.parse(savedDelivs); AppState.nextDelivId = AppState.deliverables.reduce((max, d) => Math.max(max, d.id), 0) + 1; } if (savedTasks || savedDelivs) { App.renderAll(); UI.toast(t('toastLoaded'), "info"); } else UI.toast(t('toastNoData'), "info"); } catch (e) { UI.toast(t('toastLoadError'), "error"); } },
             autoLoad() { try { const savedTasks = localStorage.getItem(this.KEYS.tasks); const savedDelivs = localStorage.getItem(this.KEYS.deliverables); if (savedTasks) { AppState.tasks = JSON.parse(savedTasks); AppState.nextId = AppState.tasks.reduce((max, t) => Math.max(max, t.id), 0) + 1; } if (savedDelivs) { AppState.deliverables = JSON.parse(savedDelivs); AppState.nextDelivId = AppState.deliverables.reduce((max, d) => Math.max(max, d.id), 0) + 1; } } catch (e) {} },
-            exportData() { try { const data = { tasks: AppState.tasks, deliverables: AppState.deliverables, exportDate: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'gantt_neoortho_' + new Date().toISOString().slice(0,10) + '.json'; a.click(); URL.revokeObjectURL(url); UI.toast("Dados exportados com sucesso!", "success"); } catch (e) { UI.toast("Erro ao exportar dados.", "error"); } }
+            exportData() { try { const data = { tasks: AppState.tasks, deliverables: AppState.deliverables, exportDate: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'gantt_hw_' + new Date().toISOString().slice(0,10) + '.json'; a.click(); URL.revokeObjectURL(url); UI.toast(t('toastExported'), "success"); } catch (e) { UI.toast(t('toastExportError'), "error"); } }
         };
 
         const Stats = {
-            render() { const ft = Filter.getFiltered(); const doneCount = AppState.deliverables.filter(d => d.done).length; const areasSet = new Set(); ft.forEach(t => t.responsible.split("+").forEach(a => { const trimmed = a.trim(); if (trimmed !== "Todas as Áreas") areasSet.add(trimmed); })); document.getElementById('statTasks').textContent = ft.length; document.getElementById('statAreas').textContent = areasSet.size; document.getElementById('statDays').textContent = `${AppState.totalDays} dias`; document.getElementById('statDeliv').textContent = `${doneCount}/${AppState.deliverables.length}`; }
+            render() { const ft = Filter.getFiltered(); const doneCount = AppState.deliverables.filter(d => d.done).length; const areasSet = new Set(); ft.forEach(t => { const parts = t.responsavel.split("/"); parts.forEach(a => { const trimmed = a.trim(); if (trimmed) areasSet.add(trimmed); }); }); document.getElementById('statTasks').textContent = ft.length; document.getElementById('statAreas').textContent = areasSet.size; document.getElementById('statDays').textContent = AppState.totalDays + ' dias'; document.getElementById('statDeliv').textContent = doneCount + '/' + AppState.deliverables.length; }
         };
 
         const Filter = {
-            getAllAreas() { const s = new Set(); AppState.tasks.forEach(t => t.responsible.split("+").forEach(a => s.add(a.trim()))); return ["Todos", ...Array.from(s).sort()]; },
-            getFiltered() { let result = [...AppState.tasks]; result.sort((a, b) => { const dateA = DateUtils.toDate(a.start); const dateB = DateUtils.toDate(b.start); if (!dateA && !dateB) return a.id - b.id; if (!dateA) return 1; if (!dateB) return -1; if (dateA.getTime() !== dateB.getTime()) return dateA - dateB; const endA = DateUtils.toDate(a.end); const endB = DateUtils.toDate(b.end); if (endA && endB && endA.getTime() !== endB.getTime()) return endA - endB; return a.id - b.id; }); if (AppState.filterArea === "Todos") return result; return result.filter(t => t.responsible.includes(AppState.filterArea)); },
+            getAllAreas() { const s = new Set(); AppState.tasks.forEach(t => { t.responsavel.split("/").forEach(a => s.add(a.trim())); }); return ["Todos", ...Array.from(s).sort()]; },
+            getFiltered() { let result = [...AppState.tasks]; result.sort((a, b) => { const dateA = DateUtils.toDate(a.start); const dateB = DateUtils.toDate(b.start); if (!dateA && !dateB) return a.id - b.id; if (!dateA) return 1; if (!dateB) return -1; if (dateA.getTime() !== dateB.getTime()) return dateA - dateB; const endA = DateUtils.toDate(a.end); const endB = DateUtils.toDate(b.end); if (endA && endB && endA.getTime() !== endB.getTime()) return endA - endB; return a.id - b.id; }); if (AppState.filterArea === "Todos") return result; return result.filter(t => t.responsavel.includes(AppState.filterArea)); },
             set(area) { AppState.filterArea = area; App.renderAll(); },
-            render() { const areas = this.getAllAreas(); document.getElementById('filterTags').innerHTML = areas.map(a => { const isActive = AppState.filterArea === a; const col = a === "Todos" ? 'var(--accent)' : Gantt.getColor(a); return `<button class="ftag${isActive ? ' active' : ''}" data-area="${a}" ${isActive ? `style="background:${col};border-color:${col};color:#fff;"` : ''}>${a}</button>`; }).join(''); }
+            render() { const areas = this.getAllAreas(); document.getElementById('filterTags').innerHTML = areas.map(a => { const isActive = AppState.filterArea === a; const col = a === "Todos" ? 'var(--accent)' : Gantt.getColor(a); return '<button class="ftag' + (isActive ? ' active' : '') + '" data-area="' + a + '" ' + (isActive ? 'style="background:' + col + ';border-color:' + col + ';color:#fff;"' : '') + '>' + a + '</button>'; }).join(''); }
         };
 
         const Gantt = {
             getColor(resp) { for (const [area, color] of Object.entries(AppState.areaColors)) { if (resp.includes(area)) return color; } return "#58595B"; },
             changeZoom(delta) { AppState.dayWidth = Math.max(2, Math.min(20, AppState.dayWidth + delta)); document.getElementById('zoomLvl').textContent = AppState.dayWidth; this.render(); },
-            render() { try { const ft = Filter.getFiltered(); const tw = AppState.totalDays * AppState.dayWidth; const rh = 52; const totalH = ft.length * rh; const headerHTML = this.buildHeader(tw); const gridHTML = this.buildGrid(tw, totalH); const { sidebarHTML, rowsHTML } = this.buildRows(ft, tw, rh); const box = document.getElementById('ganttBox'); const st = box.scrollTop, sl = box.scrollLeft; box.innerHTML = `<div class="gantt-chart"><div class="gantt-sidebar"><div class="gantt-sidebar-header"><span style="flex:1;">Atividade</span><span style="width:110px; text-align:center;">Planejado</span><span style="width:110px; text-align:center;">Realizado</span></div>${sidebarHTML}</div><div class="gantt-timeline" style="width:${tw}px;min-width:${tw}px;">${headerHTML}<div class="timeline-body" style="width:${tw}px;min-width:${tw}px;position:relative;"><div style="position:absolute;top:0;left:0;width:${tw}px;height:${totalH}px;pointer-events:none;z-index:0;">${gridHTML}</div><div style="position:relative;z-index:1;">${rowsHTML}</div></div></div></div>`; box.scrollTop = st; box.scrollLeft = sl; } catch (error) { UI.toast("Erro ao desenhar o gráfico.", "error"); } },
-            buildHeader(tw) { const mn = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']; let mhdr = '', whdr = ''; let cur = new Date(AppState.timelineStart); while (cur <= AppState.timelineEnd) { const y = cur.getFullYear(), m = cur.getMonth(); const ms = new Date(y, m, 1), me = new Date(y, m+1, 0); const es = ms < AppState.timelineStart ? AppState.timelineStart : ms; const ee = me > AppState.timelineEnd ? AppState.timelineEnd : me; const l = DateUtils.diffDays(AppState.timelineStart, es) * AppState.dayWidth; const w = (DateUtils.diffDays(es, ee) + 1) * AppState.dayWidth; mhdr += `<div class="month-hdr" style="left:${l}px;width:${w}px;">${mn[m]} ${y}</div>`; cur = new Date(y, m+1, 1); } for (let d=0; d<AppState.totalDays; d++) { const dt = new Date(AppState.timelineStart.getTime() + d * DateUtils.MSPD); if (dt.getDay() === 1) whdr += `<div class="week-hdr" style="left:${d*AppState.dayWidth}px;width:${7*AppState.dayWidth}px;">${dt.getDate()}/${dt.getMonth()+1}</div>`; } return `<div class="timeline-header" style="width:${tw}px;min-width:${tw}px;">${mhdr}${whdr}</div>`; },
-            buildGrid(tw, totalH) { 
-                let html = ''; 
-                // Linhas de grade e fins de semana
-                for (let d=0; d<AppState.totalDays; d++) { 
-                    const dt = new Date(AppState.timelineStart.getTime() + d * DateUtils.MSPD); 
-                    if (dt.getDay() === 1) html += `<div class="grid-line" style="left:${d*AppState.dayWidth}px;height:${totalH}px;"></div>`; 
-                    if (dt.getDay() === 0 || dt.getDay() === 6) html += `<div style="position:absolute;left:${d*AppState.dayWidth}px;top:0;width:${AppState.dayWidth}px;height:${totalH}px;background:rgba(0,0,0,0.02);pointer-events:none;"></div>`; 
-                }
-
-                // --- LÍNHA "HOJE" ---
-                const today = new Date();
-                today.setHours(0,0,0,0); // Normalizar para meia-noite para comparação correta
-                const diffToday = DateUtils.diffDays(AppState.timelineStart, today);
-                
-                // Verifica se hoje está dentro do range do gráfico
-                if (diffToday >= 0 && diffToday < AppState.totalDays) {
-                    const leftPos = diffToday * AppState.dayWidth;
-                    html += `<div class="today-marker" style="left:${leftPos}px; height:${totalH}px;"></div>`;
-                }
-                // ---------------------
-
-                return html; 
-            },
-            buildRows(ft, tw, rh) { let sidebarHTML = '', rowsHTML = ''; ft.forEach(t => { const col = this.getColor(t.responsible); const startD = DateUtils.toDate(t.start); const endD = DateUtils.toDate(t.end); if (!startD || !endD) return; const so = DateUtils.diffDays(AppState.timelineStart, startD) * AppState.dayWidth; const dur = DateUtils.diffDays(startD, endD) + 1; const bw = Math.max(dur * AppState.dayWidth, AppState.dayWidth); const dateLabelPlanned = DateUtils.formatShort(startD) + (startD.getTime() !== endD.getTime() ? ' — ' + DateUtils.formatShort(endD) : ''); let isRealized = false, soReal = 0, bwReal = 0, dateLabelReal = "Pendente"; const realStartD = DateUtils.toDate(t.startReal); const realEndD = DateUtils.toDate(t.endReal); if (realStartD && realEndD) { isRealized = true; soReal = DateUtils.diffDays(AppState.timelineStart, realStartD) * AppState.dayWidth; const durReal = DateUtils.diffDays(realStartD, realEndD) + 1; bwReal = Math.max(durReal * AppState.dayWidth, AppState.dayWidth); dateLabelReal = DateUtils.formatShort(realStartD) + (realStartD.getTime() !== realEndD.getTime() ? ' — ' + DateUtils.formatShort(realEndD) : ''); } sidebarHTML += `<div class="sidebar-row" data-id="${t.id}"><div class="sidebar-cell main"><div class="cdot" style="background:${col};"></div><span title="${t.name}">${t.name}</span></div><div class="sidebar-cell date" title="${dateLabelPlanned}">${dateLabelPlanned}</div><div class="sidebar-cell date realized ${isRealized ? '' : 'text-gray-400 font-normal'}" title="${dateLabelReal}">${dateLabelReal}</div></div>`; rowsHTML += `<div class="timeline-row" data-id="${t.id}" style="height:${rh}px;"><div class="gantt-bar planned" style="left:${so}px;width:${bw}px;border-color:${col};" title="Planejado: ${t.name}\n${dateLabelPlanned}\n${t.responsible}"><div class="bfill" style="background:${col};"></div></div>`; if (isRealized) { rowsHTML += `<div class="gantt-bar realized" style="left:${soReal}px;width:${bwReal}px;" title="Realizado: ${t.name}\n${dateLabelReal}\n${t.responsible}"><div class="bfill" style="background:${col};"></div><span class="btxt">${bwReal > 60 ? t.name.substring(0, Math.floor(bwReal/6))+'...' : ''}</span></div>`; } rowsHTML += `</div>`; }); return { sidebarHTML, rowsHTML }; }
+            render() { try { const ft = Filter.getFiltered(); const tw = AppState.totalDays * AppState.dayWidth; const rh = 52; const totalH = ft.length * rh; const headerHTML = this.buildHeader(tw); const gridHTML = this.buildGrid(tw, totalH); const { sidebarHTML, rowsHTML } = this.buildRows(ft, tw, rh); const box = document.getElementById('ganttBox'); const st = box.scrollTop, sl = box.scrollLeft; box.innerHTML = '<div class="gantt-chart"><div class="gantt-sidebar"><div class="gantt-sidebar-header"><span style="flex:1;">Atividade</span><span style="width:110px; text-align:center;">Planejado</span><span style="width:110px; text-align:center;">Realizado</span></div>' + sidebarHTML + '</div><div class="gantt-timeline" style="width:' + tw + 'px;min-width:' + tw + 'px;">' + headerHTML + '<div class="timeline-body" style="width:' + tw + 'px;min-width:' + tw + 'px;position:relative;"><div style="position:absolute;top:0;left:0;width:' + tw + 'px;height:' + totalH + 'px;pointer-events:none;z-index:0;">' + gridHTML + '</div><div style="position:relative;z-index:1;">' + rowsHTML + '</div></div></div></div>'; box.scrollTop = st; box.scrollLeft = sl; } catch (error) { UI.toast(t('toastDrawError'), "error"); } },
+            buildHeader(tw) { const mn = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']; let mhdr = '', whdr = ''; let cur = new Date(AppState.timelineStart); while (cur <= AppState.timelineEnd) { const y = cur.getFullYear(), m = cur.getMonth(); const ms = new Date(y, m, 1), me = new Date(y, m+1, 0); const es = ms < AppState.timelineStart ? AppState.timelineStart : ms; const ee = me > AppState.timelineEnd ? AppState.timelineEnd : me; const l = DateUtils.diffDays(AppState.timelineStart, es) * AppState.dayWidth; const w = (DateUtils.diffDays(es, ee) + 1) * AppState.dayWidth; mhdr += '<div class="month-hdr" style="left:' + l + 'px;width:' + w + 'px;">' + mn[m] + ' ' + y + '</div>'; cur = new Date(y, m+1, 1); } for (let d=0; d<AppState.totalDays; d++) { const dt = new Date(AppState.timelineStart.getTime() + d * DateUtils.MSPD); if (dt.getDay() === 1) whdr += '<div class="week-hdr" style="left:' + d*AppState.dayWidth + 'px;width:' + 7*AppState.dayWidth + 'px;">' + dt.getDate() + '/' + (dt.getMonth()+1) + '</div>'; } return '<div class="timeline-header" style="width:' + tw + 'px;min-width:' + tw + 'px;">' + mhdr + whdr + '</div>'; },
+            buildGrid(tw, totalH) { let html = ''; for (let d=0; d<AppState.totalDays; d++) { const dt = new Date(AppState.timelineStart.getTime() + d * DateUtils.MSPD); if (dt.getDay() === 1) html += '<div class="grid-line" style="left:' + d*AppState.dayWidth + 'px;height:' + totalH + 'px;"></div>'; if (dt.getDay() === 0 || dt.getDay() === 6) html += '<div style="position:absolute;left:' + d*AppState.dayWidth + 'px;top:0;width:' + AppState.dayWidth + 'px;height:' + totalH + 'px;background:rgba(0,0,0,0.02);pointer-events:none;"></div>'; } const today = new Date(); today.setHours(0,0,0,0); const diffToday = DateUtils.diffDays(AppState.timelineStart, today); if (diffToday >= 0 && diffToday < AppState.totalDays) { const leftPos = diffToday * AppState.dayWidth; html += '<div class="today-marker" style="left:' + leftPos + 'px; height:' + totalH + 'px;"></div>'; } return html; },
+            buildRows(ft, tw, rh) { let sidebarHTML = '', rowsHTML = ''; ft.forEach(t => { const col = this.getColor(t.responsavel); const startD = DateUtils.toDate(t.start); const endD = DateUtils.toDate(t.end); if (!startD || !endD) return; const so = DateUtils.diffDays(AppState.timelineStart, startD) * AppState.dayWidth; const dur = DateUtils.diffDays(startD, endD) + 1; const bw = Math.max(dur * AppState.dayWidth, AppState.dayWidth); const dateLabelPlanned = DateUtils.formatShort(startD) + (startD.getTime() !== endD.getTime() ? ' — ' + DateUtils.formatShort(endD) : ''); let isRealized = false, soReal = 0, bwReal = 0, dateLabelReal = t('pending'); const realStartD = DateUtils.toDate(t.startReal); const realEndD = DateUtils.toDate(t.endReal); if (realStartD && realEndD) { isRealized = true; soReal = DateUtils.diffDays(AppState.timelineStart, realStartD) * AppState.dayWidth; const durReal = DateUtils.diffDays(realStartD, realEndD) + 1; bwReal = Math.max(durReal * AppState.dayWidth, AppState.dayWidth); dateLabelReal = DateUtils.formatShort(realStartD) + (realStartD.getTime() !== realEndD.getTime() ? ' — ' + DateUtils.formatShort(realEndD) : ''); } sidebarHTML += '<div class="sidebar-row" data-id="' + t.id + '"><div class="sidebar-cell main"><div class="cdot" style="background:' + col + ';"></div><span title="' + t.name + '">' + t.name + '</span></div><div class="sidebar-cell date" title="' + dateLabelPlanned + '">' + dateLabelPlanned + '</div><div class="sidebar-cell date realized ' + (isRealized ? '' : 'text-gray-400 font-normal') + '" title="' + dateLabelReal + '">' + dateLabelReal + '</div></div>'; rowsHTML += '<div class="timeline-row" data-id="' + t.id + '" style="height:' + rh + 'px;"><div class="gantt-bar planned" style="left:' + so + 'px;width:' + bw + 'px;border-color:' + col + ';" title="Planejado: ' + t.name + '\n' + dateLabelPlanned + '\n' + t.responsavel + '"><div class="bfill" style="background:' + col + ';"></div></div>'; if (isRealized) { rowsHTML += '<div class="gantt-bar realized" style="left:' + soReal + 'px;width:' + bwReal + 'px;" title="Realizado: ' + t.name + '\n' + dateLabelReal + '\n' + t.responsavel + '"><div class="bfill" style="background:' + col + ';"></div><span class="btxt">' + (bwReal > 60 ? t.name.substring(0, Math.floor(bwReal/6))+'...' : '') + '</span></div>'; } rowsHTML += '</div>'; }); return { sidebarHTML, rowsHTML }; }
         };
 
         const Deliverables = {
-            toggle(id) { const d = AppState.deliverables.find(x => x.id === id); if (d) { d.done = !d.done; App.renderAll(); UI.toast(d.done ? `"${d.item}" concluída!` : `"${d.item}" reaberta`, 'success'); } },
-            render() { 
-                const doneCount = AppState.deliverables.filter(d => d.done).length; const total = AppState.deliverables.length; 
-                document.getElementById('delivProgTxt').textContent = `${doneCount}/${total}`; 
-                document.getElementById('delivBar').style.width = (total > 0 ? (doneCount / total * 100) : 0) + '%'; 
-                document.getElementById('delivGrid').innerHTML = AppState.deliverables.map(d => { 
-                    const col = Gantt.getColor(d.responsible); 
-                    return `<div class="flex items-start gap-3 rounded-lg p-3 transition-all border bg-white ${d.done ? 'opacity-50' : ''}" style="border-color: var(--border); cursor: pointer;" onclick="Modal.openEditDeliverable(${d.id})" title="Clique para editar">
-                        <input type="checkbox" class="dcheck mt-1" ${d.done ? 'checked' : ''} data-deliv-id="${d.id}" onclick="event.stopPropagation(); Deliverables.toggle(${d.id})" style="border-color:${col}40;">
-                        <div class="flex-1 min-w-0">
-                            <div class="text-xs font-medium ${d.done ? 'line-through text-gray-400' : 'text-gray-800'}">${d.item}</div>
-                            <div class="text-xs mt-1 text-gray-500">${d.responsible}</div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-pen text-gray-300 hover:text-gray-500" style="font-size:10px;"></i>
-                            <div style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0;"></div>
-                        </div>
-                    </div>`; 
-                }).join(''); 
+            toggle(id) { const d = AppState.deliverables.find(x => x.id === id); if (d) { d.done = !d.done; Storage.saveSilent(); App.renderAll(); UI.toast(d.done ? '"' + d.name + '"' + t('toastDelivDone') : '"' + d.name + '"' + t('toastDelivReopened'), 'success'); } },
+            render() {
+                const doneCount = AppState.deliverables.filter(d => d.done).length; const total = AppState.deliverables.length;
+                document.getElementById('delivProgTxt').textContent = doneCount + '/' + total;
+                document.getElementById('delivBar').style.width = (total > 0 ? (doneCount / total * 100) : 0) + '%';
+                document.getElementById('delivGrid').innerHTML = AppState.deliverables.map(d => {
+                    const col = Gantt.getColor(d.responsavel);
+                    return '<div class="flex items-start gap-3 rounded-lg p-3 transition-all border bg-white ' + (d.done ? 'opacity-50' : '') + '" style="border-color: var(--border); cursor: pointer;" onclick="Modal.openEditDeliverable(' + d.id + ')" title="Clique para editar">' +
+                        '<input type="checkbox" class="dcheck mt-1" ' + (d.done ? 'checked' : '') + ' data-deliv-id="' + d.id + '" onclick="event.stopPropagation(); Deliverables.toggle(' + d.id + ')" style="border-color:' + col + '40;">' +
+                        '<div class="flex-1 min-w-0">' +
+                            '<div class="text-xs font-medium ' + (d.done ? 'line-through text-gray-400' : 'text-gray-800') + '">' + d.name + '</div>' +
+                            '<div class="text-xs mt-1 text-gray-500">' + d.responsavel + '</div>' +
+                        '</div>' +
+                        '<div class="flex items-center gap-2">' +
+                            '<i class="fas fa-pen text-gray-300 hover:text-gray-500" style="font-size:10px;"></i>' +
+                            '<div style="width:8px;height:8px;border-radius:50%;background:' + col + ';flex-shrink:0;"></div>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
             }
         };
 
         const Modal = {
-            // Alterna os campos do Modal para o Modo Tarefa
-            openAdd() { 
-                AppState.modalMode = 'task'; 
-                document.getElementById('editId').value = ''; 
-                document.getElementById('editName').value = ''; 
-                document.getElementById('editResp').value = ''; 
-                document.getElementById('editStart').value = '2026-06-17'; 
-                document.getElementById('editEnd').value = '2026-06-17'; 
-                document.getElementById('editStartReal').value = ''; 
-                document.getElementById('editEndReal').value = ''; 
-                document.getElementById('modalTitle').textContent = 'Nova Atividade'; 
-                document.getElementById('labelName').textContent = 'Atividade';
-                document.getElementById('taskFields').classList.remove('hidden'); 
-                document.getElementById('deliverableFields').classList.add('hidden'); 
-                document.getElementById('delBtn').style.display = 'none'; 
-                document.getElementById('editModal').classList.add('active'); 
+            openAdd() {
+                AppState.modalMode = 'task';
+                document.getElementById('editId').value = '';
+                document.getElementById('editName').value = '';
+                document.getElementById('editResp').value = '';
+                document.getElementById('editStart').value = '2026-08-24';
+                document.getElementById('editEnd').value = '2026-08-24';
+                document.getElementById('editStartReal').value = '';
+                document.getElementById('editEndReal').value = '';
+                document.getElementById('modalTitle').textContent = 'Nova Atividade';
+                document.getElementById('labelName').textContent = t('labelActivity');
+                document.getElementById('taskFields').classList.remove('hidden');
+                document.getElementById('deliverableFields').classList.add('hidden');
+                document.getElementById('delBtn').style.display = 'none';
+                document.getElementById('editModal').classList.add('active');
             },
-            openEdit(id) { 
-                AppState.modalMode = 'task'; 
-                const t = AppState.tasks.find(x => x.id === id); if (!t) return; 
-                document.getElementById('editId').value = t.id; 
-                document.getElementById('editName').value = t.name; 
-                document.getElementById('editResp').value = t.responsible; 
-                document.getElementById('editStart').value = DateUtils.toInputFormat(t.start); 
-                document.getElementById('editEnd').value = DateUtils.toInputFormat(t.end); 
-                document.getElementById('editStartReal').value = DateUtils.toInputFormat(t.startReal); 
-                document.getElementById('editEndReal').value = DateUtils.toInputFormat(t.endReal); 
-                document.getElementById('modalTitle').textContent = 'Editar Atividade'; 
-                document.getElementById('labelName').textContent = 'Atividade';
-                document.getElementById('taskFields').classList.remove('hidden'); 
-                document.getElementById('deliverableFields').classList.add('hidden'); 
-                document.getElementById('delBtn').style.display = ''; 
-                document.getElementById('editModal').classList.add('active'); 
+            openEdit(id) {
+                AppState.modalMode = 'task';
+                const t = AppState.tasks.find(x => x.id === id); if (!t) return;
+                document.getElementById('editId').value = t.id;
+                document.getElementById('editName').value = t.name;
+                document.getElementById('editResp').value = t.responsavel;
+                document.getElementById('editStart').value = DateUtils.toInputFormat(t.start);
+                document.getElementById('editEnd').value = DateUtils.toInputFormat(t.end);
+                document.getElementById('editStartReal').value = DateUtils.toInputFormat(t.startReal);
+                document.getElementById('editEndReal').value = DateUtils.toInputFormat(t.endReal);
+                document.getElementById('modalTitle').textContent = t('modalTitleTask');
+                document.getElementById('labelName').textContent = t('labelActivity');
+                document.getElementById('taskFields').classList.remove('hidden');
+                document.getElementById('deliverableFields').classList.add('hidden');
+                document.getElementById('delBtn').style.display = '';
+                document.getElementById('editModal').classList.add('active');
             },
-            // Alterna os campos do Modal para o Modo Entrega
-            openAddDeliverable() { 
-                AppState.modalMode = 'deliverable'; 
-                document.getElementById('editId').value = ''; 
-                document.getElementById('editName').value = ''; 
-                document.getElementById('editResp').value = ''; 
-                document.getElementById('editDone').checked = false; 
-                document.getElementById('modalTitle').textContent = 'Nova Entrega'; 
-                document.getElementById('labelName').textContent = 'Item de Entrega';
-                document.getElementById('taskFields').classList.add('hidden'); 
-                document.getElementById('deliverableFields').classList.remove('hidden'); 
-                document.getElementById('delBtn').style.display = 'none'; 
-                document.getElementById('editModal').classList.add('active'); 
+            openAddDeliverable() {
+                AppState.modalMode = 'deliverable';
+                document.getElementById('editId').value = '';
+                document.getElementById('editName').value = '';
+                document.getElementById('editResp').value = '';
+                document.getElementById('editDone').checked = false;
+                document.getElementById('modalTitle').textContent = 'Nova Entrega';
+                document.getElementById('labelName').textContent = t('labelItem');
+                document.getElementById('taskFields').classList.add('hidden');
+                document.getElementById('deliverableFields').classList.remove('hidden');
+                document.getElementById('delBtn').style.display = 'none';
+                document.getElementById('editModal').classList.add('active');
             },
-            openEditDeliverable(id) { 
-                AppState.modalMode = 'deliverable'; 
-                const d = AppState.deliverables.find(x => x.id === id); if (!d) return; 
-                document.getElementById('editId').value = d.id; 
-                document.getElementById('editName').value = d.item; 
-                document.getElementById('editResp').value = d.responsible; 
-                document.getElementById('editDone').checked = d.done; 
-                document.getElementById('modalTitle').textContent = 'Editar Entrega'; 
-                document.getElementById('labelName').textContent = 'Item de Entrega';
-                document.getElementById('taskFields').classList.add('hidden'); 
-                document.getElementById('deliverableFields').classList.remove('hidden'); 
-                document.getElementById('delBtn').style.display = ''; 
-                document.getElementById('editModal').classList.add('active'); 
+            openEditDeliverable(id) {
+                AppState.modalMode = 'deliverable';
+                const d = AppState.deliverables.find(x => x.id === id); if (!d) return;
+                document.getElementById('editId').value = d.id;
+                document.getElementById('editName').value = d.name;
+                document.getElementById('editResp').value = d.responsavel;
+                document.getElementById('editDone').checked = d.done;
+                document.getElementById('modalTitle').textContent = t('modalTitleDeliv');
+                document.getElementById('labelName').textContent = t('labelItem');
+                document.getElementById('taskFields').classList.add('hidden');
+                document.getElementById('deliverableFields').classList.remove('hidden');
+                document.getElementById('delBtn').style.display = '';
+                document.getElementById('editModal').classList.add('active');
             },
             close() { document.getElementById('editModal').classList.remove('active'); },
-            
-            // Lógica de Salvar Unificada
-            save() { 
-                const idStr = document.getElementById('editId').value; 
-                const name = document.getElementById('editName').value.trim(); 
-                const resp = document.getElementById('editResp').value.trim(); 
-
-                if (!name || !resp) { UI.toast("Preencha Nome e Responsável.", "error"); return; }
-
+            save() {
+                const idStr = document.getElementById('editId').value;
+                const name = document.getElementById('editName').value.trim();
+                const resp = document.getElementById('editResp').value.trim();
+                if (!name || !resp) { UI.toast(t('toastFillFields'), "error"); return; }
                 if (AppState.modalMode === 'task') {
-                    const startStr = document.getElementById('editStart').value; const endStr = document.getElementById('editEnd').value; const startRealStr = document.getElementById('editStartReal').value; const endRealStr = document.getElementById('editEndReal').value; 
-                    if (!startStr || !endStr) { UI.toast("Preencha as datas de planejamento.", "error"); return; } 
-                    if (!DateUtils.toDate(startStr) || !DateUtils.toDate(endStr)) { UI.toast("Data de planejamento inválida.", "error"); return; } 
-                    if (new Date(startStr) > new Date(endStr)) { UI.toast("Fim do planejado não pode ser antes do início.", "error"); return; } 
-                    if ((startRealStr && !endRealStr) || (!startRealStr && endRealStr)) { UI.toast("Preencha início e fim do realizado, ou deixe ambos vazios.", "error"); return; } 
-                    if (startRealStr && endRealStr) { if (!DateUtils.toDate(startRealStr) || !DateUtils.toDate(endRealStr)) { UI.toast("Data realizada inválida.", "error"); return; } if (new Date(startRealStr) > new Date(endRealStr)) { UI.toast("Fim do realizado não pode ser antes do início.", "error"); return; } } 
-                    if (idStr) { const idNum = parseInt(idStr, 10); const taskIndex = AppState.tasks.findIndex(t => t.id === idNum); if (taskIndex !== -1) { AppState.tasks[taskIndex].name = name; AppState.tasks[taskIndex].responsible = resp; AppState.tasks[taskIndex].start = startStr; AppState.tasks[taskIndex].end = endStr; AppState.tasks[taskIndex].startReal = startRealStr; AppState.tasks[taskIndex].endReal = endRealStr; } UI.toast("Atividade atualizada!"); } else { AppState.tasks.push({ id: AppState.nextId++, name, responsible: resp, start: startStr, end: endStr, startReal: startRealStr, endReal: endRealStr }); UI.toast("Nova atividade adicionada!"); }
-                } 
-                else if (AppState.modalMode === 'deliverable') {
+                    const startStr = document.getElementById('editStart').value; const endStr = document.getElementById('editEnd').value; const startRealStr = document.getElementById('editStartReal').value; const endRealStr = document.getElementById('editEndReal').value;
+                    if (!startStr || !endStr) { UI.toast(t('toastFillDates'), "error"); return; }
+                    if (!DateUtils.toDate(startStr) || !DateUtils.toDate(endStr)) { UI.toast(t('toastInvalidDate'), "error"); return; }
+                    if (new Date(startStr) > new Date(endStr)) { UI.toast(t('toastInvalidEnd'), "error"); return; }
+                    if ((startRealStr && !endRealStr) || (!startRealStr && endRealStr)) { UI.toast(t('toastFillRealDates'), "error"); return; }
+                    if (startRealStr && endRealStr) { if (!DateUtils.toDate(startRealStr) || !DateUtils.toDate(endRealStr)) { UI.toast(t('toastInvalidRealDate'), "error"); return; } if (new Date(startRealStr) > new Date(endRealStr)) { UI.toast(t('toastInvalidRealEnd'), "error"); return; } }
+                    if (idStr) { const idNum = parseInt(idStr, 10); const taskIndex = AppState.tasks.findIndex(t => t.id === idNum); if (taskIndex !== -1) { AppState.tasks[taskIndex].name = name; AppState.tasks[taskIndex].responsavel = resp; AppState.tasks[taskIndex].start = startStr; AppState.tasks[taskIndex].end = endStr; AppState.tasks[taskIndex].startReal = startRealStr; AppState.tasks[taskIndex].endReal = endRealStr; } UI.toast(t('toastActivityUpdated')); } else { AppState.tasks.push({ id: AppState.nextId++, name, responsavel: resp, start: startStr, end: endStr, startReal: startRealStr, endReal: endRealStr }); UI.toast(t('toastActivityAdded')); }
+                } else if (AppState.modalMode === 'deliverable') {
                     const done = document.getElementById('editDone').checked;
-                    if (idStr) { const idNum = parseInt(idStr, 10); const delIndex = AppState.deliverables.findIndex(d => d.id === idNum); if (delIndex !== -1) { AppState.deliverables[delIndex].item = name; AppState.deliverables[delIndex].responsible = resp; AppState.deliverables[delIndex].done = done; } UI.toast("Entrega atualizada!"); } else { AppState.deliverables.push({ id: AppState.nextDelivId++, item: name, responsible: resp, done: done }); UI.toast("Nova entrega adicionada!"); }
+                    if (idStr) { const idNum = parseInt(idStr, 10); const delIndex = AppState.deliverables.findIndex(d => d.id === idNum); if (delIndex !== -1) { AppState.deliverables[delIndex].name = name; AppState.deliverables[delIndex].responsavel = resp; AppState.deliverables[delIndex].done = done; } UI.toast(t('toastDelivUpdated')); } else { AppState.deliverables.push({ id: AppState.nextDelivId++, name, responsavel: resp, done: done }); UI.toast(t('toastDelivAdded')); }
                 }
-                Modal.close(); App.renderAll(); 
+                Storage.saveSilent(); Modal.close(); App.renderAll();
             },
-            // Lógica de Excluir Unificada
-            deleteItem() { 
-                const idStr = document.getElementById('editId').value; 
-                if (idStr && confirm("Tem certeza que deseja excluir?")) { 
-                    const idNum = parseInt(idStr, 10); 
-                    if (AppState.modalMode === 'task') { AppState.tasks = AppState.tasks.filter(x => x.id !== idNum); UI.toast("Atividade removida."); } 
-                    else if (AppState.modalMode === 'deliverable') { AppState.deliverables = AppState.deliverables.filter(x => x.id !== idNum); UI.toast("Entrega removida."); } 
-                    Modal.close(); App.renderAll(); 
-                } 
+            deleteItem() {
+                const idStr = document.getElementById('editId').value;
+                if (idStr && confirm(t('confirmDelete'))) {
+                    const idNum = parseInt(idStr, 10);
+                    if (AppState.modalMode === 'task') { AppState.tasks = AppState.tasks.filter(x => x.id !== idNum); UI.toast(t('toastActivityRemoved')); }
+                    else if (AppState.modalMode === 'deliverable') { AppState.deliverables = AppState.deliverables.filter(x => x.id !== idNum); UI.toast(t('toastDelivRemoved')); }
+                    Storage.saveSilent(); Modal.close(); App.renderAll();
+                }
             }
         };
 
         const UI = {
-            toast(msg, type = 'success') { const el = document.createElement('div'); el.className = `toast ${type}`; el.textContent = msg; document.getElementById('toastBox').appendChild(el); setTimeout(() => el.remove(), 3200); },
+            toast(msg, type) { type = type || 'success'; const el = document.createElement('div'); el.className = 'toast ' + type; el.textContent = msg; document.getElementById('toastBox').appendChild(el); setTimeout(() => el.remove(), 3200); },
             toggleDeliverables() { const sec = document.getElementById('delivSec'); const btn = document.getElementById('btnDeliv'); const isHidden = sec.classList.contains('hidden'); if (isHidden) { sec.classList.remove('hidden'); btn.style.borderColor = '#00A651'; btn.style.color = '#00A651'; } else { sec.classList.add('hidden'); btn.style.borderColor = ''; btn.style.color = ''; } },
-            renderLegend() { const ft = Filter.getFiltered(); const activeAreas = new Set(); ft.forEach(t => t.responsible.split("+").forEach(a => { const trimmed = a.trim(); if (trimmed !== "Todas as Áreas") activeAreas.add(trimmed); })); const legendItems = Object.entries(AppState.areaColors).filter(([area]) => activeAreas.has(area)); document.getElementById('legendBox').innerHTML = legendItems.map(([a, c]) => `<div class="flex items-center gap-2"><div style="width:12px;height:12px;border-radius:3px;background:${c};border:1px solid rgba(0,0,0,0.1);"></div><span class="text-xs text-gray-600">${a}</span></div>`).join(''); },
-            renderDatalist() { const areas = Filter.getAllAreas().filter(a => a !== "Todos"); document.getElementById('respList').innerHTML = areas.map(a => `<option value="${a}">`).join(''); }
+            renderLegend() { const ft = Filter.getFiltered(); const activeAreas = new Set(); ft.forEach(t => { t.responsavel.split("/").forEach(a => { const trimmed = a.trim(); if (trimmed) activeAreas.add(trimmed); }); }); const legendItems = Object.entries(AppState.areaColors).filter(([area]) => activeAreas.has(area)); document.getElementById('legendBox').innerHTML = legendItems.map(([a, c]) => '<div class="flex items-center gap-2"><div style="width:12px;height:12px;border-radius:3px;background:' + c + ';border:1px solid rgba(0,0,0,0.1);"></div><span class="text-xs text-gray-600">' + a + '</span></div>').join(''); },
+            renderDatalist() { const areas = Filter.getAllAreas().filter(a => a !== "Todos"); document.getElementById('respList').innerHTML = areas.map(a => '<option value="' + a + '">').join(''); }
         };
 
         // ============================================================
@@ -652,32 +559,14 @@
         }
 
         function applyLanguage(){
-            document.querySelector('h1').innerHTML = '<span style="color: var(--accent-dark);">Gantt</span> ' + (lang === 'pt' ? 'Cadaver Lab & Mutirão' : 'Cadaver Lab & Mutirão');
-            document.querySelector('header p').textContent = lang === 'pt' ? 'Projeto Neoortho · Jun - Out 2026' : 'Neoortho Project · Jun - Oct 2026';
+            document.getElementById('headerTitle').textContent = lang === 'pt' ? 'Cadaver Lab IBRA / Medartis' : 'Cadaver Lab IBRA / Medartis';
+            document.getElementById('headerSub').textContent = lang === 'pt' ? '24 e 25 de agosto de 2026' : 'August 24-25, 2026';
             document.getElementById('langLabel').textContent = lang === 'pt' ? 'EN' : 'PT';
             document.getElementById('btnSaveLabel').textContent = t('btnSave');
             document.getElementById('btnLoadLabel').textContent = t('btnLoad');
             document.getElementById('btnExportLabel').textContent = t('btnExport');
             document.getElementById('btnDelivLabel').textContent = t('btnDeliv');
             document.getElementById('btnAddLabel').textContent = t('btnAdd');
-            
-            // Stats
-            document.querySelectorAll('.stat-card .text-xs')[0].textContent = t('statTasks');
-            document.querySelectorAll('.stat-card .text-xs')[1].textContent = t('statAreas');
-            document.querySelectorAll('.stat-card .text-xs')[2].textContent = t('statDays');
-            document.querySelectorAll('.stat-card .text-xs')[3].textContent = t('statDeliv');
-            
-            // Zoom
-            document.querySelector('label[for="zoomLvl"]').textContent = t('zoom');
-            
-            // Legend
-            document.getElementById('legendBox').previousElementSibling.textContent = t('legendTitle');
-            
-            // Deliverables section
-            document.getElementById('delivSec').querySelector('h2').textContent = t('delivTitle');
-            document.getElementById('btnAddDeliv').innerHTML = '<i class="fas fa-plus text-xs"></i> ' + t('btnAddDeliv');
-            
-            // Modal labels
             document.getElementById('labelName').textContent = t('labelName');
             document.querySelector('label[for="editResp"]').textContent = t('labelResp');
             document.querySelectorAll('#taskFields label')[0].textContent = t('labelPlannedStart');
@@ -688,11 +577,12 @@
             document.getElementById('delBtn').innerHTML = '<i class="fas fa-trash-alt mr-1"></i>' + t('btnDelete');
             document.getElementById('btnCancel').textContent = t('btnCancel');
             document.getElementById('btnSave').textContent = t('btnSaveChanges');
-            
-            // Sidebar header
             document.querySelector('.gantt-sidebar-header span:first-child').textContent = t('activity');
             document.querySelectorAll('.gantt-sidebar-header span')[1].textContent = t('planned');
             document.querySelectorAll('.gantt-sidebar-header span')[2].textContent = t('realized');
+            document.getElementById('delivSec').querySelector('h2').textContent = t('delivTitle');
+            document.getElementById('btnAddDeliv').innerHTML = '<i class="fas fa-plus text-xs"></i> ' + t('btnAddDeliv');
+            document.getElementById('legendBox').previousElementSibling.textContent = t('legendTitle');
         }
 
         const App = {
