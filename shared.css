@@ -1,0 +1,93 @@
+/* =============================================
+   SHARED UTILITY STYLES
+   Common patterns across all NeoOrtho pages
+   ============================================= */
+
+/* ---- CSS Reset ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { overflow-x: hidden; }
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(123,45,142,.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(123,45,142,.35); }
+
+/* ---- Toast / Notification ---- */
+.toast-container { position: fixed; top: 1.3rem; right: 1.3rem; z-index: 2000; display: flex; flex-direction: column; gap: .4rem; }
+.toast { padding: .8rem 1.1rem; border-radius: 11px; background: #fff; border: 1px solid #e0e0e8; box-shadow: 0 10px 35px rgba(0,0,0,.14); display: flex; align-items: center; gap: .6rem; font-size: .86rem; font-weight: 500; animation: tIn .3s ease; min-width: 260px; }
+.toast.removing { animation: tOut .3s ease forwards; }
+.toast.success { border-left: 4px solid #28A745; }
+.toast.error { border-left: 4px solid #DC3545; }
+.toast.info { border-left: 4px solid #7B2D8E; }
+.toast.warning { border-left: 4px solid #F0AD4E; }
+@keyframes tIn { from { opacity: 0; transform: translateX(35px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes tOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(35px); } }
+
+/* ---- Modal ---- */
+.modal-overlay { position: fixed; inset: 0; background: rgba(26,16,40,.55); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem; animation: mFI .2s ease; }
+.modal-overlay.show { display: flex; }
+@keyframes mFI { from { opacity: 0; } to { opacity: 1; } }
+.modal { background: #fff; border-radius: 16px; width: 100%; max-width: 540px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 70px rgba(0,0,0,.25); animation: mSU .3s ease; }
+@keyframes mSU { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+.modal-header { padding: 1.4rem 1.4rem 0; display: flex; align-items: center; justify-content: space-between; }
+.modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+.modal-close { width: 34px; height: 34px; border-radius: 9px; border: none; background: #f7f7fa; color: #6b6b80; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: .95rem; transition: all .2s; }
+.modal-close:hover { background: #DC3545; color: #fff; }
+.modal-body { padding: 1.15rem 1.4rem 1.4rem; }
+.modal-actions { display: flex; gap: .65rem; justify-content: flex-end; margin-top: .4rem; }
+
+/* ---- Form Elements ---- */
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: .8rem; font-weight: 600; margin-bottom: .35rem; }
+.form-input { width: 100%; padding: .65rem .85rem; border: 1.5px solid #e0e0e8; border-radius: 9px; font-size: .88rem; color: #1a1a2e; background: #fff; outline: none; transition: all .2s; font-family: inherit; }
+.form-input:focus { border-color: #7B2D8E; box-shadow: 0 0 0 3px rgba(123,45,142,.08); }
+.form-input::placeholder { color: #a0a0b0; }
+textarea.form-input { resize: vertical; min-height: 75px; }
+select.form-input { cursor: pointer; }
+
+/* ---- Buttons ---- */
+.btn { display: inline-flex; align-items: center; gap: .45rem; padding: .6rem 1.15rem; border-radius: 9px; font-size: .86rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all .2s; white-space: nowrap; border: none; }
+.btn-primary { background: linear-gradient(135deg, #7B2D8E, #A85CC0); color: #fff; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(123,45,142,.35); }
+.btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+.btn-secondary { border: 1.5px solid #e0e0e8; background: #fff; color: #6b6b80; }
+.btn-secondary:hover { border-color: #a0a0b0; color: #1a1a2e; }
+.btn-danger { background: #DC3545; color: #fff; }
+.btn-danger:hover { background: #C82333; transform: translateY(-1px); }
+.btn-ghost { background: transparent; color: #7B2D8E; border: none; padding: 7px 9px; border-radius: 8px; cursor: pointer; transition: all .15s; font-size: .82rem; }
+.btn-ghost:hover { background: #F0E4F5; }
+.btn-danger-ghost { background: transparent; color: #EF4444; border: none; padding: 7px 9px; border-radius: 8px; cursor: pointer; transition: all .15s; font-size: .82rem; }
+.btn-danger-ghost:hover { background: #FEF2F2; }
+
+/* ---- Cards ---- */
+.card { background: #fff; border-radius: 12px; border: 1px solid #e0e0e8; transition: all .25s; }
+.card:hover { box-shadow: 0 8px 30px rgba(26,26,46,.07); border-color: #ddd6fe; }
+
+/* ---- Badges ---- */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: .69rem; font-weight: 600; }
+.badge-success { background: #D1FAE5; color: #065F46; }
+.badge-warning { background: #FEF3C7; color: #92400E; }
+.badge-danger { background: #FEE2E2; color: #991B1B; }
+.badge-info { background: #DBEAFE; color: #1E40AF; }
+.badge-neutral { background: #f6f6f6; color: #888; }
+
+/* ---- Utility ---- */
+.hidden { display: none !important; }
+.flex { display: flex; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.w-full { width: 100%; }
+.text-center { text-align: center; }
+.text-muted { color: #6b6b80; }
+.text-sm { font-size: .82rem; }
+.text-xs { font-size: .72rem; }
+.truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mt-1 { margin-top: .25rem; }
+.mt-2 { margin-top: .5rem; }
+.mt-4 { margin-top: 1rem; }
+.mb-2 { margin-bottom: .5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.gap-1 { gap: .25rem; }
+.gap-2 { gap: .5rem; }

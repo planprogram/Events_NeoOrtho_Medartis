@@ -6,6 +6,8 @@
     <title>NeoOrtho Medartis - Project Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <script src="shared.js"></script>
     <style>
         :root{--neo-purple:#7B2D8E;--neo-purple-dark:#5A1F6B;--neo-purple-deep:#3D1550;--neo-purple-light:#A85CC0;--neo-purple-pale:#F0E4F5;--neo-blue:#1A3E6B;--neo-blue-light:#2B6FA8;--neo-blue-pale:#E8F0F8;--neo-gray-900:#1A1A2E;--neo-gray-800:#2D2D3D;--neo-gray-700:#44445A;--neo-gray-600:#6B6B80;--neo-gray-400:#A0A0B0;--neo-gray-200:#E0E0E8;--neo-gray-100:#EDEDF2;--neo-gray-50:#F7F7FA;--neo-bg:#F4F4F8;--neo-card:#FFFFFF;--neo-text:#1A1A2E;--neo-text-muted:#6B6B80;--neo-border:#E0E0E8;--neo-success:#28A745;--neo-warning:#F0AD4E;--neo-danger:#DC3545;--neo-sidebar-bg:#1A1028;--neo-sidebar-hover:#2A1D3A}
         *{margin:0;padding:0;box-sizing:border-box}
@@ -191,14 +193,6 @@
         .empty-state i{font-size:2.8rem;color:var(--neo-gray-200);margin-bottom:.9rem}
         .empty-state h3{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;color:var(--neo-text);margin-bottom:.35rem}
         .empty-state p{color:var(--neo-text-muted);font-size:.88rem}
-        .toast-container{position:fixed;top:1.3rem;right:1.3rem;z-index:2000;display:flex;flex-direction:column;gap:.4rem}
-        .toast{padding:.8rem 1.1rem;border-radius:11px;background:var(--neo-card);border:1px solid var(--neo-border);box-shadow:0 10px 35px rgba(0,0,0,.14);display:flex;align-items:center;gap:.6rem;font-size:.86rem;font-weight:500;animation:tIn .3s ease;min-width:260px}
-        .toast.success{border-left:4px solid var(--neo-success)}
-        .toast.error{border-left:4px solid var(--neo-danger)}
-        .toast.info{border-left:4px solid var(--neo-purple)}
-        .toast.removing{animation:tOut .3s ease forwards}
-        @keyframes tIn{from{opacity:0;transform:translateX(35px)}to{opacity:1;transform:translateX(0)}}
-        @keyframes tOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(35px)}}
         .sync-ind{display:inline-flex;align-items:center;gap:.3rem;font-size:.68rem;color:rgba(255,255,255,.25);margin-left:.4rem}
         .sync-dot{width:5px;height:5px;border-radius:50%;background:var(--neo-success);animation:pls 2s ease-in-out infinite}
         @keyframes pls{0%,100%{opacity:1}50%{opacity:.3}}
@@ -214,10 +208,6 @@
         .hub-card:hover .hub-link{gap:.6rem}
         .page-section{display:none}
         .page-section.active{display:block}
-        ::-webkit-scrollbar{width:5px}
-        ::-webkit-scrollbar-track{background:transparent}
-        ::-webkit-scrollbar-thumb{background:rgba(123,45,142,.2);border-radius:3px}
-        ::-webkit-scrollbar-thumb:hover{background:rgba(123,45,142,.35)}
         .mobile-menu-btn{display:none!important}
         @media(max-width:1024px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:768px){
@@ -719,15 +709,7 @@ async function deletePerson(fbKey) {
 // Utilities
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 function confirmAction() { if(pendingConfirmAction) pendingConfirmAction(); closeModal('confirmModal'); pendingConfirmAction = null; }
-function showToast(msg, type) {
-    const c = document.getElementById('toastContainer');
-    const t = document.createElement('div');
-    t.className = 'toast '+type;
-    const icons = {success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle'};
-    t.innerHTML = '<i class="fas '+(icons[type]||'fa-info-circle')+'"></i><span>'+msg+'</span>';
-    c.appendChild(t);
-    setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 300); }, 3000);
-}
+function showToast(msg, type) { sharedToast(msg, type); }
 function fmtDate(d) { if(!d) return '—'; try { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); } catch { return d; } }
 
 // Init
