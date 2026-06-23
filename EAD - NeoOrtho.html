@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAD Builder - Medical Device</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+    tailwind.config={theme:{extend:{colors:{brand:{50:'#F5F3FA',100:'#EDE9FE',200:'#DDD6FE',300:'#C4B5FD',400:'#A78BFA',500:'#8B5CF6',600:'#7C3AED',700:'#6D28D9',800:'#5B21B6',900:'#4C1D95',950:'#2E1065'},navy:{600:'#2563EB',700:'#1D4ED8',800:'#1E40AF',900:'#1E3A8A'},surface:{850:'#1E1B2E',900:'#171426',950:'#110F1D'}},fontFamily:{display:['Outfit','sans-serif'],body:['"DM Sans"','sans-serif']}}}}
+    </script>
+    <style>
+        *{box-sizing:border-box}
+        body{font-family:'DM Sans',sans-serif;background:#F5F3FA;margin:0}
+        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#C4B5FD;border-radius:3px}
+        .sidebar-bg{background:linear-gradient(180deg,#1E1538 0%,#2A1F4E 50%,#1E1538 100%)}
+        .nav-item{transition:all .2s;border-left:3px solid transparent}
+        .nav-item:hover{background:rgba(139,92,246,.1);border-left-color:rgba(139,92,246,.4)}
+        .nav-item.active{background:rgba(139,92,246,.15);border-left-color:#8B5CF6;color:#fff}
+        .pillar-link{transition:all .2s;border-left:3px solid transparent}
+        .pillar-link:hover{background:rgba(255,255,255,.05);border-left-color:rgba(255,255,255,.2)}
+        .pillar-link.active{background:rgba(255,255,255,.08);border-left-color:currentColor}
+        .card{background:#fff;border-radius:12px;border:1px solid #EDE9FE;transition:all .25s}
+        .card:hover{box-shadow:0 8px 30px rgba(76,29,149,.07);border-color:#DDD6FE}
+        .btn-primary{background:linear-gradient(135deg,#6D28D9,#7C3AED);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;font-size:14px}
+        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(109,40,217,.35)}
+        .btn-secondary{background:#EDE9FE;color:#5B21B6;border:1px solid #DDD6FE;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;font-size:14px}
+        .btn-secondary:hover{background:#DDD6FE}
+        .btn-ghost{background:transparent;color:#6D28D9;border:none;padding:7px 9px;border-radius:8px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;font-size:13px}
+        .btn-ghost:hover{background:#F5F3FA}
+        .btn-danger-ghost{background:transparent;color:#EF4444;border:none;padding:7px 9px;border-radius:8px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;font-size:13px}
+        .btn-danger-ghost:hover{background:#FEF2F2}
+        .form-input{width:100%;padding:10px 14px;border:1px solid #DDD6FE;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;transition:all .2s;background:#fff;color:#1E1B2E;outline:none}
+        .form-input:focus{border-color:#8B5CF6;box-shadow:0 0 0 3px rgba(139,92,246,.1)}
+        .form-input::placeholder{color:#A78BFA}
+        textarea.form-input{resize:vertical;min-height:80px}
+        .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+        .badge-video{background:#DBEAFE;color:#1E40AF}
+        .badge-file{background:#D1FAE5;color:#065F46}
+        .badge-notes{background:#FEF3C7;color:#92400E}
+        .lesson-panel{transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
+        .lesson-panel.open{transform:translateX(0)}
+        .modal-overlay{opacity:0;pointer-events:none;transition:opacity .25s}
+        .modal-overlay.open{opacity:1;pointer-events:auto}
+        .modal-overlay .modal-box{transform:scale(.95) translateY(10px);transition:transform .25s}
+        .modal-overlay.open .modal-box{transform:scale(1) translateY(0)}
+        .toast{animation:toastIn .35s ease forwards;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;min-width:280px;box-shadow:0 8px 30px rgba(0,0,0,.12)}
+        .toast.removing{animation:toastOut .3s ease forwards}
+        @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(40px)}}
+        .collapse-body{max-height:0;overflow:hidden;transition:max-height .45s ease}
+        .collapse-body.expanded{max-height:50000px}
+        .drop-zone{border:2px dashed #C4B5FD;border-radius:12px;transition:all .2s}
+        .drop-zone.dragover{border-color:#7C3AED;background:rgba(139,92,246,.05)}
+        .file-card{transition:all .2s}.file-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(76,29,149,.1)}
+        .empty-icon{font-size:56px;opacity:.15;margin-bottom:12px}
+        .bg-pattern{background-image:radial-gradient(circle at 20% 80%,rgba(139,92,246,.04) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(37,99,235,.03) 0%,transparent 50%)}
+        .stat-card{position:relative;overflow:hidden}.stat-card::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.08}
+        .stat-card.purple::after{background:#7C3AED}.stat-card.blue::after{background:#2563EB}.stat-card.green::after{background:#10B981}.stat-card.amber::after{background:#F59E0B}
+        @media(max-width:768px){.sidebar-desktop{display:none!important}.mobile-header{display:flex!important}.lesson-panel{width:100%!important}}
+        @media(min-width:769px){.mobile-header{display:none!important}.mobile-menu-wrap{display:none!important}}
+    </style>
+</head>
+<body class="font-body text-surface-850 overflow-hidden h-screen">
+
+    <!-- Header Mobile -->
+    <header class="mobile-header fixed top-0 left-0 right-0 z-40 bg-white border-b border-brand-100 px-4 py-3 items-center justify-between" style="display:none">
+        <button onclick="toggleMobileMenu()" class="btn-ghost text-lg"><i class="fas fa-bars"></i></button>
+        <img src="https://z-cdn-media.chatglm.cn/files/a85d1aca-138d-400a-a1a5-7cce17dceb9a.png?auth_key=1882217303-653b2db34d664939aba3709f0edb6eb8-0-01dc55d6a13c2a7f5d14674a76cce0ab" alt="Logo" class="h-9">
+        <div class="w-8"></div>
+    </header>
+
+    <!-- Menu Mobile -->
+    <div id="mobileMenuWrap" class="mobile-menu-wrap fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
+        <div class="absolute left-0 top-0 bottom-0 w-72 sidebar-bg p-5 flex flex-col overflow-y-auto">
+            <img src="https://z-cdn-media.chatglm.cn/files/a85d1aca-138d-400a-a1a5-7cce17dceb9a.png?auth_key=1882217303-653b2db34d664939aba3709f0edb6eb8-0-01dc55d6a13c2a7f5d14674a76cce0ab" alt="Logo" class="h-11 mb-5">
+            <div id="mobileNavContent"></div>
+        </div>
+    </div>
+
+    <div id="app" class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="sidebar-desktop sidebar-bg w-72 flex-shrink-0 flex flex-col text-white/80 overflow-y-auto">
+            <div class="p-5 pb-3">
+                <img src="https://z-cdn-media.chatglm.cn/files/a85d1aca-138d-400a-a1a5-7cce17dceb9a.png?auth_key=1882217303-653b2db34d664939aba3709f0edb6eb8-0-01dc55d6a13c2a7f5d14674a76cce0ab" alt="Logo" class="h-12 mb-3">
+                <h2 id="sidebarCourseName" class="font-display font-bold text-base text-white cursor-pointer hover:text-brand-300 transition-colors truncate" onclick="openCourseModal()" title="Clique para editar"></h2>
+                <p class="text-[11px] text-white/35 mt-0.5">Medical Device EAD</p>
+            </div>
+            <nav id="sidebarNav" class="px-3 flex flex-col gap-0.5 mt-1"></nav>
+            <div id="sidebarPillars" class="px-3 mt-3 flex flex-col gap-0.5"></div>
+            <div class="p-3 mt-auto border-t border-white/10 flex flex-col gap-1">
+                <button onclick="exportJSON()" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/50 hover:text-white hover:bg-white/5 transition-all w-full text-left"><i class="fas fa-download w-5 text-center"></i>Exportar</button>
+                <label class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/50 hover:text-white hover:bg-white/5 transition-all cursor-pointer w-full"><i class="fas fa-upload w-5 text-center"></i>Importar<input type="file" accept=".json" onchange="importJSON(event)" class="hidden"></label>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main id="mainContent" class="flex-1 overflow-y-auto bg-pattern p-5 md:p-8 mt-14 md:mt-0"></main>
+    </div>
+
+    <!-- Painel de Aula -->
+    <div id="lessonPanelOverlay" class="fixed inset-0 bg-black/30 z-40 hidden" onclick="closeLessonPanel()"></div>
+    <div id="lessonPanel" class="lesson-panel fixed top-0 right-0 h-full w-[600px] bg-white z-50 shadow-2xl flex flex-col overflow-hidden">
+        <div id="lessonPanelContent"></div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modalOverlay" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div id="modalBox" class="modal-box bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"></div>
+    </div>
+
+    <!-- Toasts -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-[70] flex flex-col gap-2 pointer-events-none"></div>
+
+<script>
+/* =============================================
+   CONFIGURAÇÃO DOS PILARES
+============================================= */
+const PILLAR_CONFIG = [
+    {
+        id:'coluna', name:'Coluna', icon:'fa-bone', theme:'purple', hasSub:false,
+        levels:[
+            {id:'coluna-iniciante', name:'Iniciante'},
+            {id:'coluna-intermediario', name:'Intermediário'},
+            {id:'coluna-avancado', name:'Avançado'}
+        ]
+    },
+    {
+        id:'trauma', name:'Trauma', icon:'fa-bolt', theme:'blue', hasSub:true,
+        subs:[
+            {id:'trauma-memb-sup', name:'Membros e Extremidades Superiores', levels:[
+                {id:'trauma-memb-sup-iniciante', name:'Iniciante'},
+                {id:'trauma-memb-sup-intermediario', name:'Intermediário'},
+                {id:'trauma-memb-sup-avancado', name:'Avançado'}
+            ]},
+            {id:'trauma-memb-inf', name:'Membros e Extremidades Inferiores', levels:[
+                {id:'trauma-memb-inf-iniciante', name:'Iniciante'},
+                {id:'trauma-memb-inf-intermediario', name:'Intermediário'},
+                {id:'trauma-memb-inf-avancado', name:'Avançado'}
+            ]},
+            {id:'trauma-hastes', name:'Hastes', levels:[
+                {id:'trauma-hastes-iniciante', name:'Iniciante'},
+                {id:'trauma-hastes-intermediario', name:'Intermediário'},
+                {id:'trauma-hastes-avancado', name:'Avançado'}
+            ]}
+        ]
+    },
+    {
+        id:'cmf', name:'CMF', icon:'fa-head-side', theme:'green', hasSub:false,
+        levels:[
+            {id:'cmf-iniciante', name:'Iniciante'},
+            {id:'cmf-intermediario', name:'Intermediário'},
+            {id:'cmf-avancado', name:'Avançado'}
+        ]
+    }
+];
+
+const THEMES = {
+    purple:{accent:'#6D28D9',light:'#F3E8FF',lighter:'#FAF5FF',border:'#DDD6FE',text:'#5B21B6',muted:'#8B5CF6',iconBg:'#EDE9FE',gradient:'linear-gradient(135deg,#4C1D95,#6D28D9)'},
+    blue:{accent:'#2563EB',light:'#DBEAFE',lighter:'#EFF6FF',border:'#BFDBFE',text:'#1E40AF',muted:'#3B82F6',iconBg:'#DBEAFE',gradient:'linear-gradient(135deg,#1E3A8A,#2563EB)'},
+    green:{accent:'#059669',light:'#D1FAE5',lighter:'#ECFDF5',border:'#A7F3D0',text:'#065F46',muted:'#10B981',iconBg:'#D1FAE5',gradient:'linear-gradient(135deg,#064E3B,#059669)'}
+};
+
+const LEVEL_BADGES = {
+    'Iniciante':{bg:'#D1FAE5',text:'#065F46',icon:'fa-seedling'},
+    'Intermediário':{bg:'#FEF3C7',text:'#92400E',icon:'fa-fire'},
+    'Avançado':{bg:'#FEE2E2',text:'#991B1B',icon:'fa-rocket'}
+};
+
+function getTheme(name){ return THEMES[name]||THEMES.purple; }
+function getLevelBadge(name){ return LEVEL_BADGES[name]||LEVEL_BADGES['Iniciante']; }
+
+/* Retorna todos os níveis achatados com info de contexto */
+function getAllLevels(){
+    const list=[];
+    PILLAR_CONFIG.forEach(p=>{
+        if(p.hasSub){
+            (p.subs||[]).forEach(s=>{
+                (s.levels||[]).forEach(l=>{
+                    list.push({levelId:l.id,levelName:l.name,pillarId:p.id,pillarName:p.name,subId:s.id,subName:s.name,theme:p.theme,pillarIcon:p.icon});
+                });
+            });
+        } else {
+            (p.levels||[]).forEach(l=>{
+                list.push({levelId:l.id,levelName:l.name,pillarId:p.id,pillarName:p.name,subId:null,subName:null,theme:p.theme,pillarIcon:p.icon});
+            });
+        }
+    });
+    return list;
+}
+
+function getLevelInfo(levelId){
+    return getAllLevels().find(l=>l.levelId===levelId)||null;
+}
+
+/* =============================================
+   ESTADO DA APLICAÇÃO
+============================================= */
+let state = {
+    currentView:'overview',
+    activePillar:null,
+    course:{name:'Curso EAD - Medical Device',description:'',targetAudience:'',instructor:''},
+    modules:{},
+    files:[],
+    expandedPillars:new Set(),
+    expandedSubs:new Set(),
+    expandedLevels:new Set(),
+    expandedModules:new Set(),
+    editingLesson:null,
+    fileFilter:'all'
+};
+
+function ensureModules(){
+    getAllLevels().forEach(l=>{
+        if(!state.modules[l.levelId]) state.modules[l.levelId]=[];
+    });
+}
+
+/* =============================================
+   UTILITÁRIOS
+============================================= */
+function uid(){ return 'id_'+Date.now().toString(36)+Math.random().toString(36).substr(2,6); }
+function formatFileSize(b){ if(!b)return '0 B'; const k=1024,s=['B','KB','MB','GB'],i=Math.floor(Math.log(b)/Math.log(k)); return parseFloat((b/Math.pow(k,i)).toFixed(1))+' '+s[i]; }
+function formatDate(iso){ if(!iso)return'-'; return new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+function escapeHtml(s){ if(!s)return''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function getFileIcon(t){
+    if(!t)return'fa-file'; if(t.includes('pdf'))return'fa-file-pdf'; if(t.includes('image'))return'fa-file-image';
+    if(t.includes('video'))return'fa-file-video'; if(t.includes('word')||t.includes('document'))return'fa-file-word';
+    if(t.includes('sheet')||t.includes('excel'))return'fa-file-excel';
+    if(t.includes('presentation')||t.includes('powerpoint'))return'fa-file-powerpoint';
+    if(t.includes('zip')||t.includes('rar'))return'fa-file-zipper'; if(t.includes('text'))return'fa-file-lines'; return'fa-file';
+}
+function getFileColor(t){
+    if(!t)return'text-gray-400'; if(t.includes('pdf'))return'text-red-500'; if(t.includes('image'))return'text-pink-500';
+    if(t.includes('video'))return'text-blue-500'; if(t.includes('word')||t.includes('document'))return'text-blue-600';
+    if(t.includes('sheet')||t.includes('excel'))return'text-green-600';
+    if(t.includes('presentation')||t.includes('powerpoint'))return'text-orange-500';
+    if(t.includes('zip')||t.includes('rar'))return'text-yellow-600'; return'text-gray-400';
+}
+
+function extractYoutubeId(url){
+    if(!url)return null;
+    const p=[/youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,/youtu\.be\/([a-zA-Z0-9_-]{11})/,/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/];
+    for(const r of p){const m=url.match(r);if(m)return m[1];} return null;
+}
+
+/* =============================================
+   PERSISTÊNCIA
+============================================= */
+function saveState(){
+    try{
+        const d={course:state.course,modules:state.modules,files:state.files.map(f=>({...f,data:undefined})),
+            expandedPillars:[...state.expandedPillars],expandedSubs:[...state.expandedSubs],
+            expandedLevels:[...state.expandedLevels],expandedModules:[...state.expandedModules],activePillar:state.activePillar};
+        localStorage.setItem('ead_md_data',JSON.stringify(d));
+    }catch(e){console.warn('Erro ao salvar:',e);}
+}
+
+function loadState(){
+    try{
+        const raw=localStorage.getItem('ead_md_data');
+        if(!raw)return;
+        const d=JSON.parse(raw);
+        if(d.course) state.course={...state.course,...d.course};
+        if(d.modules) state.modules=d.modules;
+        if(d.files) state.files=d.files;
+        if(d.expandedPillars) state.expandedPillars=new Set(d.expandedPillars);
+        if(d.expandedSubs) state.expandedSubs=new Set(d.expandedSubs);
+        if(d.expandedLevels) state.expandedLevels=new Set(d.expandedLevels);
+        if(d.expandedModules) state.expandedModules=new Set(d.expandedModules);
+        if(d.activePillar!==undefined) state.activePillar=d.activePillar;
+    }catch(e){console.warn('Erro ao carregar:',e);}
+}
+
+/* =============================================
+   TOAST
+============================================= */
+function showToast(msg,type='success'){
+    const c=document.getElementById('toastContainer');
+    const colors={success:'bg-emerald-600 text-white',error:'bg-red-600 text-white',warning:'bg-amber-500 text-white',info:'bg-brand-700 text-white'};
+    const icons={success:'fa-check-circle',error:'fa-exclamation-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'};
+    const t=document.createElement('div');
+    t.className='toast '+(colors[type]||colors.info)+' pointer-events-auto';
+    t.innerHTML='<i class="fas '+(icons[type]||icons.info)+'"></i><span>'+escapeHtml(msg)+'</span>';
+    c.appendChild(t);
+    setTimeout(()=>{t.classList.add('removing');setTimeout(()=>t.remove(),300);},3000);
+}
+
+/* =============================================
+   MODAL
+============================================= */
+function openModal(html){ document.getElementById('modalBox').innerHTML=html; document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+
+function openConfirmModal(msg,onConfirm){
+    openModal(`<div class="p-6">
+        <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center"><i class="fas fa-trash-alt text-red-600"></i></div><h3 class="font-display font-bold text-lg">Confirmar Exclusão</h3></div>
+        <p class="text-gray-600 mb-6">${escapeHtml(msg)}</p>
+        <div class="flex gap-3 justify-end"><button onclick="closeModal()" class="btn-secondary">Cancelar</button><button id="cfmBtn" class="px-5 py-2.5 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors cursor-pointer">Excluir</button></div>
+    </div>`);
+    document.getElementById('cfmBtn').onclick=()=>{onConfirm();closeModal();};
+}
+
+/* =============================================
+   NAVEGAÇÃO
+============================================= */
+const NAV_ITEMS=[
+    {id:'overview',icon:'fa-chart-pie',label:'Visão Geral'},
+    {id:'structure',icon:'fa-sitemap',label:'Estrutura do Curso'},
+    {id:'files',icon:'fa-folder-open',label:'Biblioteca de Arquivos'},
+    {id:'preview',icon:'fa-eye',label:'Pré-visualização'}
+];
+
+function renderNav(){
+    const navHtml=NAV_ITEMS.map(n=>`<button onclick="switchView('${n.id}')" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-r-lg text-sm font-medium w-full text-left ${state.currentView===n.id&&state.activePillar===null?'active':''}"><i class="fas ${n.icon} w-5 text-center"></i>${n.label}</button>`).join('');
+
+    const pillarHtml=`<div class="text-[10px] uppercase tracking-widest text-white/25 font-semibold px-4 pt-4 pb-1">Pilares</div>`+
+        PILLAR_CONFIG.map(p=>{
+            const th=getTheme(p.theme);
+            const isActive=state.currentView==='structure'&&state.activePillar===p.id;
+            return `<button onclick="selectPillar('${p.id}')" class="pillar-link flex items-center gap-3 px-4 py-2.5 rounded-r-lg text-sm font-medium w-full text-left ${isActive?'active':''}" style="color:${th.muted}">
+                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${th.muted}"></span>${p.name}
+            </button>`;
+        }).join('');
+
+    const fullHtml=navHtml+pillarHtml;
+    document.getElementById('sidebarNav').innerHTML=navHtml;
+    document.getElementById('sidebarPillars').innerHTML=pillarHtml;
+    const mob=document.getElementById('mobileNavContent');
+    if(mob) mob.innerHTML=fullHtml;
+    document.getElementById('sidebarCourseName').textContent=state.course.name||'Curso sem nome';
+}
+
+function switchView(v){ state.currentView=v; state.activePillar=null; renderNav(); renderView(); closeMobileMenu(); }
+function selectPillar(id){ state.currentView='structure'; state.activePillar=id; renderNav(); renderView(); closeMobileMenu(); }
+
+function closeMobileMenu(){ const m=document.getElementById('mobileMenuWrap'); if(m&&!m.classList.contains('hidden')) m.classList.add('hidden'); }
+function toggleMobileMenu(){ document.getElementById('mobileMenuWrap').classList.toggle('hidden'); }
+
+function renderView(){
+    const m=document.getElementById('mainContent');
+    switch(state.currentView){
+        case'overview':m.innerHTML=renderOverview();break;
+        case'structure':m.innerHTML=renderStructure();break;
+        case'files':m.innerHTML=renderFiles();break;
+        case'preview':m.innerHTML=renderPreview();break;
+    }
+}
+
+/* =============================================
+   HELPERS DE ESTATÍSTICA
+============================================= */
+function getStats(){
+    let totalModules=0,totalLessons=0,totalVideos=0,withFiles=0,withNotes=0;
+    Object.values(state.modules).forEach(mods=>{
+        mods.forEach(mod=>{
+            totalModules++;
+            (mod.lessons||[]).forEach(l=>{
+                totalLessons++;
+                if(l.videoUrl)totalVideos++;
+                if(l.files&&l.files.length>0)withFiles++;
+                if(l.notes)withNotes++;
+            });
+        });
+    });
+    const pct=totalLessons>0?Math.round(((totalVideos+withFiles+withNotes)/(totalLessons*3))*100):0;
+    return{totalModules,totalLessons,totalVideos,totalFiles:state.files.length,withFiles,withNotes,pct};
+}
+
+function getPillarStats(pillarId){
+    const levels=getAllLevels().filter(l=>l.pillarId===pillarId).map(l=>l.levelId);
+    let mods=0,lessons=0,vids=0;
+    levels.forEach(lid=>{
+        (state.modules[lid]||[]).forEach(mod=>{
+            mods++;
+            (mod.lessons||[]).forEach(les=>{lessons++;if(les.videoUrl)vids++;});
+        });
+    });
+    return{mods,lessons,vids};
+}
+
+/* =============================================
+   VISÃO GERAL
+============================================= */
+function renderOverview(){
+    const s=getStats();
+    return `<div class="max-w-6xl mx-auto">
+        <div class="mb-8"><h1 class="font-display font-extrabold text-3xl md:text-4xl text-surface-850 mb-2">Visão Geral</h1><p class="text-gray-500">Acompanhe o progresso da montagem do curso</p></div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            ${[['Módulos',s.totalModules,'fa-layer-group','purple'],['Aulas',s.totalLessons,'fa-play-circle','blue'],['Vídeos',s.totalVideos,'fa-video','green'],['Arquivos',s.totalFiles,'fa-file-alt','amber']].map(([label,val,icon,c])=>`
+            <div class="card stat-card ${c} p-5">
+                <div class="flex items-center justify-between mb-3"><span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">${label}</span><div class="w-9 h-9 rounded-lg bg-brand-100 flex items-center justify-center"><i class="fas ${icon} text-brand-600 text-sm"></i></div></div>
+                <p class="font-display font-extrabold text-3xl text-surface-850">${val}</p>
+            </div>`).join('')}
+        </div>
+        <div class="grid lg:grid-cols-2 gap-6">
+            <div class="card p-6">
+                <h3 class="font-display font-bold text-lg mb-4">Progresso de Montagem</h3>
+                <div class="mb-4"><div class="flex justify-between text-sm mb-2"><span class="text-gray-500">Conteúdo preenchido</span><span class="font-semibold text-brand-700">${s.pct}%</span></div><div class="w-full h-3 bg-brand-100 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all duration-700" style="width:${s.pct}%;background:linear-gradient(90deg,#6D28D9,#8B5CF6);"></div></div></div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between"><span class="flex items-center gap-2 text-gray-600"><i class="fas fa-video text-navy-600 w-4"></i>Vídeos vinculados</span><span class="font-medium">${s.totalVideos}/${s.totalLessons}</span></div>
+                    <div class="flex justify-between"><span class="flex items-center gap-2 text-gray-600"><i class="fas fa-paperclip text-emerald-600 w-4"></i>Aulas com arquivos</span><span class="font-medium">${s.withFiles}/${s.totalLessons}</span></div>
+                    <div class="flex justify-between"><span class="flex items-center gap-2 text-gray-600"><i class="fas fa-sticky-note text-amber-600 w-4"></i>Aulas com observações</span><span class="font-medium">${s.withNotes}/${s.totalLessons}</span></div>
+                </div>
+            </div>
+            <div class="card p-6">
+                <h3 class="font-display font-bold text-lg mb-4">Pilares</h3>
+                <div class="space-y-3">
+                    ${PILLAR_CONFIG.map(p=>{
+                        const th=getTheme(p.theme); const ps=getPillarStats(p.id);
+                        return `<button onclick="selectPillar('${p.id}')" class="w-full flex items-center gap-4 p-3.5 rounded-xl transition-colors text-left group hover:opacity-90" style="background:${th.light}">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white" style="background:${th.accent}"><i class="fas ${p.icon}"></i></div>
+                            <div class="flex-1"><p class="font-semibold text-sm" style="color:${th.text}">${p.name}</p><p class="text-xs text-gray-500">${ps.mods} módulos · ${ps.lessons} aulas · ${ps.vids} vídeos</p></div>
+                            <i class="fas fa-chevron-right text-sm" style="color:${th.muted}"></i>
+                        </button>`;
+                    }).join('')}
+                </div>
+            </div>
+        </div>
+        ${s.totalModules===0?`<div class="card p-12 mt-6 text-center"><i class="fas fa-rocket empty-icon text-brand-300"></i><h3 class="font-display font-bold text-xl text-gray-500 mb-2">Comece a montar seu curso</h3><p class="text-gray-400 mb-6 max-w-md mx-auto">Crie módulos dentro dos pilares e vincule vídeos e materiais.</p><button onclick="selectPillar('coluna')" class="btn-primary"><i class="fas fa-plus mr-2"></i>Começar pela Coluna</button></div>`:''}
+    </div>`;
+}
+
+/* =============================================
+   ESTRUTURA DO CURSO
+============================================= */
+function renderStructure(){
+    const pillars=state.activePillar?PILLAR_CONFIG.filter(p=>p.id===state.activePillar):PILLAR_CONFIG;
+    const backBtn=state.activePillar?`<button onclick="state.activePillar=null;renderNav();renderView()" class="flex items-center gap-2 text-sm text-brand-600 hover:text-brand-800 font-medium mb-4 transition-colors"><i class="fas fa-arrow-left"></i>Voltar para todos os pilares</button>`:'';
+
+    return `<div class="max-w-5xl mx-auto">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+            <div>${backBtn}<h1 class="font-display font-extrabold text-3xl text-surface-850 mb-1">${state.activePillar?(PILLAR_CONFIG.find(p=>p.id===state.activePillar)||{}).name||'Estrutura':'Estrutura do Curso'}</h1><p class="text-gray-500 text-sm">Organize módulos e aulas por pilar, subdivisão e nível</p></div>
+        </div>
+        ${pillars.map(p=>renderPillarCard(p)).join('')}
+    </div>`;
+}
+
+function renderPillarCard(p){
+    const th=getTheme(p.theme);
+    const isExp=state.expandedPillars.has(p.id);
+    const ps=getPillarStats(p.id);
+
+    let body='';
+    if(p.hasSub){
+        body=(p.subs||[]).map(sub=>renderSubSection(sub,p)).join('');
+    } else {
+        body=(p.levels||[]).map(l=>renderLevelSection(l.id,l.name,th,null,p.id)).join('');
+    }
+
+    return `<div class="card mb-5 overflow-hidden" style="border-left:4px solid ${th.accent}">
+        <div class="p-5 cursor-pointer flex items-center gap-4 transition-colors hover:opacity-90" style="background:${th.lighter}" onclick="toggleCollapse('expandedPillars','${p.id}')">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center text-white flex-shrink-0" style="background:${th.accent}"><i class="fas ${p.icon} text-lg"></i></div>
+            <div class="flex-1 min-w-0"><h2 class="font-display font-bold text-xl" style="color:${th.text}">${p.name}</h2><p class="text-sm text-gray-500">${ps.mods} módulos · ${ps.lessons} aulas · ${ps.vids} vídeos</p></div>
+            <i class="fas fa-chevron-down transition-transform duration-300 ${isExp?'rotate-180':''}" style="color:${th.muted}"></i>
+        </div>
+        <div class="collapse-body ${isExp?'expanded':''}">${body}</div>
+    </div>`;
+}
+
+function renderSubSection(sub,pillar){
+    const th=getTheme(pillar.theme);
+    const isExp=state.expandedSubs.has(sub.id);
+    const levelIds=sub.levels.map(l=>l.id);
+    let mCount=0,lCount=0;
+    levelIds.forEach(lid=>{(state.modules[lid]||[]).forEach(m=>{mCount++;(m.lessons||[]).forEach(()=>lCount++);});});
+
+    return `<div class="border-t" style="border-color:${th.border}">
+        <div class="px-5 py-3.5 cursor-pointer flex items-center gap-3 hover:bg-white/50 transition-colors" onclick="toggleCollapse('expandedSubs','${sub.id}')">
+            <i class="fas fa-folder text-sm" style="color:${th.muted}"></i>
+            <span class="font-semibold text-sm flex-1" style="color:${th.text}">${sub.name}</span>
+            <span class="text-xs text-gray-400">${mCount} mód · ${lCount} aulas</span>
+            <i class="fas fa-chevron-down text-xs transition-transform duration-300 ${isExp?'rotate-180':''}" style="color:${th.muted}"></i>
+        </div>
+        <div class="collapse-body ${isExp?'expanded':''}">${sub.levels.map(l=>renderLevelSection(l.id,l.name,th,sub.id,pillar.id)).join('')}</div>
+    </div>`;
+}
+
+function renderLevelSection(levelId,levelName,theme,subId,pillarId){
+    const lb=getLevelBadge(levelName);
+    const modules=state.modules[levelId]||[];
+    const isExp=state.expandedLevels.has(levelId);
+    const lessonCount=modules.reduce((s,m)=>s+(m.lessons||[]).length,0);
+
+    return `<div class="border-t border-gray-100">
+        <div class="px-5 py-3 cursor-pointer flex items-center gap-3 hover:bg-gray-50/50 transition-colors" onclick="toggleCollapse('expandedLevels','${levelId}')">
+            <span class="badge flex-shrink-0" style="background:${lb.bg};color:${lb.text}"><i class="fas ${lb.icon} text-[9px]"></i>${levelName}</span>
+            <span class="text-xs text-gray-400 flex-1">${modules.length} mód${modules.length!==1?'ulos':'ulo'} · ${lessonCount} aula${lessonCount!==1?'s':''}</span>
+            <button onclick="event.stopPropagation();openModuleModal('${levelId}')" class="text-xs font-semibold hover:opacity-80 transition-opacity" style="color:${theme.accent}"><i class="fas fa-plus mr-1"></i>Módulo</button>
+            <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform duration-300 ${isExp?'rotate-180':''}"></i>
+        </div>
+        <div class="collapse-body ${isExp?'expanded':''}">
+            ${modules.length===0?`<div class="px-5 py-6 text-center text-gray-400 text-sm"><i class="fas fa-inbox text-xl mb-1 opacity-30 block"></i>Nenhum módulo neste nível</div>`:
+            modules.map((mod,mi)=>renderModuleCard(levelId,mod,mi,theme)).join('')}
+        </div>
+    </div>`;
+}
+
+function renderModuleCard(levelId,mod,mi,theme){
+    const isExp=state.expandedModules.has(mod.id);
+    const lc=(mod.lessons||[]).length;
+    const info=getLevelInfo(levelId);
+    const ctx=info?`${info.pillarName}${info.subName?' › '+info.subName:''} › ${info.levelName}`:'';
+
+    return `<div class="mx-5 my-2 rounded-lg border overflow-hidden" style="border-color:${theme.border}">
+        <div class="px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-white/60 transition-colors" style="background:${theme.lighter}" onclick="toggleCollapse('expandedModules','${mod.id}')">
+            <span class="w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0" style="background:${theme.accent};color:#fff">${mi+1}</span>
+            <div class="flex-1 min-w-0">
+                <p class="font-semibold text-sm text-surface-850 truncate">${escapeHtml(mod.title)}</p>
+                <p class="text-[11px] text-gray-400 truncate">${ctx}</p>
+            </div>
+            <span class="badge badge-file text-[10px]">${lc} aula${lc!==1?'s':''}</span>
+            <div class="flex items-center gap-0.5 flex-shrink-0" onclick="event.stopPropagation()">
+                <button onclick="moveModule('${levelId}','${mod.id}',-1)" class="btn-ghost text-xs px-1.5 ${mi===0?'opacity-30 pointer-events-none':''}"><i class="fas fa-arrow-up"></i></button>
+                <button onclick="moveModule('${levelId}','${mod.id}',1)" class="btn-ghost text-xs px-1.5 ${mi>=(state.modules[levelId]||[]).length-1?'opacity-30 pointer-events-none':''}"><i class="fas fa-arrow-down"></i></button>
+                <button onclick="openModuleModal('${levelId}','${mod.id}')" class="btn-ghost text-xs px-1.5"><i class="fas fa-pen"></i></button>
+                <button onclick="deleteModule('${levelId}','${mod.id}')" class="btn-danger-ghost text-xs px-1.5"><i class="fas fa-trash-alt"></i></button>
+            </div>
+            <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform duration-300 ${isExp?'rotate-180':''}"></i>
+        </div>
+        <div class="collapse-body ${isExp?'expanded':''}">
+            ${(mod.lessons||[]).length===0?`<div class="px-4 py-5 text-center text-gray-400 text-sm">Nenhuma aula</div>`:
+            (mod.lessons||[]).map((les,li)=>renderLessonRow(levelId,mod.id,les,li,theme)).join('')}
+            <div class="px-4 py-2.5 border-t border-gray-100">
+                <button onclick="openLessonPanel('${levelId}','${mod.id}',null)" class="flex items-center gap-2 text-xs font-semibold transition-colors" style="color:${theme.accent}"><i class="fas fa-plus-circle"></i>Adicionar Aula</button>
+            </div>
+        </div>
+    </div>`;
+}
+
+function renderLessonRow(levelId,modId,les,li,theme){
+    return `<div class="flex items-center gap-2.5 px-4 py-2.5 hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0 group">
+        <span class="text-[11px] font-bold w-6 text-center flex-shrink-0" style="color:${theme.muted}">${li+1}</span>
+        <p class="flex-1 text-sm text-surface-850 truncate cursor-pointer hover:underline" onclick="openLessonPanel('${levelId}','${modId}','${les.id}')">${escapeHtml(les.title)}</p>
+        <div class="flex items-center gap-1.5 flex-shrink-0">
+            ${les.videoUrl?'<span class="badge badge-video text-[10px]"><i class="fas fa-video text-[8px]"></i></span>':''}
+            ${les.files&&les.files.length>0?`<span class="badge badge-file text-[10px]">${les.files.length}</span>`:''}
+            ${les.notes?'<span class="badge badge-notes text-[10px]"><i class="fas fa-sticky-note text-[8px]"></i></span>':''}
+        </div>
+        <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+            <button onclick="moveLesson('${levelId}','${modId}','${les.id}',-1)" class="btn-ghost text-xs px-1 ${li===0?'opacity-30 pointer-events-none':''}"><i class="fas fa-arrow-up"></i></button>
+            <button onclick="moveLesson('${levelId}','${modId}','${les.id}',1)" class="btn-ghost text-xs px-1 ${li>=(state.modules[levelId]||[]).find(m=>m.id===modId)?.lessons.length-1?'opacity-30 pointer-events-none':''}"><i class="fas fa-arrow-down"></i></button>
+            <button onclick="openLessonPanel('${levelId}','${modId}','${les.id}')" class="btn-ghost text-xs px-1"><i class="fas fa-pen"></i></button>
+            <button onclick="deleteLesson('${levelId}','${modId}','${les.id}')" class="btn-danger-ghost text-xs px-1"><i class="fas fa-trash-alt"></i></button>
+        </div>
+    </div>`;
+}
+
+function toggleCollapse(setName,id){
+    const s=state[setName];
+    if(s.has(id))s.delete(id);else s.add(id);
+    renderView();
+}
+
+/* =============================================
+   CRUD DE MÓDULOS
+============================================= */
+function openModuleModal(levelId,editId){
+    const mods=state.modules[levelId]||[];
+    const mod=editId?mods.find(m=>m.id===editId):null;
+    const isEdit=!!mod;
+    const info=getLevelInfo(levelId);
+    const ctx=info?`${info.pillarName}${info.subName?' › '+info.subName:''} › ${info.levelName}`:'';
+    openModal(`<div class="p-6">
+        <h2 class="font-display font-bold text-xl mb-1">${isEdit?'Editar':'Novo'} Módulo</h2>
+        <p class="text-xs text-gray-400 mb-5">${escapeHtml(ctx)}</p>
+        <div class="space-y-4">
+            <div><label class="block text-sm font-semibold text-gray-600 mb-1.5">Título do Módulo</label><input id="modTitle" class="form-input" placeholder="Ex: Introdução a Medical Devices" value="${isEdit?escapeHtml(mod.title):''}"></div>
+            <div><label class="block text-sm font-semibold text-gray-600 mb-1.5">Descrição</label><textarea id="modDesc" class="form-input" rows="3" placeholder="Breve descrição">${isEdit?escapeHtml(mod.description):''}</textarea></div>
+        </div>
+        <div class="flex gap-3 justify-end mt-6"><button onclick="closeModal()" class="btn-secondary">Cancelar</button><button onclick="saveModule('${levelId}','${editId||''}')" class="btn-primary">${isEdit?'Salvar':'Criar Módulo'}</button></div>
+    </div>`);
+    setTimeout(()=>document.getElementById('modTitle').focus(),100);
+}
+
+function saveModule(levelId,editId){
+    const title=document.getElementById('modTitle').value.trim();
+    const desc=document.getElementById('modDesc').value.trim();
+    if(!title){showToast('Informe o título','warning');return;}
+    if(!state.modules[levelId])state.modules[levelId]=[];
+    if(editId){
+        const mod=state.modules[levelId].find(m=>m.id===editId);
+        if(mod){mod.title=title;mod.description=desc;}
+    } else {
+        const nm={id:uid(),title,description:desc,lessons:[]};
+        state.modules[levelId].push(nm);
+        state.expandedLevels.add(levelId);
+        state.expandedModules.add(nm.id);
+    }
+    saveState();closeModal();renderView();
+    showToast(editId?'Módulo atualizado':'Módulo criado');
+}
+
+function deleteModule(levelId,modId){
+    const mod=(state.modules[levelId]||[]).find(m=>m.id===modId);
+    if(!mod)return;
+    openConfirmModal(`Excluir o módulo "${mod.title}" e suas ${(mod.lessons||[]).length} aula(s)?`,()=>{
+        state.modules[levelId]=state.modules[levelId].filter(m=>m.id!==modId);
+        state.expandedModules.delete(modId);
+        saveState();renderView();showToast('Módulo excluído','info');
+    });
+}
+
+function moveModule(levelId,modId,dir){
+    const mods=state.modules[levelId];if(!mods)return;
+    const i=mods.findIndex(m=>m.id===modId);const ni=i+dir;
+    if(ni<0||ni>=mods.length)return;
+    [mods[i],mods[ni]]=[mods[ni],mods[i]];saveState();renderView();
+}
+
+function moveLesson(levelId,modId,lesId,dir){
+    const mod=(state.modules[levelId]||[]).find(m=>m.id===modId);if(!mod)return;
+    const ls=mod.lessons||[];const i=ls.findIndex(l=>l.id===lesId);const ni=i+dir;
+    if(ni<0||ni>=ls.length)return;
+    [ls[i],ls[ni]]=[ls[ni],ls[i]];saveState();renderView();
+}
+
+function deleteLesson(levelId,modId,lesId){
+    const mod=(state.modules[levelId]||[]).find(m=>m.id===modId);if(!mod)return;
+    const les=mod.lessons.find(l=>l.id===lesId);
+    openConfirmModal(`Excluir a aula "${les?les.title:''}"?`,()=>{
+        mod.lessons=mod.lessons.filter(l=>l.id!==lesId);saveState();renderView();showToast('Aula excluída','info');
+    });
+}
+
+/* =============================================
+   PAINEL DE EDIÇÃO DE AULA
+============================================= */
+function openLessonPanel(levelId,modId,lesId){
+    const mod=(state.modules[levelId]||[]).find(m=>m.id===modId);
+    if(!mod){showToast('Módulo não encontrado','error');return;}
+    const les=lesId?mod.lessons.find(l=>l.id===lesId):null;
+    const isEdit=!!les;
+    const info=getLevelInfo(levelId);
+    const ctx=info?`${info.pillarName}${info.subName?' › '+info.subName:''} › ${info.levelName} › ${mod.title}`:'';
+    const ytId=isEdit&&les.videoType==='youtube'?extractYoutubeId(les.videoUrl):null;
+    const vType=isEdit?(les.videoType||'youtube'):'youtube';
+
+    state.editingLesson={levelId,modId,lesId:lesId||null};
+
+    document.getElementById('lessonPanelContent').innerHTML=`
+        <div class="flex items-center justify-between p-5 border-b border-gray-100">
+            <div><h2 class="font-display font-bold text-lg">${isEdit?'Editar':'Nova'} Aula</h2><p class="text-[11px] text-gray-400 mt-0.5">${escapeHtml(ctx)}</p></div>
+            <button onclick="closeLessonPanel()" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"><i class="fas fa-times text-gray-400"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-5 space-y-5">
+            <div><label class="block text-sm font-semibold text-gray-600 mb-1.5">Título da Aula</label><input id="lpTitle" class="form-input" placeholder="Ex: Classificação de Medical Devices" value="${isEdit?escapeHtml(les.title):''}"></div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-600 mb-1.5"><i class="fas fa-video text-navy-600 mr-1"></i>Vídeo da Aula</label>
+                <div class="grid grid-cols-3 gap-2 mb-3">
+                    ${['youtube|YouTube|fab fa-youtube','propria|Rede Própria|fas fa-server','nenhum|Nenhum|fas fa-ban'].map(s=>{
+                        const[tp,lb,ic]=s.split('|');
+                        return `<button onclick="setVideoType('${tp}')" data-vt="${tp}" class="vt-btn text-xs font-semibold py-2.5 rounded-lg border-2 transition-all cursor-pointer ${vType===tp?'border-brand-600 bg-brand-50 text-brand-700':'border-gray-200 text-gray-400 hover:border-gray-300'}"><i class="${ic} mr-1"></i>${lb}</button>`;
+                    }).join('')}
+                </div>
+                <input id="lpVideoUrl" class="form-input mb-2" placeholder="Cole a URL do vídeo aqui..." value="${isEdit?escapeHtml(les.videoUrl||''):''}" oninput="updateVideoPreview()">
+                <div id="lpVideoPreview" class="rounded-xl overflow-hidden bg-gray-100 ${ytId?'':'hidden'}">${ytId?`<iframe src="https://www.youtube.com/embed/${ytId}" class="w-full aspect-video" frameborder="0" allowfullscreen></iframe>`:''}</div>
+                <div id="lpVideoHint" class="text-xs text-gray-400 mt-2"></div>
+            </div>
+            <div><label class="block text-sm font-semibold text-gray-600 mb-1.5"><i class="fas fa-comment-dots text-amber-500 mr-1"></i>Observações do Vídeo</label><textarea id="lpVideoNotes" class="form-input" rows="2" placeholder="Trechos importantes, tempo, etc.">${isEdit?escapeHtml(les.videoNotes||''):''}</textarea></div>
+            <div>
+                <div class="flex items-center justify-between mb-2"><label class="text-sm font-semibold text-gray-600"><i class="fas fa-paperclip text-emerald-600 mr-1"></i>Arquivos Anexados</label><button onclick="openFilePicker()" class="text-xs text-brand-600 hover:text-brand-800 font-semibold transition-colors"><i class="fas fa-plus mr-1"></i>Adicionar</button></div>
+                <div id="lpFiles">${renderAttachedFiles(isEdit?les.files:[])}</div>
+                ${state.files.length===0?'<p class="text-xs text-gray-400 mt-1">Biblioteca vazia. Vá em "Biblioteca de Arquivos" para enviar.</p>':''}
+            </div>
+            <div><label class="block text-sm font-semibold text-gray-600 mb-1.5"><i class="fas fa-sticky-note text-amber-500 mr-1"></i>Observações Gerais</label><textarea id="lpNotes" class="form-input" rows="4" placeholder="Notas, instruções complementares...">${isEdit?escapeHtml(les.notes||''):''}</textarea></div>
+        </div>
+        <div class="p-5 border-t border-gray-100 flex gap-3 justify-end bg-gray-50/50"><button onclick="closeLessonPanel()" class="btn-secondary">Cancelar</button><button onclick="saveLesson()" class="btn-primary">${isEdit?'Salvar':'Criar Aula'}</button></div>`;
+
+    const panel=document.getElementById('lessonPanelContent');
+    panel.dataset.attachedFiles=JSON.stringify(isEdit&&les.files?les.files:[]);
+    panel.dataset.videoType=vType;
+
+    document.getElementById('lessonPanelOverlay').classList.remove('hidden');
+    document.getElementById('lessonPanel').classList.add('open');
+    updateVideoPreview();
+    setTimeout(()=>document.getElementById('lpTitle').focus(),350);
+}
+
+function closeLessonPanel(){
+    document.getElementById('lessonPanel').classList.remove('open');
+    setTimeout(()=>document.getElementById('lessonPanelOverlay').classList.add('hidden'),350);
+    state.editingLesson=null;
+}
+
+function setVideoType(type){
+    const panel=document.getElementById('lessonPanelContent');
+    panel.dataset.videoType=type;
+    document.querySelectorAll('.vt-btn').forEach(b=>{
+        if(b.dataset.vt===type) b.className='vt-btn text-xs font-semibold py-2.5 rounded-lg border-2 transition-all cursor-pointer border-brand-600 bg-brand-50 text-brand-700';
+        else b.className='vt-btn text-xs font-semibold py-2.5 rounded-lg border-2 transition-all cursor-pointer border-gray-200 text-gray-400 hover:border-gray-300';
+    });
+    updateVideoPreview();
+}
+
+function updateVideoPreview(){
+    const url=document.getElementById('lpVideoUrl').value.trim();
+    const type=document.getElementById('lessonPanelContent').dataset.videoType;
+    const preview=document.getElementById('lpVideoPreview');
+    const hint=document.getElementById('lpVideoHint');
+    if(type==='youtube'){
+        const ytId=extractYoutubeId(url);
+        if(ytId){preview.innerHTML=`<iframe src="https://www.youtube.com/embed/${ytId}" class="w-full aspect-video" frameborder="0" allowfullscreen></iframe>`;preview.classList.remove('hidden');hint.textContent='Vídeo do YouTube detectado.';hint.className='text-xs text-emerald-600 mt-2';}
+        else if(url){preview.classList.add('hidden');hint.textContent='URL do YouTube não reconhecida. Use o formato youtube.com/watch?v=XXXXX';hint.className='text-xs text-amber-600 mt-2';}
+        else{preview.classList.add('hidden');hint.textContent='Cole um link do YouTube para pré-visualizar.';hint.className='text-xs text-gray-400 mt-2';}
+    } else if(type==='propria'){
+        preview.classList.add('hidden');
+        if(url){hint.innerHTML=`<i class="fas fa-external-link-alt mr-1"></i>Rede própria: <a href="${escapeHtml(url)}" target="_blank" class="text-brand-600 underline">${escapeHtml(url)}</a>`;hint.className='text-xs text-brand-600 mt-2';}
+        else{hint.textContent='Cole a URL do vídeo da sua rede própria.';hint.className='text-xs text-gray-400 mt-2';}
+    } else {preview.classList.add('hidden');hint.textContent='Nenhum vídeo vinculado.';hint.className='text-xs text-gray-400 mt-2';}
+}
+
+function renderAttachedFiles(ids){
+    if(!ids||ids.length===0) return '<p class="text-sm text-gray-400 py-3 text-center">Nenhum arquivo anexado</p>';
+    return ids.map(fid=>{const f=state.files.find(x=>x.id===fid);if(!f)return'';return `<div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-lg mb-2"><i class="fas ${getFileIcon(f.type)} ${getFileColor(f.type)}"></i><div class="flex-1 min-w-0"><p class="text-sm font-medium text-surface-850 truncate">${escapeHtml(f.name)}</p><p class="text-xs text-gray-400">${formatFileSize(f.size)}</p></div><button onclick="detachFile('${fid}')" class="btn-danger-ghost text-xs px-2"><i class="fas fa-times"></i></button></div>`;}).join('');
+}
+
+function detachFile(fid){
+    const p=document.getElementById('lessonPanelContent');
+    let files=JSON.parse(p.dataset.attachedFiles||'[]');
+    files=files.filter(f=>f!==fid);p.dataset.attachedFiles=JSON.stringify(files);
+    document.getElementById('lpFiles').innerHTML=renderAttachedFiles(files);
+}
+
+function attachFile(fid){
+    const p=document.getElementById('lessonPanelContent');
+    let files=JSON.parse(p.dataset.attachedFiles||'[]');
+    if(!files.includes(fid))files.push(fid);
+    p.dataset.attachedFiles=JSON.stringify(files);
+    document.getElementById('lpFiles').innerHTML=renderAttachedFiles(files);
+}
+
+function openFilePicker(){
+    const p=document.getElementById('lessonPanelContent');
+    const attached=JSON.parse(p.dataset.attachedFiles||'[]');
+    const available=state.files.filter(f=>!attached.includes(f.id));
+    if(available.length===0){showToast('Todos os arquivos já estão anexados ou biblioteca vazia','info');return;}
+    openModal(`<div class="p-6"><h2 class="font-display font-bold text-xl mb-4">Selecionar Arquivos</h2><div class="space-y-2 max-h-80 overflow-y-auto">${available.map(f=>`<button onclick="attachFile('${f.id}');closeModal()" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-brand-50 transition-colors text-left"><i class="fas ${getFileIcon(f.type)} ${getFileColor(f.type)} text-lg w-6 text-center"></i><div class="flex-1 min-w-0"><p class="text-sm font-medium truncate">${escapeHtml(f.name)}</p><p class="text-xs text-gray-400">${formatFileSize(f.size)}</p></div><i class="fas fa-plus-circle text-brand-400"></i></button>`).join('')}</div><div class="flex justify-end mt-4"><button onclick="closeModal()" class="btn-secondary">Fechar</button></div></div>`);
+}
+
+function saveLesson(){
+    const title=document.getElementById('lpTitle').value.trim();
+    if(!title){showToast('Informe o título da aula','warning');return;}
+    const{levelId,modId,lesId}=state.editingLesson;
+    const mod=(state.modules[levelId]||[]).find(m=>m.id===modId);if(!mod)return;
+    const panel=document.getElementById('lessonPanelContent');
+    const data={id:lesId||uid(),title,videoType:panel.dataset.videoType||'youtube',videoUrl:document.getElementById('lpVideoUrl').value.trim(),videoNotes:document.getElementById('lpVideoNotes').value.trim(),notes:document.getElementById('lpNotes').value.trim(),files:JSON.parse(panel.dataset.attachedFiles||'[]')};
+    if(lesId){const i=mod.lessons.findIndex(l=>l.id===lesId);if(i>=0)mod.lessons[i]=data;}
+    else{mod.lessons.push(data);state.expandedModules.add(modId);}
+    saveState();closeLessonPanel();renderView();showToast(lesId?'Aula atualizada':'Aula criada');
+}
+
+/* =============================================
+   BIBLIOTECA DE ARQUIVOS
+============================================= */
+function renderFiles(){
+    const filtered=state.fileFilter==='all'?state.files:state.files.filter(f=>{
+        const t=f.type||'';
+        const map={pdf:'pdf',image:'image',document:'word||document||text',spreadsheet:'sheet||excel',presentation:'presentation||powerpoint',video:'video',archive:'zip||rar||compress'};
+        const keys=map[state.fileFilter];if(!keys)return true;
+        return keys.split('||').some(k=>t.includes(k));
+    });
+    const filters=[['all','Todos'],['pdf','PDF'],['image','Imagens'],['document','Documentos'],['spreadsheet','Planilhas'],['presentation','Apresentações'],['video','Vídeos'],['archive','Compactados']];
+
+    return `<div class="max-w-6xl mx-auto">
+        <div class="mb-6"><h1 class="font-display font-extrabold text-3xl text-surface-850 mb-1">Biblioteca de Arquivos</h1><p class="text-gray-500 text-sm">Gerencie os materiais de apoio</p></div>
+        <div id="dropZone" class="drop-zone p-8 mb-6 text-center cursor-pointer" onclick="document.getElementById('fileInput').click()">
+            <input id="fileInput" type="file" multiple class="hidden" onchange="handleFileUpload(this.files)">
+            <i class="fas fa-cloud-upload-alt text-4xl text-brand-300 mb-3 block"></i>
+            <p class="font-semibold text-surface-850 mb-1">Arraste arquivos aqui ou clique para enviar</p>
+            <p class="text-sm text-gray-400">PDF, imagens, documentos, planilhas, apresentações, vídeos</p>
+        </div>
+        <div class="flex items-center gap-2 mb-5 flex-wrap">
+            ${filters.map(([id,lb])=>`<button onclick="state.fileFilter='${id}';renderView()" class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${state.fileFilter===id?'bg-brand-700 text-white':'bg-white text-gray-500 border border-gray-200 hover:border-brand-300 hover:text-brand-600'}">${lb}</button>`).join('')}
+            <span class="text-xs text-gray-400 ml-2">${filtered.length} arquivo${filtered.length!==1?'s':''}</span>
+        </div>
+        ${filtered.length===0?`<div class="card p-12 text-center"><i class="fas fa-folder-open empty-icon text-brand-300"></i><h3 class="font-display font-bold text-lg text-gray-500 mb-2">${state.files.length===0?'Nenhum arquivo enviado':'Nenhum arquivo neste filtro'}</h3></div>`:
+        `<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${filtered.map(f=>`
+            <div class="file-card card p-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-11 h-11 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0"><i class="fas ${getFileIcon(f.type)} ${getFileColor(f.type)} text-lg"></i></div>
+                    <div class="flex-1 min-w-0"><p class="font-semibold text-sm text-surface-850 truncate" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</p><p class="text-xs text-gray-400 mt-0.5">${formatFileSize(f.size)} · ${formatDate(f.uploadedAt)}</p></div>
+                    <button onclick="deleteFile('${f.id}')" class="btn-danger-ghost text-xs px-1.5 flex-shrink-0"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                ${f.data?`<div class="mt-3 pt-3 border-t border-gray-100"><a href="${f.data}" download="${escapeHtml(f.name)}" class="text-xs text-brand-600 hover:text-brand-800 font-semibold transition-colors"><i class="fas fa-download mr-1"></i>Baixar</a></div>`:'<p class="text-xs text-amber-500 mt-2"><i class="fas fa-exclamation-triangle mr-1"></i>Reenviar necessário</p>'}
+            </div>`).join('')}</div>`}
+    </div>`;
+}
+
+function handleFileUpload(fileList){
+    if(!fileList||fileList.length===0)return;
+    let added=0,total=fileList.length;
+    for(const file of fileList){
+        if(file.size>10*1024*1024){
+            state.files.push({id:uid(),name:file.name,type:file.type,size:file.size,data:null,uploadedAt:new Date().toISOString()});
+            added++;checkUploadDone(added,total);continue;
+        }
+        const reader=new FileReader();
+        reader.onload=(e)=>{
+            state.files.push({id:uid(),name:file.name,type:file.type,size:file.size,data:e.target.result,uploadedAt:new Date().toISOString()});
+            added++;checkUploadDone(added,total);
+        };
+        reader.readAsDataURL(file);
+    }
+    document.getElementById('fileInput').value='';
+}
+
+function checkUploadDone(added,total){
+    if(added===total){try{saveState();}catch(e){showToast('Limite de armazenamento atingido','error');}renderView();showToast(`${added} arquivo(s) enviado(s)`);}
+}
+
+function deleteFile(id){
+    const f=state.files.find(x=>x.id===id);if(!f)return;
+    openConfirmModal(`Excluir "${f.name}"? Será removido da biblioteca e de todas as aulas.`,()=>{
+        state.files=state.files.filter(x=>x.id!==id);
+        Object.values(state.modules).forEach(mods=>{mods.forEach(m=>{if(m.lessons)m.lessons.forEach(l=>{if(l.files)l.files=l.files.filter(fid=>fid!==id);});});});
+        saveState();renderView();showToast('Arquivo excluído','info');
+    });
+}
+
+/* =============================================
+   PRÉ-VISUALIZAÇÃO
+============================================= */
+function renderPreview(){
+    const hasContent=getStats().totalModules>0;
+    return `<div class="max-w-4xl mx-auto">
+        <div class="card p-8 mb-6" style="background:linear-gradient(135deg,#4C1D95,#6D28D9);border:none">
+            <div class="flex items-center gap-4 mb-4">
+                <img src="https://z-cdn-media.chatglm.cn/files/a85d1aca-138d-400a-a1a5-7cce17dceb9a.png?auth_key=1882217303-653b2db34d664939aba3709f0edb6eb8-0-01dc55d6a13c2a7f5d14674a76cce0ab" alt="Logo" class="h-12 bg-white/10 rounded-lg p-1.5">
+                <div><h1 class="font-display font-extrabold text-2xl text-white">${escapeHtml(state.course.name||'Nome do Curso')}</h1>${state.course.instructor?`<p class="text-brand-200 text-sm">Instrutor: ${escapeHtml(state.course.instructor)}</p>`:''}</div>
+            </div>
+            ${state.course.description?`<p class="text-brand-100 text-sm leading-relaxed">${escapeHtml(state.course.description)}</p>`:''}
+            ${state.course.targetAudience?`<p class="text-brand-200 text-xs mt-3"><i class="fas fa-users mr-1"></i>${escapeHtml(state.course.targetAudience)}</p>`:''}
+        </div>
+        ${!hasContent?`<div class="card p-12 text-center"><i class="fas fa-eye empty-icon text-brand-300"></i><h3 class="font-display font-bold text-lg text-gray-500 mb-2">Nenhum conteúdo</h3><p class="text-gray-400 text-sm">Adicione módulos e aulas para visualizar</p></div>`:
+        PILLAR_CONFIG.map(p=>{const th=getTheme(p.theme);let levelsHtml='';
+            if(p.hasSub){levelsHtml=(p.subs||[]).map(sub=>`<div class="mb-4"><h3 class="font-display font-semibold text-base mb-3" style="color:${th.text}"><i class="fas fa-folder mr-2 opacity-60"></i>${sub.name}</h3>${sub.levels.map(l=>renderPreviewLevel(l.id,l.name,th)).join('')}</div>`).join('');}
+            else{levelsHtml=p.levels.map(l=>renderPreviewLevel(l.id,l.name,th)).join('');}
+            return `<div class="card mb-5 overflow-hidden" style="border-left:4px solid ${th.accent}"><div class="p-5" style="background:${th.lighter}"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-white" style="background:${th.accent}"><i class="fas ${p.icon}"></i></div><h2 class="font-display font-bold text-xl" style="color:${th.text}">${p.name}</h2></div></div><div class="p-5">${levelsHtml}</div></div>`;
+        }).join('')}
+        <p class="text-center py-6 text-gray-400 text-xs">Pré-visualização — o layout final pode variar conforme a plataforma de hospedagem.</p>
+    </div>`;
+}
+
+function renderPreviewLevel(levelId,levelName,theme){
+    const lb=getLevelBadge(levelName);
+    const modules=state.modules[levelId]||[];
+    if(modules.length===0)return'';
+    let html=`<div class="mb-5"><span class="badge mb-3" style="background:${lb.bg};color:${lb.text}"><i class="fas ${lb.icon} text-[9px]"></i>${levelName}</span>`;
+    modules.forEach((mod,mi)=>{
+        html+=`<div class="mb-3 ml-2 border-l-2 pl-4" style="border-color:${theme.border}"><h4 class="font-display font-semibold text-surface-850 text-sm mb-2">${mi+1}. ${escapeHtml(mod.title)}</h4>`;
+        (mod.lessons||[]).forEach((les,li)=>{
+            const ytId=les.videoType==='youtube'?extractYoutubeId(les.videoUrl):null;
+            const lFiles=(les.files||[]).map(fid=>state.files.find(f=>f.id===fid)).filter(Boolean);
+            html+=`<div class="mb-3 ml-3"><p class="text-sm font-medium text-surface-850 mb-2">${mi+1}.${li+1} ${escapeHtml(les.title)}</p>`;
+            if(ytId) html+=`<div class="rounded-xl overflow-hidden bg-black mb-2"><iframe src="https://www.youtube.com/embed/${ytId}" class="w-full aspect-video" frameborder="0" allowfullscreen></iframe></div>`;
+            else if(les.videoUrl) html+=`<a href="${escapeHtml(les.videoUrl)}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-navy-600 text-white rounded-lg text-sm font-medium mb-2 hover:bg-navy-700 transition-colors"><i class="fas fa-external-link-alt"></i>Assistir Vídeo</a>`;
+            if(les.videoNotes) html+=`<p class="text-xs text-amber-700 bg-amber-50 p-2.5 rounded-lg mb-2"><i class="fas fa-info-circle mr-1"></i>${escapeHtml(les.videoNotes)}</p>`;
+            if(lFiles.length>0) html+=`<div class="flex flex-wrap gap-2 mb-2">${lFiles.map(f=>f.data?`<a href="${f.data}" download="${escapeHtml(f.name)}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-medium transition-colors"><i class="fas ${getFileIcon(f.type)} ${getFileColor(f.type)}"></i>${escapeHtml(f.name)}</a>`:`<span class="text-xs text-gray-400"><i class="fas ${getFileIcon(f.type)} mr-1"></i>${escapeHtml(f.name)} (indisponível)</span>`).join('')}</div>`;
+            if(les.notes) html+=`<div class="bg-brand-50 p-3 rounded-lg"><p class="text-xs text-brand-700 whitespace-pre-wrap">${escapeHtml(les.notes)}</p></div>`;
+            html+=`</div>`;
+        });
+        html+=`</div>`;
+    });
+    html+=`</div>`;return html;
+}
+
+/* =============================================
+   CONFIGURAÇÃO DO CURSO
+============================================= */
+function openCourseModal(){
+    openModal(`<div class="p-6">
+        <h2 class="font-display font-bold text-xl mb-5">Configurar Curso</h2>
+        <div class="space-y-4">
+            <div><label class="block text-sm font-semibold text-gray-600 mb-1.5">Nome do Curso</label><input id="csName" class="form-input" value="${escapeHtml(state.course.name)}" placeholder="Ex: Treinamento Medical Devices"></div>
+            <div><label class="block text-sm font-semibold text-gray-600 mb-1.5">Descrição</label><textarea id="csDesc" class="form-input" rows="3" placeholder="Descrição geral">${escapeHtml(state.course.description)}</textarea></div>
+            <div><label class="block text-sm font-semibold text-gray-600 mb-1.5">Público-Alvo</label><input id="csAud" class="form-input" value="${escapeHtml(state.course.targetAudience)}" placeholder="Ex: Engenheiros, profissionais de qualidade"></div>
+            <div><label class="block text-sm font-semibold text-gray-600 mb-1.5">Instrutor</label><input id="csInst" class="form-input" value="${escapeHtml(state.course.instructor)}" placeholder="Nome do instrutor"></div>
+        </div>
+        <div class="flex gap-3 justify-end mt-6"><button onclick="closeModal()" class="btn-secondary">Cancelar</button><button onclick="saveCourse()" class="btn-primary">Salvar</button></div>
+    </div>`);
+}
+
+function saveCourse(){
+    state.course.name=document.getElementById('csName').value.trim();
+    state.course.description=document.getElementById('csDesc').value.trim();
+    state.course.targetAudience=document.getElementById('csAud').value.trim();
+    state.course.instructor=document.getElementById('csInst').value.trim();
+    saveState();closeModal();renderNav();renderView();showToast('Configurações salvas');
+}
+
+/* =============================================
+   EXPORTAR / IMPORTAR
+============================================= */
+function exportJSON(){
+    const data={version:'2.0',exportedAt:new Date().toISOString(),course:state.course,modules:state.modules,files:state.files.map(f=>({...f,data:undefined}))};
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`ead-md-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);
+    showToast('Estrutura exportada');
+}
+
+function importJSON(event){
+    const file=event.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=(e)=>{
+        try{
+            const d=JSON.parse(e.target.result);
+            if(d.course)state.course={...state.course,...d.course};
+            if(d.modules)state.modules=d.modules;
+            if(d.files)state.files=d.files;
+            ensureModules();saveState();renderNav();renderView();showToast('Estrutura importada');
+        }catch(err){showToast('Arquivo inválido','error');}
+    };
+    reader.readAsText(file);event.target.value='';
+}
+
+/* =============================================
+   DRAG & DROP
+============================================= */
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',e=>{
+    e.preventDefault();
+    const dz=document.getElementById('dropZone');
+    if(dz&&state.currentView==='files'){dz.classList.remove('dragover');handleFileUpload(e.dataTransfer.files);}
+});
+document.addEventListener('dragenter',e=>{if(state.currentView==='files'){const dz=document.getElementById('dropZone');if(dz)dz.classList.add('dragover');}});
+document.addEventListener('dragleave',e=>{if(state.currentView==='files'){const dz=document.getElementById('dropZone');if(dz&&!dz.contains(e.relatedTarget))dz.classList.remove('dragover');}});
+
+/* =============================================
+   ATALHOS E MODAL
+============================================= */
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay'))closeModal();});
+document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+        if(document.getElementById('lessonPanel').classList.contains('open'))closeLessonPanel();
+        else if(document.getElementById('modalOverlay').classList.contains('open'))closeModal();
+    }
+});
+
+/* =============================================
+   INICIALIZAÇÃO
+============================================= */
+(function init(){
+    loadState();
+    ensureModules();
+    renderNav();
+    renderView();
+})();
+</script>
+</body>
+</html>
