@@ -8,6 +8,8 @@
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <style>
     :root {
       --primary: #2a2a2a;
@@ -648,6 +650,21 @@
 
   <script>
     // ============================================================
+    // FIREBASE
+    // ============================================================
+    firebase.initializeApp({
+        apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
+        authDomain: "neoorthomedartis.firebaseapp.com",
+        databaseURL: "https://neoorthomedartis-default-rtdb.firebaseio.com",
+        projectId: "neoorthomedartis",
+        storageBucket: "neoorthomedartis.firebasestorage.app",
+        messagingSenderId: "48492402152",
+        appId: "1:48492402152:web:c395acaf1e365d491bc05d",
+        measurementId: "G-W4JC235S2Y"
+    });
+    var hwDb = firebase.database();
+
+    // ============================================================
     // IDIOMA
     // ============================================================
     var lang = localStorage.getItem('ibra_hw_lang') || 'pt';
@@ -1183,40 +1200,30 @@
     }
 
     // ============================================================
-    // SAVE / LOAD / IMPORT / EXPORT
+    // SAVE / LOAD / IMPORT / EXPORT (Firebase)
     // ============================================================
     function saveData() {
-      try {
-        localStorage.setItem('ibra_hw_tasks', JSON.stringify(tasks));
+      hwDb.ref('hw_tasks').set(tasks).then(function() {
         showToast('Dados salvos com sucesso!', 'success');
-      } catch (e) {
+      }).catch(function(e) {
         showToast('Erro ao salvar dados.', 'error');
-      }
+      });
     }
 
     function loadData() {
-      try {
-        var saved = localStorage.getItem('ibra_hw_tasks');
-        if (saved) {
-          var parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            tasks = parsed;
-            nextId = Math.max.apply(null, tasks.map(function(t){ return t.id; })) + 1;
-            return true;
-          }
+      hwDb.ref('hw_tasks').once('value').then(function(snapshot) {
+        var saved = snapshot.val();
+        if (saved && Array.isArray(saved) && saved.length > 0) {
+          tasks = saved;
+          nextId = Math.max.apply(null, tasks.map(function(t){ return t.id; })) + 1;
         }
-      } catch (e) {
-        // ignore corrupt data
-      }
-      return false;
+      }).catch(function(e) {
+        // ignore
+      });
     }
 
     function saveDataSilent() {
-      try {
-        localStorage.setItem('ibra_hw_tasks', JSON.stringify(tasks));
-      } catch (e) {
-        // ignore
-      }
+      hwDb.ref('hw_tasks').set(tasks).catch(function(e) { /* ignore */ });
     }
 
     function triggerImport() {
