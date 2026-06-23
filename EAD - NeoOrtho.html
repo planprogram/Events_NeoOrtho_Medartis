@@ -7,13 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="shared.css">
-    <script src="shared.js"></script>
     <script>
     tailwind.config={theme:{extend:{colors:{brand:{50:'#F5F3FA',100:'#EDE9FE',200:'#DDD6FE',300:'#C4B5FD',400:'#A78BFA',500:'#8B5CF6',600:'#7C3AED',700:'#6D28D9',800:'#5B21B6',900:'#4C1D95',950:'#2E1065'},navy:{600:'#2563EB',700:'#1D4ED8',800:'#1E40AF',900:'#1E3A8A'},surface:{850:'#1E1B2E',900:'#171426',950:'#110F1D'}},fontFamily:{display:['Outfit','sans-serif'],body:['"DM Sans"','sans-serif']}}}}
     </script>
     <style>
+        *{box-sizing:border-box}
         body{font-family:'DM Sans',sans-serif;background:#F5F3FA;margin:0}
+        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#C4B5FD;border-radius:3px}
         .sidebar-bg{background:linear-gradient(180deg,#1E1538 0%,#2A1F4E 50%,#1E1538 100%)}
         .nav-item{transition:all .2s;border-left:3px solid transparent}
         .nav-item:hover{background:rgba(139,92,246,.1);border-left-color:rgba(139,92,246,.4)}
@@ -45,6 +45,10 @@
         .modal-overlay.open{opacity:1;pointer-events:auto}
         .modal-overlay .modal-box{transform:scale(.95) translateY(10px);transition:transform .25s}
         .modal-overlay.open .modal-box{transform:scale(1) translateY(0)}
+        .toast{animation:toastIn .35s ease forwards;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;min-width:280px;box-shadow:0 8px 30px rgba(0,0,0,.12)}
+        .toast.removing{animation:toastOut .3s ease forwards}
+        @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(40px)}}
         .collapse-body{max-height:0;overflow:hidden;transition:max-height .45s ease}
         .collapse-body.expanded{max-height:50000px}
         .drop-zone{border:2px dashed #C4B5FD;border-radius:12px;transition:all .2s}
@@ -215,8 +219,33 @@ function ensureModules(){
 }
 
 /* =============================================
-   UTILITÁRIOS (delegated to shared.js)
+   UTILITÁRIOS
 ============================================= */
+function uid(){ return 'id_'+Date.now().toString(36)+Math.random().toString(36).substr(2,6); }
+function formatFileSize(b){ if(!b)return '0 B'; const k=1024,s=['B','KB','MB','GB'],i=Math.floor(Math.log(b)/Math.log(k)); return parseFloat((b/Math.pow(k,i)).toFixed(1))+' '+s[i]; }
+function formatDate(iso){ if(!iso)return'-'; return new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+function escapeHtml(s){ if(!s)return''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function getFileIcon(t){
+    if(!t)return'fa-file'; if(t.includes('pdf'))return'fa-file-pdf'; if(t.includes('image'))return'fa-file-image';
+    if(t.includes('video'))return'fa-file-video'; if(t.includes('word')||t.includes('document'))return'fa-file-word';
+    if(t.includes('sheet')||t.includes('excel'))return'fa-file-excel';
+    if(t.includes('presentation')||t.includes('powerpoint'))return'fa-file-powerpoint';
+    if(t.includes('zip')||t.includes('rar'))return'fa-file-zipper'; if(t.includes('text'))return'fa-file-lines'; return'fa-file';
+}
+function getFileColor(t){
+    if(!t)return'text-gray-400'; if(t.includes('pdf'))return'text-red-500'; if(t.includes('image'))return'text-pink-500';
+    if(t.includes('video'))return'text-blue-500'; if(t.includes('word')||t.includes('document'))return'text-blue-600';
+    if(t.includes('sheet')||t.includes('excel'))return'text-green-600';
+    if(t.includes('presentation')||t.includes('powerpoint'))return'text-orange-500';
+    if(t.includes('zip')||t.includes('rar'))return'text-yellow-600'; return'text-gray-400';
+}
+
+function extractYoutubeId(url){
+    if(!url)return null;
+    const p=[/youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,/youtu\.be\/([a-zA-Z0-9_-]{11})/,/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/];
+    for(const r of p){const m=url.match(r);if(m)return m[1];} return null;
+}
 
 /* =============================================
    PERSISTÊNCIA
@@ -247,9 +276,18 @@ function loadState(){
 }
 
 /* =============================================
-   TOAST (delegated to shared.js sharedToast)
+   TOAST
 ============================================= */
-function showToast(msg,type){ sharedToast(msg,type); }
+function showToast(msg,type='success'){
+    const c=document.getElementById('toastContainer');
+    const colors={success:'bg-emerald-600 text-white',error:'bg-red-600 text-white',warning:'bg-amber-500 text-white',info:'bg-brand-700 text-white'};
+    const icons={success:'fa-check-circle',error:'fa-exclamation-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'};
+    const t=document.createElement('div');
+    t.className='toast '+(colors[type]||colors.info)+' pointer-events-auto';
+    t.innerHTML='<i class="fas '+(icons[type]||icons.info)+'"></i><span>'+escapeHtml(msg)+'</span>';
+    c.appendChild(t);
+    setTimeout(()=>{t.classList.add('removing');setTimeout(()=>t.remove(),300);},3000);
+}
 
 /* =============================================
    MODAL
