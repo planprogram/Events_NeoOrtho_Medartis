@@ -1044,6 +1044,7 @@
       const task = tasks.find(t => t.id === id);
       if (!task) return;
       task[field] = value || '';
+      saveDataSilent();
       renderTable();
       updateDashboard();
       populateFilters();
@@ -1123,6 +1124,7 @@
         showToast('Tarefa criada', 'success');
       }
 
+      saveDataSilent();
       closeModal();
       populateFilters();
       renderTable();
@@ -1168,6 +1170,7 @@
         populateFilters();
         showToast('Dados resetados para o estado inicial', 'info');
       }
+      saveDataSilent();
       closeConfirmModal();
       renderTable();
       updateDashboard();
@@ -1180,7 +1183,7 @@
     }
 
     // ============================================================
-    // SAVE / IMPORT / EXPORT (Unified)
+    // SAVE / LOAD / IMPORT / EXPORT
     // ============================================================
     function saveData() {
       try {
@@ -1188,6 +1191,31 @@
         showToast('Dados salvos com sucesso!', 'success');
       } catch (e) {
         showToast('Erro ao salvar dados.', 'error');
+      }
+    }
+
+    function loadData() {
+      try {
+        var saved = localStorage.getItem('ibra_hw_tasks');
+        if (saved) {
+          var parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            tasks = parsed;
+            nextId = Math.max.apply(null, tasks.map(function(t){ return t.id; })) + 1;
+            return true;
+          }
+        }
+      } catch (e) {
+        // ignore corrupt data
+      }
+      return false;
+    }
+
+    function saveDataSilent() {
+      try {
+        localStorage.setItem('ibra_hw_tasks', JSON.stringify(tasks));
+      } catch (e) {
+        // ignore
       }
     }
 
@@ -1227,6 +1255,7 @@
             atualizadas++;
           });
 
+          saveDataSilent();
           populateFilters();
           renderTable();
           updateDashboard();
@@ -1453,6 +1482,7 @@
     // ============================================================
     document.addEventListener('DOMContentLoaded', () => {
       applyLanguage();
+      loadData();
       populateFilters();
       renderTable();
       updateDashboard();
