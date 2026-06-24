@@ -33,9 +33,12 @@
         .login-particles span{position:absolute;width:3px;height:3px;background:var(--neo-purple-light);border-radius:50%;opacity:.25;animation:pF linear infinite}
         @keyframes pF{0%{transform:translateY(100vh);opacity:0}10%{opacity:.25}90%{opacity:.25}100%{transform:translateY(-10vh);opacity:0}}
         .login-right{flex:1;display:flex;align-items:center;justify-content:center;padding:3rem;background:linear-gradient(135deg,#221530,#1A1028)}
-        .login-form-container{width:100%;max-width:390px}
+        .login-form-container{width:100%;max-width:420px}
         .login-form-container h2{font-family:'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:700;color:#fff;margin-bottom:.4rem}
         .login-form-container .subtitle{color:rgba(255,255,255,.4);font-size:.92rem;margin-bottom:2rem}
+        .auth-tabs{display:flex;gap:0;margin-bottom:1.5rem;background:rgba(255,255,255,.05);border-radius:10px;padding:3px}
+        .auth-tab{flex:1;padding:.65rem;text-align:center;border-radius:8px;font-size:.85rem;font-weight:600;color:rgba(255,255,255,.45);cursor:pointer;transition:all .25s}
+        .auth-tab.active{background:var(--neo-purple);color:#fff}
         .form-group{margin-bottom:1.2rem}
         .form-group label{display:block;font-size:.78rem;font-weight:600;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.8px;margin-bottom:.45rem}
         .input-wrapper{position:relative}
@@ -43,13 +46,22 @@
         .form-group input{width:100%;padding:.8rem 1rem .8rem 2.7rem;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.08);border-radius:11px;color:#fff;font-size:.93rem;font-family:'DM Sans',sans-serif;transition:all .3s;outline:none}
         .form-group input:focus{border-color:var(--neo-purple);background:rgba(123,45,142,.08);box-shadow:0 0 0 3px rgba(123,45,142,.15)}
         .form-group input::placeholder{color:rgba(255,255,255,.2)}
-        .login-btn{width:100%;padding:.9rem;background:linear-gradient(135deg,var(--neo-purple),var(--neo-purple-light));border:none;border-radius:11px;color:#fff;font-size:.98rem;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .3s;margin-top:.5rem;letter-spacing:.3px}
-        .login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(123,45,142,.45)}
-        .login-btn:active{transform:translateY(0)}
-        .login-error{background:rgba(220,53,69,.12);border:1px solid rgba(220,53,69,.3);color:#F08070;padding:.7rem 1rem;border-radius:10px;font-size:.83rem;margin-bottom:1rem;display:none;align-items:center;gap:.5rem}
-        .login-error.show{display:flex}
+        .auth-btn{width:100%;padding:.9rem;background:linear-gradient(135deg,var(--neo-purple),var(--neo-purple-light));border:none;border-radius:11px;color:#fff;font-size:.98rem;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .3s;margin-top:.5rem;letter-spacing:.3px}
+        .auth-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(123,45,142,.45)}
+        .auth-btn:active{transform:translateY(0)}
+        .auth-btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+        .auth-error{background:rgba(220,53,69,.12);border:1px solid rgba(220,53,69,.3);color:#F08070;padding:.7rem 1rem;border-radius:10px;font-size:.83rem;margin-bottom:1rem;display:none;align-items:center;gap:.5rem;flex-wrap:wrap}
+        .auth-error.show{display:flex}
+        .auth-success{background:rgba(40,167,69,.12);border:1px solid rgba(40,167,69,.3);color:#50C878;padding:.7rem 1rem;border-radius:10px;font-size:.83rem;margin-bottom:1rem;display:none;align-items:center;gap:.5rem}
+        .auth-success.show{display:flex}
         .login-hint{text-align:center;margin-top:1.5rem;color:rgba(255,255,255,.3);font-size:.8rem}
         .login-hint code{background:rgba(255,255,255,.07);padding:2px 7px;border-radius:4px;color:var(--neo-purple-light);font-size:.78rem}
+        .password-strength{height:3px;border-radius:2px;margin-top:.4rem;background:rgba(255,255,255,.08);overflow:hidden}
+        .password-strength .bar{height:100%;width:0;transition:all .3s;border-radius:2px}
+        .password-strength .bar.weak{width:33%;background:var(--neo-danger)}
+        .password-strength .bar.medium{width:66%;background:var(--neo-warning)}
+        .password-strength .bar.strong{width:100%;background:var(--neo-success)}
+        .admin-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(123,45,142,.15);color:var(--neo-purple-light);font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px}
         #appScreen{display:none;min-height:100vh}
         #appScreen.active{display:flex}
         .sidebar{width:255px;min-height:100vh;background:var(--neo-sidebar-bg);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s}
@@ -212,6 +224,31 @@
         .cover-preview{height:100px;border-radius:8px;background-size:cover;background-position:center;background-color:var(--neo-gray-100);border:1px solid var(--neo-border);display:flex;align-items:center;justify-content:center;overflow:hidden;transition:all .2s}
         .cover-preview.has-image{height:120px}
         .cover-preview img{width:100%;height:100%;object-fit:cover}
+        .admin-panel{background:var(--neo-card);border-radius:13px;border:1px solid var(--neo-border);overflow:hidden}
+        .admin-panel-header{padding:1.15rem 1.4rem;border-bottom:1px solid var(--neo-border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem}
+        .admin-panel-header h3{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
+        .admin-panel-header h3 i{color:var(--neo-purple)}
+        .admin-search{flex:1;max-width:300px;position:relative}
+        .admin-search input{width:100%;padding:.5rem .8rem .5rem 2.2rem;border:1.5px solid var(--neo-border);border-radius:8px;font-size:.84rem;font-family:'DM Sans',sans-serif;outline:none;transition:all .2s}
+        .admin-search input:focus{border-color:var(--neo-purple);box-shadow:0 0 0 3px rgba(123,45,142,.08)}
+        .admin-search i{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--neo-gray-400);font-size:.8rem}
+        .admin-table{width:100%;border-collapse:collapse}
+        .admin-table th{text-align:left;padding:.7rem 1rem;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--neo-text-muted);border-bottom:1px solid var(--neo-border);background:var(--neo-gray-50)}
+        .admin-table td{padding:.85rem 1rem;border-bottom:1px solid var(--neo-border);font-size:.86rem;vertical-align:middle}
+        .admin-table tr:last-child td{border-bottom:none}
+        .admin-table tr:hover{background:var(--neo-gray-50)}
+        .admin-user-cell{display:flex;align-items:center;gap:.65rem}
+        .admin-user-av{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0}
+        .admin-user-info{display:flex;flex-direction:column}
+        .admin-user-info .name{font-weight:600;color:var(--neo-text)}
+        .admin-user-info .email{font-size:.76rem;color:var(--neo-text-muted)}
+        .role-select{padding:.35rem .65rem;border:1.5px solid var(--neo-border);border-radius:6px;font-size:.78rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none;cursor:pointer;transition:all .2s}
+        .role-select:focus{border-color:var(--neo-purple)}
+        .admin-actions-cell{display:flex;gap:.35rem}
+        .admin-act-btn{width:30px;height:30px;border-radius:7px;border:none;background:var(--neo-gray-50);color:var(--neo-gray-600);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.78rem;transition:all .2s}
+        .admin-act-btn:hover{background:var(--neo-gray-100);color:var(--neo-purple)}
+        .admin-act-btn.danger:hover{background:rgba(220,53,69,.1);color:var(--neo-danger)}
+        .admin-panel-footer{padding:.9rem 1.4rem;border-top:1px solid var(--neo-border);display:flex;align-items:center;justify-content:space-between;font-size:.8rem;color:var(--neo-text-muted)}
         @media(max-width:1024px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:768px){
             .login-left{display:none}
@@ -240,15 +277,27 @@
     </div>
     <div class="login-right">
         <div class="login-form-container">
-            <h2>Welcome back</h2>
-            <p class="subtitle">Sign in to manage your projects</p>
-            <div class="login-error" id="loginError"><i class="fas fa-exclamation-circle"></i><span>Invalid credentials. Try again.</span></div>
-            <form id="loginForm">
-                <div class="form-group"><label>Email</label><div class="input-wrapper"><i class="fas fa-envelope"></i><input type="email" id="loginEmail" placeholder="you@neoortho.com" autocomplete="email"></div></div>
-                <div class="form-group"><label>Password</label><div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password"></div></div>
-                <button type="submit" class="login-btn">Sign In</button>
+            <h2 id="authTitle">Welcome back</h2>
+            <p class="subtitle" id="authSubtitle">Sign in to manage your projects</p>
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Sign In</div>
+                <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</div>
+            </div>
+            <div class="auth-error" id="authError"><i class="fas fa-exclamation-circle"></i><span id="authErrorMsg">Invalid credentials. Try again.</span></div>
+            <div class="auth-success" id="authSuccess"><i class="fas fa-check-circle"></i><span id="authSuccessMsg">Account created successfully!</span></div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group"><label>Email</label><div class="input-wrapper"><i class="fas fa-envelope"></i><input type="email" id="loginEmail" placeholder="you@neoortho.com" autocomplete="email" required></div></div>
+                <div class="form-group"><label>Password</label><div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" required></div></div>
+                <button type="submit" class="auth-btn" id="loginBtn">Sign In</button>
             </form>
-            <p class="login-hint">Demo: <code>admin@neoortho.com</code> / <code>admin123</code></p>
+            <form id="registerForm" style="display:none" onsubmit="handleRegister(event)">
+                <div class="form-group"><label>Full Name</label><div class="input-wrapper"><i class="fas fa-user"></i><input type="text" id="regName" placeholder="Your full name" required></div></div>
+                <div class="form-group"><label>Email</label><div class="input-wrapper"><i class="fas fa-envelope"></i><input type="email" id="regEmail" placeholder="you@neoortho.com" required></div></div>
+                <div class="form-group"><label>Password</label><div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="regPassword" placeholder="Min 6 characters" minlength="6" required oninput="checkPasswordStrength(this.value)"></div><div class="password-strength"><div class="bar" id="pwStrengthBar"></div></div></div>
+                <div class="form-group"><label>Confirm Password</label><div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="regPassword2" placeholder="Repeat password" required></div></div>
+                <button type="submit" class="auth-btn" id="regBtn">Create Account</button>
+            </form>
+            <p class="login-hint" id="authHint">First user to register becomes the Administrator</p>
         </div>
     </div>
 </div>
@@ -264,6 +313,8 @@
             <div class="nav-item" data-page="active" onclick="filterByStatus('active')"><i class="fas fa-bolt"></i> Active</div>
             <div class="nav-item" data-page="completed" onclick="filterByStatus('completed')"><i class="fas fa-check-circle"></i> Completed</div>
             <div class="nav-item" data-page="draft" onclick="filterByStatus('draft')"><i class="fas fa-pencil-alt"></i> Drafts</div>
+            <div class="nav-label">Administration</div>
+            <div class="nav-item" data-page="users" onclick="switchPage('users')" id="navUsers" style="display:none"><i class="fas fa-user-shield"></i> User Management</div>
             <div class="nav-label">Project Hubs</div>
             <a class="nav-item ext-link" href="Essential.html" target="_blank"><i class="fas fa-graduation-cap"></i> Curso Essential</a>
             <a class="nav-item ext-link" href="Gantt - Steps2Walk v3.html" target="_blank"><i class="fas fa-chart-gantt"></i> Steps2Walk Gantt</a>
@@ -275,7 +326,7 @@
         <div class="sidebar-footer">
             <div class="sidebar-user">
                 <div class="avatar" id="sidebarAvatar">AD</div>
-                <div class="user-info"><div class="name" id="sidebarName">Admin</div><div class="role">Administrator <span class="sync-ind"><span class="sync-dot"></span> synced</span></div></div>
+                <div class="user-info"><div class="name" id="sidebarName">Admin</div><div class="role" id="sidebarRole">Administrator <span class="sync-ind"><span class="sync-dot"></span> synced</span></div></div>
                 <div class="logout-btn" onclick="logout()" title="Sign Out"><i class="fas fa-sign-out-alt"></i></div>
             </div>
         </div>
@@ -304,449 +355,39 @@
         <section class="page-section" id="page-active"><div class="page-content"><div class="page-header"><h2>Active Projects</h2><p>Currently in progress</p></div><div class="projects-grid" id="activeProjects"></div></div></section>
         <section class="page-section" id="page-completed"><div class="page-content"><div class="page-header"><h2>Completed Projects</h2><p>Finished projects</p></div><div class="projects-grid" id="completedProjects"></div></div></section>
         <section class="page-section" id="page-draft"><div class="page-content"><div class="page-header"><h2>Draft Projects</h2><p>Still being planned</p></div><div class="projects-grid" id="draftProjects"></div></div></section>
+        <section class="page-section" id="page-users">
+            <div class="page-content">
+                <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;"><div><h2>User Management</h2><p>Manage who can access the platform</p></div><button class="btn-primary" onclick="openUserModal()"><i class="fas fa-user-plus"></i> Add User</button></div>
+                <div class="admin-panel">
+                    <div class="admin-panel-header">
+                        <h3><i class="fas fa-users"></i> System Users</h3>
+                        <div class="admin-search"><i class="fas fa-search"></i><input type="text" placeholder="Search users..." id="userSearch" oninput="renderUserTable()"></div>
+                    </div>
+                    <div style="overflow-x:auto">
+                        <table class="admin-table" id="userTable">
+                            <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Joined</th><th>Last Login</th><th>Actions</th></tr></thead>
+                            <tbody id="userTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="admin-panel-footer">
+                        <span id="userCountInfo">0 users</span>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 </div>
 <div class="modal-overlay" id="projectModal"><div class="modal"><div class="modal-header"><h3 id="projectModalTitle">New Project</h3><button class="modal-close" onclick="closeModal('projectModal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="projectForm" onsubmit="saveProject(event)"><input type="hidden" id="projectId"><div class="mf-group"><label>Project Name</label><input type="text" id="projectName" placeholder="e.g. 3D Bracket Design v2" required></div><div class="mf-row"><div class="mf-group"><label>Category</label><select id="projectCategory"><option value="Neoortho">Neoortho</option><option value="Medartis">Medartis</option><option value="IBRA">IBRA</option><option value="Outros">Outros</option></select></div><div class="mf-group"><label>Status</label><select id="projectStatus"><option value="active">Active</option><option value="paused">Paused</option><option value="completed">Completed</option><option value="draft">Draft</option></select></div></div><div class="mf-group"><label>Cover Image URL</label><input type="url" id="projectCover" placeholder="https://example.com/image.jpg" oninput="previewCover(this.value)"><div id="coverPreview" class="cover-preview"><i class="fas fa-image" style="color:var(--neo-gray-400);font-size:1.5rem"></i></div></div><div class="mf-group"><label>Description</label><textarea id="projectDesc" placeholder="Brief description..."></textarea></div><div style="margin-top:.3rem"><div class="perm-title"><i class="fas fa-shield-alt"></i> Access & Permissions</div><div class="perm-list" id="permList"></div><div style="position:relative;width:100%" id="addPermWrap"><button type="button" class="add-perm-btn" onclick="togglePermDD()"><i class="fas fa-user-plus"></i> Add person to this project</button><div class="dd-menu" id="permDD"><div class="dd-search"><input type="text" placeholder="Search people..." id="permSearchIn" oninput="filterPermDD(this.value)"></div><div id="permDDList"></div></div></div></div><div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeModal('projectModal')">Cancel</button><button type="submit" class="btn-primary" id="projectSubmitBtn">Save Project</button></div></form></div></div></div>
-<div class="modal-overlay" id="peopleModal"><div class="modal" style="max-width:440px"><div class="modal-header"><h3 id="peopleModalTitle">Add Person</h3><button class="modal-close" onclick="closeModal('peopleModal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="peopleForm" onsubmit="savePerson(event)"><input type="hidden" id="personId"><div class="mf-group"><label>Full Name</label><input type="text" id="personName" placeholder="e.g. Maria Silva" required></div><div class="mf-group"><label>Email</label><input type="email" id="personEmail" placeholder="e.g. maria@neoortho.com" required></div><div class="mf-group"><label>Global Role</label><select id="personRole"><option value="viewer">Viewer — Can only view</option><option value="editor">Editor — Can view and edit</option><option value="admin">Admin — Full access</option></select></div><div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeModal('peopleModal')">Cancel</button><button type="submit" class="btn-primary">Save Person</button></div></form></div></div></div>
+<div class="modal-overlay" id="peopleModal"><div class="modal" style="max-width:440px"><div class="modal-header"><h3 id="peopleModalTitle">Add Person</h3><button class="modal-close" onclick="closeModal('peopleModal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="peopleForm" onsubmit="savePerson(event)"><input type="hidden" id="personId"><div class="mf-group"><label>Full Name</label><input type="text" id="personName" placeholder="e.g. Maria Silva" required></div><div class="mf-group"><label>Email</label><input type="email" id="personEmail" placeholder="e.g. maria@neoortho.com" required></div><div class="mf-group"><label>Global Role</label><select id="personRole"><option value="viewer">Viewer</option><option value="editor">Editor</option><option value="admin">Admin</option></select></div><div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeModal('peopleModal')">Cancel</button><button type="submit" class="btn-primary">Save Person</button></div></form></div></div></div>
+<div class="modal-overlay" id="userModal"><div class="modal" style="max-width:440px"><div class="modal-header"><h3 id="userModalTitle">Add User</h3><button class="modal-close" onclick="closeModal('userModal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="userForm" onsubmit="saveUser(event)"><input type="hidden" id="userEditId"><div class="mf-group"><label>Full Name</label><input type="text" id="userName" placeholder="e.g. Maria Silva" required></div><div class="mf-group"><label>Email</label><input type="email" id="userEmail" placeholder="e.g. maria@neoortho.com" required></div><div class="mf-group"><label>Password</label><input type="password" id="userPassword" placeholder="Min 6 characters" minlength="6"></div><div class="mf-group"><label>Role</label><select id="userRole"><option value="viewer">Viewer</option><option value="editor">Editor</option><option value="admin">Admin</option></select></div><div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeModal('userModal')">Cancel</button><button type="submit" class="btn-primary" id="userSubmitBtn">Save User</button></div></form></div></div></div>
 <div class="modal-overlay" id="confirmModal"><div class="modal" style="max-width:390px"><div class="modal-body"><div class="confirm-dialog"><i class="fas fa-exclamation-triangle"></i><h4 id="confirmTitle">Delete?</h4><p id="confirmMsg">This cannot be undone.</p><div class="confirm-actions"><button class="btn-secondary" onclick="closeModal('confirmModal')">Cancel</button><button class="btn-danger" id="confirmBtn" onclick="confirmAction()">Delete</button></div></div></div></div></div>
 <div class="modal-overlay" id="detailModal"><div class="modal" style="max-width:620px"><div class="modal-header"><h3>Project Details</h3><button class="modal-close" onclick="closeModal('detailModal')"><i class="fas fa-times"></i></button></div><div class="modal-body" id="detailContent"></div></div></div>
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script>
-// Firebase Config
-firebase.initializeApp({
-    apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
-    authDomain: "neoorthomedartis.firebaseapp.com",
-    databaseURL: "https://neoorthomedartis-default-rtdb.firebaseio.com",
-    projectId: "neoorthomedartis",
-    storageBucket: "neoorthomedartis.firebasestorage.app",
-    messagingSenderId: "48492402152",
-    appId: "1:48492402152:web:c395acaf1e365d491bc05d",
-    measurementId: "G-W4JC235S2Y"
-});
-const db = firebase.database();
-
-// Hub links data
-const hubLinks = [
-    { name: 'Curso Essential', desc: 'Gestão de projetos - Curso Essential', icon: 'fa-graduation-cap', color: '#7B2D8E', url: 'Essential.html' },
-    { name: 'Steps2Walk Gantt', desc: 'Gráfico Gantt do projeto Steps2Walk v3', icon: 'fa-chart-gantt', color: '#1A3E6B', url: 'Gantt - Steps2Walk v3.html' },
-    { name: 'EAD NeoOrtho', desc: 'Plataforma EAD - Medical Device Training (Coluna, Trauma, CMF)', icon: 'fa-laptop-code', color: '#8B5CF6', url: 'EAD - NeoOrtho.html' },
-    { name: 'Cadaver Lab Foot & Ankle', desc: 'Gestão de projetos - IBRA Foot and Ankle', icon: 'fa-bone', color: '#28A745', url: 'Cadaver Lab IBRA (Apoio Medartis) Foot and Ankle - Gestão de Projetos.html' },
-    { name: 'Cadaver Lab Hand & Wrist', desc: 'Gestão de projetos - IBRA Hand and Wrist', icon: 'fa-hand-holding-medical', color: '#E67E22', url: 'Cadaver Lab IBRA (Apoio Medartis) Hand and Wrist - Gestão de Projetos.html' },
-    { name: 'Template Step by Step', desc: 'Template de treinamento hands-on — procedimentos passo a passo', icon: 'fa-list-ol', color: '#00B3B9', url: 'Template Step by Step.html' }
-];
-
-// State
-const COLORS = ['#7B2D8E','#1A3E6B','#28A745','#E67E22','#DC3545','#F0AD4E','#16A085','#2980B9','#8E44AD','#D35400'];
-const COVERS = Array.from({length:12},(_,i) => `https://picsum.photos/seed/neodart${i+1}/600/300.jpg`);
-let people = [], projects = [];
-let currentFilter = 'all', searchQuery = '';
-let tempPermissions = [], pendingConfirmAction = null;
-
-// Seed data
-function seedPeople() {
-    return {
-        p1:{name:'Carlos Mendes',email:'carlos@neoortho.com',role:'admin',color:COLORS[0]},
-        p2:{name:'Ana Beatriz',email:'ana@neoortho.com',role:'editor',color:COLORS[1]},
-        p3:{name:'Rafael Costa',email:'rafael@neoortho.com',role:'editor',color:COLORS[2]},
-        p4:{name:'Juliana Ferreira',email:'juliana@neoortho.com',role:'viewer',color:COLORS[3]},
-        p5:{name:'Pedro Almeida',email:'pedro@neoortho.com',role:'viewer',color:COLORS[4]},
-        p6:{name:'Luciana Souza',email:'luciana@neoortho.com',role:'editor',color:COLORS[5]}
-    };
-}
-function seedProjects() {
-    return {
-        pr1:{name:'3D Bracket Design v2',category:'Neoortho',status:'active',desc:'Redesign of the self-ligating bracket with improved torque control.',cover:COVERS[0],date:'2024-12-10',permissions:{a:{personId:'p1',role:'editor'},b:{personId:'p2',role:'editor'},c:{personId:'p4',role:'viewer'}}},
-        pr2:{name:'AI Treatment Planner',category:'Neoortho',status:'active',desc:'ML model to predict optimal tooth movement sequences.',cover:COVERS[1],date:'2024-11-28',permissions:{d:{personId:'p1',role:'editor'},e:{personId:'p3',role:'editor'},f:{personId:'p5',role:'viewer'}}},
-        pr3:{name:'NiTi Wire Thermal Study',category:'Medartis',status:'completed',desc:'Comparative analysis of superelastic NiTi wires.',cover:COVERS[2],date:'2024-10-15',permissions:{g:{personId:'p1',role:'editor'},h:{personId:'p6',role:'editor'},i:{personId:'p4',role:'viewer'}}},
-        pr4:{name:'Patient App Redesign',category:'Neoortho',status:'paused',desc:'Complete UX overhaul of the patient-facing mobile app.',cover:COVERS[3],date:'2024-11-05',permissions:{j:{personId:'p2',role:'editor'},k:{personId:'p3',role:'viewer'}}},
-        pr5:{name:'Clear Aligner Material Test',category:'Medartis',status:'active',desc:'Testing new multi-layer polymer for clear aligners.',cover:COVERS[4],date:'2024-12-01',permissions:{l:{personId:'p1',role:'editor'},m:{personId:'p6',role:'editor'},n:{personId:'p5',role:'viewer'},o:{personId:'p4',role:'viewer'}}},
-        pr6:{name:'Clinic Dashboard Analytics',category:'IBRA',status:'draft',desc:'BI dashboard for clinic managers.',cover:COVERS[5],date:'2024-12-18',permissions:{p:{personId:'p1',role:'editor'},q:{personId:'p3',role:'editor'}}}
-    };
-}
-
-// Load data from Firebase
-async function loadData() {
-    try {
-        const [pSnap, prSnap] = await Promise.all([db.ref('people').once('value'), db.ref('projects').once('value')]);
-        let p = pSnap.val(), pr = prSnap.val();
-        if (!p || Object.keys(p).length === 0) { await db.ref('people').set(seedPeople()); p = seedPeople(); }
-        if (!pr || Object.keys(pr).length === 0) { await db.ref('projects').set(seedProjects()); pr = seedProjects(); }
-        people = toArray(p);
-        projects = toArray(pr);
-    } catch(err) {
-        console.error('Firebase error:', err);
-        showToast('Database connection failed. Using local data.', 'error');
-        people = toArray(seedPeople());
-        projects = toArray(seedProjects());
-    }
-}
-function toArray(obj) {
-    if (!obj) return [];
-    if (Array.isArray(obj)) return obj.filter(Boolean);
-    return Object.entries(obj).map(([k,v]) => ({_fbKey:k,...v})).filter(Boolean);
-}
-function getPerms(pr) {
-    if (!pr || !pr.permissions) return [];
-    return toArray(pr.permissions);
-}
-
-// Login particles
-(function(){
-    const c = document.getElementById('loginParticles');
-    for(let i=0;i<25;i++){
-        const s = document.createElement('span');
-        s.style.left = Math.random()*100+'%';
-        s.style.animationDuration = (7+Math.random()*10)+'s';
-        s.style.animationDelay = Math.random()*8+'s';
-        const sz = 2+Math.random()*3;
-        s.style.width = s.style.height = sz+'px';
-        c.appendChild(s);
-    }
-})();
-
-// Login handler
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const em = document.getElementById('loginEmail').value.trim();
-    const pw = document.getElementById('loginPassword').value;
-    if (em === 'admin@neoortho.com' && pw === 'admin123') {
-        document.getElementById('loginError').classList.remove('show');
-        document.getElementById('loginScreen').classList.add('hidden');
-        setTimeout(() => {
-            document.getElementById('loginScreen').classList.remove('visible');
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('appScreen').classList.add('active');
-            renderAll();
-        }, 600);
-    } else {
-        document.getElementById('loginError').classList.add('show');
-        document.getElementById('loginPassword').value = '';
-    }
-});
-
-function logout() {
-    document.getElementById('appScreen').classList.remove('active');
-    document.getElementById('loginScreen').style.display = 'flex';
-    setTimeout(() => { document.getElementById('loginScreen').classList.add('visible'); document.getElementById('loginScreen').classList.remove('hidden'); }, 10);
-    document.getElementById('loginEmail').value = '';
-    document.getElementById('loginPassword').value = '';
-}
-
-// Navigation
-function switchPage(page) {
-    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    const sec = document.getElementById('page-'+page);
-    if(sec) sec.classList.add('active');
-    const ni = document.querySelector(`.nav-item[data-page="${page}"]`);
-    if(ni) ni.classList.add('active');
-    document.getElementById('sidebar').classList.remove('mobile-open');
-    if(['dashboard','projects'].includes(page)) currentFilter = 'all';
-    renderAll();
-}
-function filterByStatus(st) { switchPage(st); currentFilter = st; renderProjectGrids(); }
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('mobile-open'); }
-
-// Render
-function renderAll() { renderStats(); renderProjectGrids(); renderPeople(); renderHubCards(); document.getElementById('projectCount').textContent = projects.length; }
-
-function getFiltered() {
-    let f = [...projects];
-    if(currentFilter!=='all') f = f.filter(p=>p.status===currentFilter);
-    if(searchQuery) { const q=searchQuery.toLowerCase(); f=f.filter(p=>p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q)||(p.desc||'').toLowerCase().includes(q)); }
-    return f;
-}
-
-function renderStats() {
-    document.getElementById('statsGrid').innerHTML = `
-        <div class="stat-card"><div class="stat-icon" style="background:rgba(123,45,142,.1);color:var(--neo-purple)"><i class="fas fa-folder-open"></i></div><div class="stat-value">${projects.length}</div><div class="stat-label">Total Projects</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:rgba(40,167,69,.1);color:var(--neo-success)"><i class="fas fa-bolt"></i></div><div class="stat-value">${projects.filter(p=>p.status==='active').length}</div><div class="stat-label">Active</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:rgba(43,111,168,.1);color:var(--neo-blue-light)"><i class="fas fa-check-circle"></i></div><div class="stat-value">${projects.filter(p=>p.status==='completed').length}</div><div class="stat-label">Completed</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:rgba(230,126,34,.1);color:#E67E22"><i class="fas fa-users"></i></div><div class="stat-value">${people.length}</div><div class="stat-label">Team Members</div></div>`;
-}
-
-function initials(name) { return name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(); }
-function findPerson(id) { return people.find(p=>p._fbKey===id||p.id===id); }
-
-function cardHtml(pr) {
-    const perms = getPerms(pr);
-    const avs = perms.slice(0,3).map(pm => {
-        const ps = findPerson(pm.personId);
-        if(!ps) return '';
-        return `<div class="p-avatar" style="background:${ps.color}" title="${ps.name}">${initials(ps.name)}</div>`;
-    }).join('');
-    const more = perms.length>3 ? `<div class="p-avatar more">+${perms.length-3}</div>` : '';
-    return `<div class="project-card" onclick="openDetail('${pr._fbKey}')">
-        <div class="project-card-cover" style="background-image:url('${pr.cover||COVERS[0]}')">
-            <span class="status-badge ${pr.status}">${pr.status}</span>
-            <div class="project-card-actions">
-                <button class="card-act-btn" onclick="event.stopPropagation();editProject('${pr._fbKey}')" title="Edit"><i class="fas fa-pen"></i></button>
-                <button class="card-act-btn del" onclick="event.stopPropagation();deleteProject('${pr._fbKey}')" title="Delete"><i class="fas fa-trash"></i></button>
-            </div>
-        </div>
-        <div class="project-card-body">
-            <div class="project-category">${pr.category}</div>
-            <h3>${pr.name}</h3>
-            <p class="project-desc">${pr.desc||''}</p>
-            <div class="project-card-footer"><div class="project-avatars">${avs}${more}</div><div class="project-date">${fmtDate(pr.date)}</div></div>
-        </div></div>`;
-}
-
-function emptyHtml(msg) { return `<div class="empty-state"><i class="fas fa-folder-open"></i><h3>No projects found</h3><p>${msg}</p></div>`; }
-
-function renderProjectGrids() {
-    const f = getFiltered();
-    const h = f.length ? f.map(cardHtml).join('') : emptyHtml('Try changing filters or create a new project');
-    document.getElementById('dashboardProjects').innerHTML = h;
-    document.getElementById('allProjects').innerHTML = h;
-    ['active','completed','draft'].forEach(st => {
-        const sp = projects.filter(p=>p.status===st);
-        const el = document.getElementById(st+'Projects');
-        if(el) el.innerHTML = sp.length ? sp.map(cardHtml).join('') : emptyHtml(`No ${st} projects yet`);
-    });
-}
-
-function renderPeople() {
-    document.getElementById('peopleGrid').innerHTML = people.map(p => {
-        const cnt = projects.filter(pr => getPerms(pr).some(pm => pm.personId===p._fbKey || pm.personId===p.id)).length;
-        return `<div class="people-card">
-            <div class="p-big-avatar" style="background:${p.color}">${initials(p.name)}</div>
-            <h4>${p.name}</h4><div class="p-email">${p.email}</div>
-            <span class="p-role-badge ${p.role}">${p.role}</span>
-            <div class="p-count"><strong>${cnt}</strong> projects assigned</div>
-            <div style="margin-top:.9rem;display:flex;gap:.45rem;justify-content:center">
-                <button class="btn-secondary" style="padding:.35rem .75rem;font-size:.78rem" onclick="editPerson('${p._fbKey}')"><i class="fas fa-pen" style="margin-right:3px"></i>Edit</button>
-                <button class="btn-secondary" style="padding:.35rem .75rem;font-size:.78rem;color:var(--neo-danger);border-color:rgba(220,53,69,.3)" onclick="deletePerson('${p._fbKey}')"><i class="fas fa-trash" style="margin-right:3px"></i>Remove</button>
-            </div></div>`;
-    }).join('');
-}
-
-function renderHubCards() {
-    document.getElementById('hubGrid').innerHTML = hubLinks.map(hub =>
-        `<a class="hub-card" href="${hub.url}" target="_blank">
-            <div class="hub-card-icon" style="background:${hub.color}"><i class="fas ${hub.icon}"></i></div>
-            <h4>${hub.name}</h4>
-            <p>${hub.desc}</p>
-            <span class="hub-link">Open <i class="fas fa-arrow-right"></i></span>
-        </a>`
-    ).join('');
-}
-
-function setFilter(f,btn) { currentFilter=f; btn.closest('.filter-bar').querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); renderProjectGrids(); }
-function handleSearch(q) { searchQuery=q; renderProjectGrids(); }
-
-// Cover image preview
-function previewCover(url) {
-    const preview = document.getElementById('coverPreview');
-    if (url && url.trim()) {
-        preview.innerHTML = `<img src="${url}" alt="Cover preview" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-exclamation-triangle\\' style=\\'color:var(--neo-danger);font-size:1.5rem\\'></i>';this.parentElement.classList.remove('has-image')">`;
-        preview.classList.add('has-image');
-        preview.style.backgroundImage = `url('${url}')`;
-    } else {
-        preview.innerHTML = '<i class="fas fa-image" style="color:var(--neo-gray-400);font-size:1.5rem"></i>';
-        preview.classList.remove('has-image');
-        preview.style.backgroundImage = '';
-    }
-}
-
-// Project CRUD
-async function openProjectModal(fbKey) {
-    document.getElementById('projectForm').reset();
-    document.getElementById('projectId').value = '';
-    document.getElementById('coverPreview').innerHTML = '<i class="fas fa-image" style="color:var(--neo-gray-400);font-size:1.5rem"></i>';
-    document.getElementById('coverPreview').classList.remove('has-image');
-    document.getElementById('coverPreview').style.backgroundImage = '';
-    if(fbKey) {
-        const pr = projects.find(p=>p._fbKey===fbKey);
-        if(!pr) return;
-        document.getElementById('projectModalTitle').textContent = 'Edit Project';
-        document.getElementById('projectId').value = fbKey;
-        document.getElementById('projectName').value = pr.name;
-        document.getElementById('projectCategory').value = pr.category;
-        document.getElementById('projectStatus').value = pr.status;
-        document.getElementById('projectDesc').value = pr.desc||'';
-        document.getElementById('projectCover').value = pr.cover||'';
-        previewCover(pr.cover||'');
-        tempPermissions = getPerms(pr).map(pm=>({personId:pm.personId,role:pm.role}));
-    } else {
-        document.getElementById('projectModalTitle').textContent = 'New Project';
-        tempPermissions = [];
-    }
-    renderPermList();
-    document.getElementById('projectModal').classList.add('show');
-}
-function editProject(k) { openProjectModal(k); }
-
-async function saveProject(e) {
-    e.preventDefault();
-    const btn = document.getElementById('projectSubmitBtn');
-    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    const fbKey = document.getElementById('projectId').value;
-    const permObj = {};
-    tempPermissions.forEach((pm,i) => { permObj['p'+i] = {personId:pm.personId,role:pm.role}; });
-    const coverUrl = document.getElementById('projectCover').value.trim();
-    const data = {
-        name: document.getElementById('projectName').value.trim(),
-        category: document.getElementById('projectCategory').value,
-        status: document.getElementById('projectStatus').value,
-        desc: document.getElementById('projectDesc').value.trim(),
-        cover: coverUrl || COVERS[Math.floor(Math.random()*COVERS.length)],
-        permissions: permObj
-    };
-    try {
-        if(fbKey) {
-            const existing = projects.find(p=>p._fbKey===fbKey);
-            if(existing) { data.date = existing.date; if(!coverUrl) data.cover = existing.cover||COVERS[0]; }
-            await db.ref('projects/'+fbKey).update(data);
-            showToast('Project updated','success');
-        } else {
-            data.date = new Date().toISOString().split('T')[0];
-            await db.ref('projects').push(data);
-            showToast('Project created','success');
-        }
-        await loadData(); closeModal('projectModal'); renderAll();
-    } catch(err) { console.error(err); showToast('Error saving project','error'); }
-    finally { btn.disabled=false; btn.innerHTML='Save Project'; }
-}
-
-async function deleteProject(fbKey) {
-    const pr = projects.find(p=>p._fbKey===fbKey);
-    if(!pr) return;
-    document.getElementById('confirmTitle').textContent = 'Delete Project?';
-    document.getElementById('confirmMsg').textContent = `"${pr.name}" will be permanently removed.`;
-    document.getElementById('confirmBtn').textContent = 'Delete';
-    pendingConfirmAction = async () => {
-        try { await db.ref('projects/'+fbKey).remove(); await loadData(); showToast('Project deleted','info'); renderAll(); }
-        catch(err) { showToast('Error deleting','error'); }
-    };
-    document.getElementById('confirmModal').classList.add('show');
-}
-
-function openDetail(fbKey) {
-    const pr = projects.find(p=>p._fbKey===fbKey);
-    if(!pr) return;
-    const perms = getPerms(pr);
-    const ph = perms.map(pm => {
-        const ps = findPerson(pm.personId);
-        if(!ps) return '';
-        return `<div class="perm-item"><div class="perm-av" style="background:${ps.color}">${initials(ps.name)}</div><div class="perm-nm">${ps.name}</div><span class="p-role-badge ${pm.role}" style="margin:0">${pm.role}</span></div>`;
-    }).join('');
-    document.getElementById('detailContent').innerHTML = `
-        <div style="height:170px;border-radius:11px;background-image:url('${pr.cover||COVERS[0]}');background-size:cover;background-position:center;margin-bottom:1.15rem;position:relative">
-            <span class="status-badge ${pr.status}" style="position:absolute;top:10px;right:10px">${pr.status}</span>
-            <button class="card-act-btn" style="position:absolute;top:10px;left:10px" onclick="editProject('${pr._fbKey}')" title="Edit cover"><i class="fas fa-camera"></i></button>
-        </div>
-        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--neo-purple);margin-bottom:.3rem">${pr.category}</div>
-        <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.35rem;font-weight:700;margin-bottom:.45rem">${pr.name}</h3>
-        <p style="color:var(--neo-text-muted);font-size:.9rem;line-height:1.6;margin-bottom:1.15rem">${pr.desc||'No description.'}</p>
-        <div style="display:flex;gap:1.3rem;margin-bottom:1.4rem;font-size:.83rem;color:var(--neo-text-muted)">
-            <span><i class="fas fa-calendar" style="margin-right:4px;color:var(--neo-purple)"></i>${fmtDate(pr.date)}</span>
-            <span><i class="fas fa-users" style="margin-right:4px;color:var(--neo-purple)"></i>${perms.length} people</span>
-        </div>
-        <div class="perm-title"><i class="fas fa-shield-alt"></i> Team Access</div>
-        <div class="perm-list">${ph||'<p style="color:var(--neo-text-muted);font-size:.83rem;padding:.4rem 0">No one assigned</p>'}</div>
-        <div class="modal-actions" style="margin-top:1.15rem">
-            <button class="btn-secondary" onclick="closeModal('detailModal')">Close</button>
-            <button class="btn-primary" onclick="closeModal('detailModal');editProject('${pr._fbKey}')"><i class="fas fa-pen"></i> Edit</button>
-        </div>`;
-    document.getElementById('detailModal').classList.add('show');
-}
-
-// Permissions UI
-function renderPermList() {
-    document.getElementById('permList').innerHTML = tempPermissions.map((pm,i) => {
-        const ps = findPerson(pm.personId);
-        if(!ps) return '';
-        return `<div class="perm-item">
-            <div class="perm-av" style="background:${ps.color}">${initials(ps.name)}</div>
-            <div class="perm-nm">${ps.name}</div>
-            <select class="perm-sel" onchange="tempPermissions[${i}].role=this.value">
-                <option value="editor" ${pm.role==='editor'?'selected':''}>Editor</option>
-                <option value="viewer" ${pm.role==='viewer'?'selected':''}>Viewer</option>
-            </select>
-            <button type="button" class="perm-rm" onclick="tempPermissions.splice(${i},1);renderPermList()" title="Remove"><i class="fas fa-times"></i></button>
-        </div>`;
-    }).join('');
-}
-
-function togglePermDD() {
-    document.getElementById('permDD').classList.toggle('show');
-    if(document.getElementById('permDD').classList.contains('show')) {
-        document.getElementById('permSearchIn').value = '';
-        filterPermDD('');
-        document.getElementById('permSearchIn').focus();
-    }
-}
-function filterPermDD(q) {
-    const assigned = tempPermissions.map(pm => pm.personId);
-    const avail = people.filter(p => !assigned.includes(p._fbKey) && p.name.toLowerCase().includes(q.toLowerCase()));
-    document.getElementById('permDDList').innerHTML = avail.map(p =>
-        `<div class="dd-item" onclick="addPerm('${p._fbKey}')"><div class="dd-av" style="background:${p.color}">${initials(p.name)}</div><span>${p.name}</span></div>`
-    ).join('') || '<div class="dd-item" style="color:var(--neo-text-muted)">No people found</div>';
-}
-function addPerm(personId) { tempPermissions.push({personId, role:'viewer'}); renderPermList(); document.getElementById('permDD').classList.remove('show'); }
-document.addEventListener('click', function(e) { const w = document.getElementById('addPermWrap'); if(w && !w.contains(e.target)) document.getElementById('permDD').classList.remove('show'); });
-
-// People CRUD
-function openPeopleModal(fbKey) {
-    document.getElementById('peopleForm').reset();
-    document.getElementById('personId').value = '';
-    if(fbKey) {
-        const p = people.find(x => x._fbKey === fbKey);
-        if(!p) return;
-        document.getElementById('peopleModalTitle').textContent = 'Edit Person';
-        document.getElementById('personId').value = fbKey;
-        document.getElementById('personName').value = p.name;
-        document.getElementById('personEmail').value = p.email;
-        document.getElementById('personRole').value = p.role;
-    } else {
-        document.getElementById('peopleModalTitle').textContent = 'Add Person';
-    }
-    document.getElementById('peopleModal').classList.add('show');
-}
-function editPerson(k) { openPeopleModal(k); }
-
-async function savePerson(e) {
-    e.preventDefault();
-    const fbKey = document.getElementById('personId').value;
-    const data = { name: document.getElementById('personName').value.trim(), email: document.getElementById('personEmail').value.trim(), role: document.getElementById('personRole').value, color: COLORS[Math.floor(Math.random() * COLORS.length)] };
-    try {
-        if(fbKey) { const ex = people.find(p=>p._fbKey===fbKey); if(ex) data.color=ex.color; await db.ref('people/'+fbKey).update(data); showToast('Person updated','success'); }
-        else { await db.ref('people').push(data); showToast('Person added','success'); }
-        await loadData(); closeModal('peopleModal'); renderAll();
-    } catch(err) { console.error(err); showToast('Error saving person','error'); }
-}
-
-async function deletePerson(fbKey) {
-    const p = people.find(x => x._fbKey === fbKey);
-    if(!p) return;
-    document.getElementById('confirmTitle').textContent = 'Remove Person?';
-    document.getElementById('confirmMsg').textContent = `"${p.name}" will be removed from the team.`;
-    document.getElementById('confirmBtn').textContent = 'Remove';
-    pendingConfirmAction = async () => {
-        try { await db.ref('people/'+fbKey).remove(); await loadData(); showToast('Person removed','info'); renderAll(); }
-        catch(err) { showToast('Error removing person','error'); }
-    };
-    document.getElementById('confirmModal').classList.add('show');
-}
-
-// Utilities
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-function confirmAction() { if(pendingConfirmAction) pendingConfirmAction(); closeModal('confirmModal'); pendingConfirmAction = null; }
-function showToast(msg, type) { sharedToast(msg, type); }
-function fmtDate(d) { if(!d) return '—'; try { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); } catch { return d; } }
-
-// Init
-async function init() {
-    document.getElementById('loadingScreen').classList.add('hide');
-    document.getElementById('loginScreen').classList.add('visible');
-    try { await loadData(); } catch(e) { console.warn('Pre-load failed:', e); }
-}
-init();
-</script>
+<script src="app.js"></script>
 </body>
 </html>
