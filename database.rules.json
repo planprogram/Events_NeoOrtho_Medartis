@@ -15,6 +15,10 @@
       "$projectId": {
         ".write": "auth != null && (root.child('users/' + auth.uid + '/role').val() === 'admin' || data.child('permissions').child(auth.uid).exists() || newData.child('permissions').child(auth.uid).exists())"
       }
+    },
+    "essential_cronograma": {
+      ".read": true,
+      ".write": true
     }
   }
 }

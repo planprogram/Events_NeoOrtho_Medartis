@@ -7,6 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="shared.css">
   <script src="shared.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
@@ -760,6 +762,30 @@
 
   <script>
     // ============================================================
+    // FIREBASE INIT
+    // ============================================================
+    var fbApp, fbDb;
+    try {
+      if (!firebase.apps.length) {
+        fbApp = firebase.initializeApp({
+          apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
+          authDomain: "neoorthomedartis.firebaseapp.com",
+          databaseURL: "https://neoorthomedartis-default-rtdb.firebaseio.com",
+          projectId: "neoorthomedartis",
+          storageBucket: "neoorthomedartis.firebasestorage.app",
+          messagingSenderId: "48492402152",
+          appId: "1:48492402152:web:c395acaf1e365d491bc05d",
+          measurementId: "G-W4JC235S2Y"
+        });
+      } else {
+        fbApp = firebase.app();
+      }
+      fbDb = firebase.database();
+    } catch(e) {
+      console.error('Firebase init error:', e);
+    }
+
+    // ============================================================
     // IDIOMA
     // ============================================================
     var lang = localStorage.getItem('essential_lang') || 'pt';
@@ -1006,309 +1032,339 @@
       { id:61,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao Parafuso Interfragmentario vs Deslizante', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'10:45 — Slides e demonstracao' },
       { id:62,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao Titanio, Anodizacao e Bloqueio', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'10:55 — Tecnologias Medartis' },
       { id:63,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao SpeedTip e Hexadrive', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'11:10 — Demonstracao pratica' },
-      { id:64,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao Parafuso CCS', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'11:35 — Conceito e aplicacao' },
-      { id:65,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao Aptus Hand + Radio Distal + Artrodese', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'13:00–15:05 — 3 modulos sequenciais' },
-      { id:66,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Role Play executado', responsavel:'Educacao/Professor', offset:0, status:'Nao iniciado', observacoes:'15:25–16:05 — Simulacao de venda' },
-      { id:67,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Avaliacao Dia 1 aplicada', responsavel:'Educacao', offset:0, status:'Nao iniciado', observacoes:'16:05–16:45 — 20 questoes' },
-      { id:68,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Fotos e registros Dia 1', responsavel:'Marketing', offset:0, status:'Nao iniciado', observacoes:'Fotos das sessoes e participantes' },
+      { id:64,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao Parafuso CCS', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'13:30 — Fixacao compressiva, tecnica de insercao' },
+      { id:65,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao Aptus Hand e Radio Distal', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'14:30 — Anatomia aplicada, indicacoes' },
+      { id:66,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Sessao Artrodese de Punho', responsavel:'Professor', offset:0, status:'Nao iniciado', observacoes:'15:30 — Tecnica, parafusos, placas, indicacoes' },
+      { id:67,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Avaliacao Dia 1 aplicada', responsavel:'Educacao', offset:0, status:'Nao iniciado', observacoes:'17:00 — 20 questoes sobre o conteudo do dia' },
+      { id:68,  categoria:'DIA 1 - APTUS TEORIA', entrega:'Encerramento e feedback do dia', responsavel:'Educacao', offset:0, status:'Nao iniciado', observacoes:'17:30 — Avaliacao e feedback geral' },
 
       // ── DIA 2 — APTUS HANDS-ON (offset 1) ──
-      { id:69,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Revisao principais pontos Dia 1', responsavel:'Educacao', offset:1, status:'Nao iniciado', observacoes:'08:30 — Recapitulacao interativa' },
-      { id:70,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Ulna Shortening', responsavel:'Professor', offset:1, status:'Nao iniciado', observacoes:'09:15 — Teoria + tecnica cirurgica' },
-      { id:71,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Hands-On Ulna Shortening + Radio Distal', responsavel:'Professor/Educacao', offset:1, status:'Nao iniciado', observacoes:'09:30–10:15 — Pratica nas estacoes' },
-      { id:72,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Codificacao de cores Medartis', responsavel:'Produto', offset:1, status:'Nao iniciado', observacoes:'10:30 — Explicacao do sistema' },
-      { id:73,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Aptus Clavicle', responsavel:'Professor', offset:1, status:'Nao iniciado', observacoes:'10:50 — Teoria e indicacoes' },
-      { id:74,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Hands-On Clavicle', responsavel:'Professor/Educacao', offset:1, status:'Nao iniciado', observacoes:'11:15–12:00 — Pratica nas estacoes' },
-      { id:75,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Anatomia do Cotovelo + APTUS Elbow', responsavel:'Professor', offset:1, status:'Nao iniciado', observacoes:'13:00–13:40 — Anatomia + sistema' },
-      { id:76,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Placa Banda de Tensao — Olecrano', responsavel:'Professor', offset:1, status:'Nao iniciado', observacoes:'13:40–14:25 — Tecnica especifica' },
-      { id:77,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Anatomia do Pe + APTUS Foot', responsavel:'Professor', offset:1, status:'Nao iniciado', observacoes:'14:30–15:05 — Foot + Hallux + Calcaneo' },
-      { id:78,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Dinamica de fixacao', responsavel:'Educacao', offset:1, status:'Nao iniciado', observacoes:'15:05–15:20 — Atividade interativa' },
-      { id:79,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Sessao Novidades Medartis', responsavel:'Produto', offset:1, status:'Nao iniciado', observacoes:'15:20–15:35 — Lancamentos e roadmap' },
-      { id:80,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Avaliacao Dia 2 aplicada', responsavel:'Educacao', offset:1, status:'Nao iniciado', observacoes:'15:35–16:20 — 20 questoes' },
-      { id:81,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Limpeza e organizacao das estacoes', responsavel:'Logistica', offset:1, status:'Nao iniciado', observacoes:'Pos-hands-on — descontaminacao' },
+      { id:69,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Briefing Dia 2 e organizacao das estacoes', responsavel:'Educacao', offset:1, status:'Nao iniciado', observacoes:'08:30 — Apresentacao pratica do dia' },
+      { id:70,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Estacao Ulna Shortening', responsavel:'Professor/Monitor', offset:1, status:'Nao iniciado', observacoes:'09:00 — Tecnica cirurgica, parafusos Aptus' },
+      { id:71,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Estacao Radio Distal', responsavel:'Professor/Monitor', offset:1, status:'Nao iniciado', observacoes:'10:00 — Placas e parafusos, navegacao' },
+      { id:72,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Estacao Clavicle', responsavel:'Professor/Monitor', offset:1, status:'Nao iniciado', observacoes:'11:00 — Placas de clavicula, tecnica minimamente invasiva' },
+      { id:73,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Estacao Cotovelo', responsavel:'Professor/Monitor', offset:1, status:'Nao iniciado', observacoes:'13:00 — Placas e parafusos para cotovelo' },
+      { id:74,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Estacao Pe', responsavel:'Professor/Monitor', offset:1, status:'Nao iniciado', observacoes:'14:00 — Parafusos para antepie e mediopie' },
+      { id:75,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Estacao CCS e compressao', responsavel:'Professor/Monitor', offset:1, status:'Nao iniciado', observacoes:'15:00 — Compressao seletiva, tecnica CCS' },
+      { id:76,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Avaliacao pratica Dia 2', responsavel:'Educacao', offset:1, status:'Nao iniciado', observacoes:'16:30 — Avaliacao pratica individual' },
+      { id:77,  categoria:'DIA 2 - APTUS HANDS-ON', entrega:'Encerramento e feedback do dia', responsavel:'Educacao', offset:1, status:'Nao iniciado', observacoes:'17:30 — Avaliacao e feedback geral' },
 
       // ── DIA 3 — MODUS TEORIA (offset 2) ──
-      { id:82,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Credenciamento Dia 3 preparado', responsavel:'Eventos', offset:2, status:'Nao iniciado', observacoes:'08:30 — Verificar presenca' },
-      { id:83,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Material de abertura Modus', responsavel:'Educacao', offset:2, status:'Nao iniciado', observacoes:'Introducao Medartis + IBRA (foco CMF)' },
-      { id:84,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Revisao pre-estudo', responsavel:'Educacao', offset:2, status:'Nao iniciado', observacoes:'10:00 — Discussao do material enviado' },
-      { id:85,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Sessao Midface', responsavel:'Professor', offset:2, status:'Nao iniciado', observacoes:'10:45 — Anatomia, indicacoes, tecnica' },
-      { id:86,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Hands-On Midface', responsavel:'Professor/Educacao', offset:2, status:'Nao iniciado', observacoes:'11:35–12:00 — Pratica nas estacoes' },
-      { id:87,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Sessao Mandible Trauma', responsavel:'Professor', offset:2, status:'Nao iniciado', observacoes:'13:00–13:40 — Fraturas mandibulares' },
-      { id:88,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Sessao Mandible Reco', responsavel:'Professor', offset:2, status:'Nao iniciado', observacoes:'13:40–14:20 — Reconstrucao mandibular' },
-      { id:89,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Dinamica CMF', responsavel:'Educacao', offset:2, status:'Nao iniciado', observacoes:'14:20–14:50 — Atividade interativa' },
-      { id:90,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Hands-On Mandible', responsavel:'Professor/Educacao', offset:2, status:'Nao iniciado', observacoes:'14:50–15:30 — Pratica nas estacoes' },
-      { id:91,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Avaliacao Dia 3 aplicada', responsavel:'Educacao', offset:2, status:'Nao iniciado', observacoes:'15:50–16:20 — 20 questoes' },
+      { id:78,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Briefing Dia 3 — Introducao Modus', responsavel:'Educacao', offset:2, status:'Nao iniciado', observacoes:'08:30 — Apresentacao da linha Modus' },
+      { id:79,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Sessao Midface — Fraturas e placas', responsavel:'Professor', offset:2, status:'Nao iniciado', observacoes:'09:00 — Orbita, zigomatico, maxila' },
+      { id:80,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Sessao Mandible Trauma', responsavel:'Professor', offset:2, status:'Nao iniciado', observacoes:'10:00 — Fraturas de mandibula, placas, parafusos' },
+      { id:81,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Sessao Mandible Reco', responsavel:'Professor', offset:2, status:'Nao iniciado', observacoes:'11:00 — Reconstrucao mandibular, enxertos' },
+      { id:82,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Sessao Ortognatica — Planejamento', responsavel:'Professor', offset:2, status:'Nao iniciado', observacoes:'13:00 — Planejamento cirurgico, guias 3D' },
+      { id:83,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Sessao IMF e Chave 90', responsavel:'Professor', offset:2, status:'Nao iniciado', observacoes:'14:00 — Fixacao intermaxilar, tecnica Chave 90' },
+      { id:84,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Sessao Transbucal e Fechamento', responsavel:'Professor', offset:2, status:'Nao iniciado', observacoes:'15:00 — Acesso transbucal, fechamento de fistulas' },
+      { id:85,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Avaliacao Dia 3 aplicada', responsavel:'Educacao', offset:2, status:'Nao iniciado', observacoes:'17:00 — 20 questoes sobre o conteudo do dia' },
+      { id:86,  categoria:'DIA 3 - MODUS TEORIA', entrega:'Encerramento e feedback do dia', responsavel:'Educacao', offset:2, status:'Nao iniciado', observacoes:'17:30 — Avaliacao e feedback geral' },
 
       // ── DIA 4 — MODUS HANDS-ON (offset 3) ──
-      { id:92,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Revisao principais pontos Dia 3', responsavel:'Educacao', offset:3, status:'Nao iniciado', observacoes:'08:30 — Recapitulacao interativa' },
-      { id:93,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Sessao Ortognatica', responsavel:'Professor', offset:3, status:'Nao iniciado', observacoes:'09:00–09:40 — Planejamento e tecnica' },
-      { id:94,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Dinamica Ortognatica', responsavel:'Educacao', offset:3, status:'Nao iniciado', observacoes:'09:40–10:10 — Atividade pratica' },
-      { id:95,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Sessao IMF / Chave 90 / Transbucal', responsavel:'Professor', offset:3, status:'Nao iniciado', observacoes:'10:25–10:55 — Tecnicas de fixacao' },
-      { id:96,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Hands-On Ortognatica', responsavel:'Professor/Educacao', offset:3, status:'Nao iniciado', observacoes:'10:55–11:30 — Pratica nas estacoes' },
-      { id:97,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Sessao Concorrencia', responsavel:'Comercial/Produto', offset:3, status:'Nao iniciado', observacoes:'11:30–12:00 — Comparativo com concorrentes' },
-      { id:98,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Dinamica de vendas CMF', responsavel:'Educacao', offset:3, status:'Nao iniciado', observacoes:'13:00–14:00 — Simulacao com cenarios reais' },
-      { id:99,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Sessao Fechamento', responsavel:'Professor/Educacao', offset:3, status:'Nao iniciado', observacoes:'14:00–14:40 — Consideracoes finais' },
-      { id:100, categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Avaliacao Dia 4 aplicada', responsavel:'Educacao', offset:3, status:'Nao iniciado', observacoes:'14:40–15:20 — 20 questoes + avaliacao geral' },
-      { id:101, categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Encerramento formal', responsavel:'Educacao/Diretoria', offset:3, status:'Nao iniciado', observacoes:'15:20–16:00 — Discursos, fotos, entregas' },
-      { id:102, categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Limpeza final das estacoes', responsavel:'Logistica', offset:3, status:'Nao iniciado', observacoes:'Desmontagem e descontaminacao completa' },
-      { id:103, categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Retorno de instrumentais ao estoque', responsavel:'Produto/Logistica', offset:4, status:'Nao iniciado', observacoes:'Inventario e devolucao' },
+      { id:87,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Briefing Dia 4 e organizacao das estacoes', responsavel:'Educacao', offset:3, status:'Nao iniciado', observacoes:'08:30 — Apresentacao pratica do dia' },
+      { id:88,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Estacao Midface — Placas e parafusos', responsavel:'Professor/Monitor', offset:3, status:'Nao iniciado', observacoes:'09:00 — Orbita, zigomatico, maxila' },
+      { id:89,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Estacao Mandible Trauma', responsavel:'Professor/Monitor', offset:3, status:'Nao iniciado', observacoes:'10:00 — Placas de mandibula, parafusos' },
+      { id:90,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Estacao Mandible Reco', responsavel:'Professor/Monitor', offset:3, status:'Nao iniciado', observacoes:'11:00 — Reconstrucao, enxertos, placas' },
+      { id:91,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Estacao Ortognatica', responsavel:'Professor/Monitor', offset:3, status:'Nao iniciado', observacoes:'13:00 — Guias 3D, planejamento cirurgico' },
+      { id:92,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Estacao IMF e Chave 90', responsavel:'Professor/Monitor', offset:3, status:'Nao iniciado', observacoes:'14:00 — Fixacao intermaxilar pratica' },
+      { id:93,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Estacao Transbucal e Fechamento', responsavel:'Professor/Monitor', offset:3, status:'Nao iniciado', observacoes:'15:00 — Acesso transbucal, fechamento' },
+      { id:94,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Avaliacao pratica Dia 4', responsavel:'Educacao', offset:3, status:'Nao iniciado', observacoes:'16:30 — Avaliacao pratica individual' },
+      { id:95,  categoria:'DIA 4 - MODUS HANDS-ON', entrega:'Encerramento do curso', responsavel:'Educacao/Diretoria', offset:3, status:'Nao iniciado', observacoes:'17:30 — Certificados, fotos e encerramento' },
 
       // ── PÓS-EVENTO ──
-      { id:104, categoria:'POS-EVENTO', entrega:'Correcao das avaliacoes', responsavel:'Educacao', offset:5, status:'Nao iniciado', observacoes:'4 provas — resultado individual e geral' },
-      { id:105, categoria:'POS-EVENTO', entrega:'Emissao de certificados', responsavel:'Educacao', offset:10, status:'Nao iniciado', observacoes:'Digital e/ou impresso para todos' },
-      { id:106, categoria:'POS-EVENTO', entrega:'Envio de fotos e materiais', responsavel:'Marketing/Educacao', offset:10, status:'Nao iniciado', observacoes:'Link com galeria e apresentacoes' },
-      { id:107, categoria:'POS-EVENTO', entrega:'Pesquisa de satisfacao enviada', responsavel:'Educacao', offset:6, status:'Nao iniciado', observacoes:'Google Forms — NPS, conteudo, infra, professores' },
-      { id:108, categoria:'POS-EVENTO', entrega:'Relatorio de avaliacao consolidado', responsavel:'Educacao', offset:17, status:'Nao iniciado', observacoes:'Media por dia, por modulo, por professor' },
-      { id:109, categoria:'POS-EVENTO', entrega:'Relatorio financeiro', responsavel:'Financeiro', offset:24, status:'Nao iniciado', observacoes:'Custo real vs. orcado — por categoria' },
-      { id:110, categoria:'POS-EVENTO', entrega:'Follow-up com participantes externos', responsavel:'Comercial', offset:17, status:'Nao iniciado', observacoes:'Agradecimento + proximo passo comercial' },
-      { id:111, categoria:'POS-EVENTO', entrega:'Registro de leads (publico externo)', responsavel:'Comercial/CRM', offset:10, status:'Nao iniciado', observacoes:'Input no CRM com perfil e interesse' },
-      { id:112, categoria:'POS-EVENTO', entrega:'Licoes aprendidas documentadas', responsavel:'Educacao', offset:24, status:'Nao iniciado', observacoes:'O que funcionou, o que melhorar' },
-      { id:113, categoria:'POS-EVENTO', entrega:'Devolucao/confirmacao de materiais', responsavel:'Produto/Logistica', offset:10, status:'Nao iniciado', observacoes:'Conferir se todos os instrumentais retornaram' },
-      { id:114, categoria:'POS-EVENTO', entrega:'Pagamento de fornecedores', responsavel:'Financeiro', offset:24, status:'Nao iniciado', observacoes:'Local, transporte, alimentacao, materiais' },
-      { id:115, categoria:'POS-EVENTO', entrega:'Agradecimento formal a professores', responsavel:'Educacao', offset:10, status:'Nao iniciado', observacoes:'E-mail + certificado de professor convidado' }
+      { id:96,  categoria:'POS-EVENTO', entrega:'Envio de certificados aos participantes', responsavel:'Educacao', offset:5, status:'Nao iniciado', observacoes:'Digital — PDF personalizado' },
+      { id:97,  categoria:'POS-EVENTO', entrega:'Pesquisa de satisfacao enviada', responsavel:'Educacao', offset:5, status:'Nao iniciado', observacoes:'Formulario online — Google Forms' },
+      { id:98,  categoria:'POS-EVENTO', entrega:'Compilacao de resultados e metricas', responsavel:'Educacao', offset:7, status:'Nao iniciado', observacoes:'Avaliacoes, presenca, feedbacks' },
+      { id:99,  categoria:'POS-EVENTO', entrega:'Relatorio final do evento', responsavel:'Educacao/Diretoria', offset:10, status:'Nao iniciado', observacoes:'Documento completo para diretoria' },
+      { id:100, categoria:'POS-EVENTO', entrega:'Feedback aos professores e equipe', responsavel:'Educacao', offset:10, status:'Nao iniciado', observacoes:'Reuniao de debriefing' },
+      { id:101, categoria:'POS-EVENTO', entrega:'Devolucao de produtos e materiais', responsavel:'Logistica', offset:7, status:'Nao iniciado', observacoes:'Inventario e devolucao ao estoque' },
+      { id:102, categoria:'POS-EVENTO', entrega:'Prestacao de contas financeira', responsavel:'Financeiro', offset:14, status:'Nao iniciado', observacoes:'Notas fiscais, pagamentos, saldo' },
+      { id:103, categoria:'POS-EVENTO', entrega:'Documentacao fotografica organizada', responsavel:'Marketing', offset:7, status:'Nao iniciado', observacoes:'Banco de fotos para redes sociais e site' },
+      { id:104, categoria:'POS-EVENTO', entrega:'Comunicacao pos-evento a participantes', responsavel:'Marketing/Educacao', offset:5, status:'Nao iniciado', observacoes:'E-mail com fotos, certificados e agradecimento' },
+      { id:105, categoria:'POS-EVENTO', entrega:'Planejamento de proxima edicao', responsavel:'Educacao', offset:30, status:'Nao iniciado', observacoes:'Licoes aprendidas, melhorias, datas' },
+      { id:106, categoria:'POS-EVENTO', entrega:'Atualizacao de base de cirurgioes parceiros', responsavel:'Comercial', offset:14, status:'Nao iniciado', observacoes:'CRM — atualizar contatos e interacoes' },
+      { id:107, categoria:'POS-EVENTO', entrega:'Material didatico arquivado', responsavel:'Educacao', offset:14, status:'Nao iniciado', observacoes:'Slides, fotos, videos, avaliacoes' },
+      { id:108, categoria:'POS-EVENTO', entrega:'Relatorio de vendas pos-curso', responsavel:'Comercial', offset:21, status:'Nao iniciado', observacoes:'Acompanhamento de geracoes de leads' },
+      { id:109, categoria:'POS-EVENTO', entrega:'Analise de ROI do evento', responsavel:'Financeiro/Diretoria', offset:30, status:'Nao iniciado', observacoes:'Retorno sobre investimento completo' },
+      { id:110, categoria:'POS-EVENTO', entrega:'Encerramento administrativo do projeto', responsavel:'Educacao/Gestao', offset:30, status:'Nao iniciado', observacoes:'Checklist final, arquivos, aprovacoes' },
+      { id:111, categoria:'POS-EVENTO', entrega:'Agradecimento formal a parceiros', responsavel:'Marketing/Diretoria', offset:14, status:'Nao iniciado', observacoes:'Cartas/brindes para KOLs e parceiros' },
+      { id:112, categoria:'POS-EVENTO', entrega:'Publicacao de case de sucesso', responsavel:'Marketing', offset:45, status:'Nao iniciado', observacoes:'Artigo/site/redes sociais' },
+      { id:113, categoria:'POS-EVENTO', entrega:'Avaliacao de impacto em 90 dias', responsavel:'Educacao/Comercial', offset:90, status:'Nao iniciado', observacoes:'Mensurar aplicacao pratica do aprendizado' },
+      { id:114, categoria:'POS-EVENTO', entrega:'Reuniao de fechamento com stakeholders', responsavel:'Educacao/Diretoria', offset:30, status:'Nao iniciado', observacoes:'Apresentacao de resultados e planos futuros' },
+      { id:115, categoria:'POS-EVENTO', entrega:'Arquivamento final do projeto', responsavel:'Gestao', offset:60, status:'Nao iniciado', observacoes:'Todos os documentos e dados arquivados' }
     ];
 
     // ============================================================
     // ESTADO
     // ============================================================
-    let tasks = [];
-    let nextId = 200;
-    let editingId = null;
-    let confirmAction = null;
-    let deleteTargetId = null;
+    var tasks = [];
+    var nextId = 116;
+    var editTaskId = null;
+    var confirmCallback = null;
+
+    // ============================================================
+    // FIREBASE REALTIME DATABASE
+    // ============================================================
+    var FB_PATH = 'essential_cronograma';
+
+    async function loadFromFirebase() {
+      if (!fbDb) return;
+      try {
+        var snap = await fbDb.ref(FB_PATH).once('value');
+        var data = snap.val();
+        if (data && data.tasks && Array.isArray(data.tasks) && data.tasks.length > 0) {
+          tasks = data.tasks;
+          nextId = Math.max.apply(null, tasks.map(function(t){ return t.id; })) + 1;
+          if (data.eventStartDate) document.getElementById('eventStartDate').value = data.eventStartDate;
+          if (data.eventEndDate) document.getElementById('eventEndDate').value = data.eventEndDate;
+          if (data.eventStartDate) EVENT_DATE = parseDate(data.eventStartDate);
+        } else {
+          await seedToFirebase();
+        }
+      } catch(err) {
+        console.error('Firebase load error:', err);
+      }
+    }
+
+    async function seedToFirebase() {
+      if (!fbDb) return;
+      try {
+        var startStr = document.getElementById('eventStartDate').value;
+        var endStr = document.getElementById('eventEndDate').value;
+        var seedData = {
+          tasks: TASK_TEMPLATES.map(function(t) {
+            return {
+              id: t.id, categoria: t.categoria, entrega: t.entrega,
+              responsavel: t.responsavel, offset: t.offset,
+              prazoPlanejado: '', prazoReal: '', status: t.status, observacoes: t.observacoes
+            };
+          }),
+          eventStartDate: startStr || '',
+          eventEndDate: endStr || '',
+          lang: lang
+        };
+        await fbDb.ref(FB_PATH).set(seedData);
+        tasks = seedData.tasks;
+        nextId = Math.max.apply(null, tasks.map(function(t){ return t.id; })) + 1;
+      } catch(err) {
+        console.error('Firebase seed error:', err);
+      }
+    }
+
+    async function saveToFirebase() {
+      if (!fbDb) return;
+      try {
+        var startStr = document.getElementById('eventStartDate').value;
+        var endStr = document.getElementById('eventEndDate').value;
+        await fbDb.ref(FB_PATH).set({
+          tasks: tasks, eventStartDate: startStr, eventEndDate: endStr, lang: lang
+        });
+      } catch(err) {
+        console.error('Firebase save error:', err);
+      }
+    }
+
+    function saveData() {
+      saveToFirebase();
+      showToast('Dados salvos com sucesso!', 'success');
+    }
 
     // ============================================================
     // UTILITÁRIOS
     // ============================================================
-    function escapeHtml(str) {
-      if (!str) return '';
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
+    function parseDate(s) {
+      if (!s) return null;
+      var p = s.split('-');
+      if (p.length !== 3) return null;
+      return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
     }
-    function dateToISO(d) {
-      if (!d || !d.includes('/')) return '';
-      const p = d.split('/');
-      if (p.length !== 3) return '';
-      return p[2] + '-' + p[1].padStart(2,'0') + '-' + p[0].padStart(2,'0');
+
+    function formatDate(d) {
+      if (!d) return '';
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
     }
-    function isoToDate(iso) {
-      if (!iso || !iso.includes('-')) return '';
-      const p = iso.split('-');
-      if (p.length !== 3) return '';
-      return p[2] + '/' + p[1] + '/' + p[0];
+
+    function formatDateBR(d) {
+      if (!d) return '';
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      return day + '/' + m + '/' + y;
     }
-    function parseDate(d) {
-      if (!d) return null;
-      if (d.includes('/')) {
-        const p = d.split('/').map(Number);
-        if (p.length !== 3 || p.some(isNaN)) return null;
-        return new Date(p[2], p[1] - 1, p[0]);
-      }
-      if (d.includes('-')) {
-        const p = d.split('-').map(Number);
-        if (p.length !== 3 || p.some(isNaN)) return null;
-        return new Date(p[0], p[1] - 1, p[2]);
-      }
-      return null;
+
+    function offsetLabel(offset) {
+      if (offset < 0) return offset + ' ' + t('before');
+      if (offset === 0) return t('during');
+      if (offset > 0) return '+' + offset + ' ' + t('after');
+      return '';
     }
-    function formatDate(date) {
-      if (!date) return '';
-      const d = date.getDate().toString().padStart(2,'0');
-      const m = (date.getMonth()+1).toString().padStart(2,'0');
-      return d + '/' + m + '/' + date.getFullYear();
+
+    function statusClass(status) {
+      var map = {
+        'Nao iniciado': 'nao-iniciado',
+        'Em andamento': 'em-andamento',
+        'Concluido': 'concluido',
+        'Atrasado': 'atrasado',
+        'Cancelado': 'cancelado'
+      };
+      return map[status] || 'nao-iniciado';
     }
-    function addDays(date, days) {
-      const result = new Date(date);
-      result.setDate(result.getDate() + days);
-      return result;
-    }
-    function offsetLabel(off) {
-      if (off === 0) return 'DIA 1';
-      if (off === 1) return 'DIA 2';
-      if (off === 2) return 'DIA 3';
-      if (off === 3) return 'DIA 4';
-      if (off < 0) return off + 'd';
-      return '+' + off + 'd';
+
+    function showToast(msg, type) {
+      var container = document.getElementById('toastContainer');
+      var toast = document.createElement('div');
+      toast.className = 'toast ' + (type || 'info');
+      toast.textContent = msg;
+      container.appendChild(toast);
+      requestAnimationFrame(function() {
+        toast.classList.add('show');
+      });
+      setTimeout(function() {
+        toast.classList.remove('show');
+        setTimeout(function() { toast.remove(); }, 400);
+      }, 3000);
     }
 
     // ============================================================
     // GERAR CRONOGRAMA
     // ============================================================
-    function generateTimeline() {
-      const startStr = document.getElementById('eventStartDate').value;
-      const endStr = document.getElementById('eventEndDate').value;
+    async function generateTimeline() {
+      var startStr = document.getElementById('eventStartDate').value;
+      var endStr = document.getElementById('eventEndDate').value;
 
       if (!startStr) {
-        showToast('Defina a data de inicio do curso', 'warning');
+        showToast(t('toastDefineDate'), 'warning');
         return;
       }
       if (!endStr) {
-        showToast('Defina a data de fim do curso', 'warning');
+        showToast(t('toastDefineEndDate'), 'warning');
         return;
       }
 
-      const startDate = parseDate(startStr);
-      const endDate = parseDate(endStr);
+      var startDate = parseDate(startStr);
+      var endDate = parseDate(endStr);
 
       if (!startDate || !endDate) {
-        showToast('Datas invalidas', 'error');
+        showToast(t('toastInvalidDate'), 'warning');
         return;
       }
       if (endDate <= startDate) {
-        showToast('A data de fim deve ser posterior ao inicio', 'warning');
+        showToast(t('toastEndAfterStart'), 'warning');
         return;
       }
 
-      const diffDays = Math.round((endDate - startDate) / (1000*60*60*24));
-      if (diffDays < 3) {
-        showToast('O curso precisa de pelo menos 4 dias (inicio a fim)', 'warning');
+      var diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      if (diffDays < 4) {
+        showToast(t('toastMinDays'), 'warning');
         return;
       }
 
       EVENT_DATE = startDate;
-      const today = new Date(); today.setHours(0,0,0,0);
+      tasks = [];
+      nextId = 1;
 
-      // Gerar tarefas a partir dos templates
-      tasks = TASK_TEMPLATES.map(t => {
-        const plannedDate = addDays(startDate, t.offset);
-        const plannedStr = formatDate(plannedDate);
-
-        // Status automatico baseado na data de hoje
-        let autoStatus = t.status;
-        if (plannedDate < today && autoStatus === 'Nao iniciado') {
-          autoStatus = 'Atrasado';
-        }
-
-        return {
-          id: t.id,
-          categoria: t.categoria,
-          entrega: t.entrega,
-          responsavel: t.responsavel,
-          offset: t.offset,
-          prazoPlanejado: plannedStr,
+      TASK_TEMPLATES.forEach(function(tmpl) {
+        var d = new Date(startDate);
+        d.setDate(d.getDate() + tmpl.offset);
+        var offsetDay = tmpl.offset < 0 ? t('daysBefore') : (tmpl.offset > 0 ? t('daysAfter') : t('daysDuring'));
+        tasks.push({
+          id: nextId++,
+          categoria: tmpl.categoria,
+          entrega: tmpl.entrega,
+          responsavel: tmpl.responsavel,
+          offset: tmpl.offset,
+          prazoPlanejado: formatDate(d),
           prazoReal: '',
-          status: autoStatus,
-          observacoes: t.observacoes
-        };
+          status: tmpl.status,
+          observacoes: tmpl.observacoes
+        });
       });
 
-      nextId = Math.max(...tasks.map(t => t.id)) + 1;
-
-      // Salvar no localStorage
-      localStorage.setItem('essential_tasks', JSON.stringify(tasks));
-      localStorage.setItem('essential_start', startStr);
-      localStorage.setItem('essential_end', endStr);
-
-      // Atualizar tudo
-      updateDaysCounter();
-      updateTimelineBar();
-      populateFilters();
+      await saveToFirebase();
       renderTable();
       updateDashboard();
+      populateFilters();
 
-      // Contar atrasadas
-      const atrasadas = tasks.filter(t => t.status === 'Atrasado').length;
-      const msg = 'Cronograma gerado! ' + tasks.length + ' tarefas de ' + formatDate(startDate) + ' a ' + formatDate(endDate);
-      if (atrasadas > 0) {
-        showToast(msg + ' — ' + atrasadas + ' tarefas atrasadas', 'warning');
-      } else {
-        showToast(msg, 'success');
-      }
+      var overdue = tasks.filter(function(t) {
+        var pp = parseDate(t.prazoPlanejado);
+        return pp && pp < new Date(new Date().toDateString()) && t.status !== 'Concluido' && t.status !== 'Cancelado';
+      }).length;
+
+      showToast(t('toastGenerated') + tasks.length + t('toastTasks') + formatDateBR(startDate) + t('toastTo') + formatDateBR(endDate) + (overdue > 0 ? ' (' + overdue + t('toastOverdue') + ')' : ''), 'success');
     }
 
     // ============================================================
     // TIMELINE BAR
     // ============================================================
     function updateTimelineBar() {
-      if (!EVENT_DATE) return;
-      const today = new Date(); today.setHours(0,0,0,0);
+      var startStr = document.getElementById('eventStartDate').value;
+      var endStr = document.getElementById('eventEndDate').value;
+      var fill = document.getElementById('timelineFill');
+      var info = document.getElementById('timelineInfo');
 
-      // Encontrar min e max dos offsets
-      const offsets = tasks.map(t => t.offset);
-      const minOff = Math.min(...offsets);
-      const maxOff = Math.max(...offsets);
-      const range = maxOff - minOff;
+      if (!startStr || !EVENT_DATE) {
+        fill.style.width = '0%';
+        info.innerHTML = t('timelineInfo');
+        return;
+      }
 
-      if (range <= 0) return;
+      var end = parseDate(endStr);
+      if (!end) {
+        fill.style.width = '0%';
+        info.innerHTML = t('timelineInfo');
+        return;
+      }
 
-      const todayOff = Math.round((today - EVENT_DATE) / (1000*60*60*24));
-      const pct = Math.max(0, Math.min(100, ((todayOff - minOff) / range) * 100));
+      var total = (end - EVENT_DATE) / (1000 * 60 * 60 * 24);
+      var elapsed = (new Date(new Date().toDateString()) - EVENT_DATE) / (1000 * 60 * 60 * 24);
+      var pct = Math.max(0, Math.min(100, (elapsed / total) * 100));
+      fill.style.width = pct + '%';
 
-      document.getElementById('timelineFill').style.width = pct + '%';
-
-      const before = tasks.filter(t => t.offset < 0).length;
-      const during = tasks.filter(t => t.offset >= 0 && t.offset <= 3).length;
-      const after = tasks.filter(t => t.offset > 3).length;
-
-      document.getElementById('timelineInfo').innerHTML =
-        '<strong>' + before + '</strong> antes &nbsp;|&nbsp; <strong>' + during + '</strong> durante &nbsp;|&nbsp; <strong>' + after + '</strong> pos-evento';
-    }
-
-    // ============================================================
-    // LOCALSTORAGE
-    // ============================================================
-    function loadFromStorage() {
-      try {
-        const saved = localStorage.getItem('essential_tasks');
-        const savedStart = localStorage.getItem('essential_start');
-        const savedEnd = localStorage.getItem('essential_end');
-
-        if (savedStart) document.getElementById('eventStartDate').value = savedStart;
-        if (savedEnd) document.getElementById('eventEndDate').value = savedEnd;
-
-        if (savedStart && saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            tasks = parsed;
-            nextId = Math.max(...tasks.map(t => t.id)) + 1;
-            EVENT_DATE = parseDate(savedStart);
-            return;
-          }
-        }
-      } catch(e) {}
-    }
-    function saveToStorage() {
-      try {
-        localStorage.setItem('essential_tasks', JSON.stringify(tasks));
-        localStorage.setItem('essential_start', document.getElementById('eventStartDate').value);
-        localStorage.setItem('essential_end', document.getElementById('eventEndDate').value);
-      } catch(e) {}
-    }
-    
-    // ============================================================
-    // SAVE / IMPORT / EXPORT (Unified)
-    // ============================================================
-    function saveData() {
-      saveToStorage();
-      showToast('Dados salvos com sucesso!', 'success');
+      var daysLeft = Math.max(0, Math.round(total - elapsed));
+      info.innerHTML = '<strong>' + daysLeft + '</strong> ' + t('daysAfter') + ' — ' + formatDateBR(new Date());
     }
 
     // ============================================================
     // POPULAR FILTROS
     // ============================================================
     function populateFilters() {
-      const catSel = document.getElementById('filterCategoria');
-      const curCat = catSel.value;
-      catSel.innerHTML = '<option value="">Todas as categorias</option>';
-      CATEGORIAS_ORDER.forEach(c => {
-        catSel.innerHTML += '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>';
-      });
-      catSel.value = curCat;
+      var catSelect = document.getElementById('filterCategoria');
+      var respSelect = document.getElementById('filterResponsavel');
 
-      const respSel = document.getElementById('filterResponsavel');
-      const curResp = respSel.value;
-      const resps = [...new Set(tasks.map(t => t.responsavel).filter(Boolean))].sort();
-      respSel.innerHTML = '<option value="">Todos os responsaveis</option>';
-      resps.forEach(r => {
-        respSel.innerHTML += '<option value="' + escapeHtml(r) + '">' + escapeHtml(r) + '</option>';
+      var cats = [];
+      var respSet = {};
+      tasks.forEach(function(task) {
+        if (cats.indexOf(task.categoria) === -1) cats.push(task.categoria);
+        if (task.responsavel) respSet[task.responsavel] = true;
       });
-      respSel.value = curResp;
 
-      const formCat = document.getElementById('formCategoria');
-      formCat.innerHTML = '';
-      CATEGORIAS_ORDER.forEach(c => {
-        formCat.innerHTML += '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>';
+      cats.sort(function(a, b) {
+        var ai = CATEGORIAS_ORDER.indexOf(a);
+        var bi = CATEGORIAS_ORDER.indexOf(b);
+        if (ai === -1) ai = 999;
+        if (bi === -1) bi = 999;
+        return ai - bi;
+      });
+
+      var respList = Object.keys(respSet).sort();
+
+      catSelect.innerHTML = '<option value="">' + t('allCats') + '</option>';
+      cats.forEach(function(c) {
+        var opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = catL(c);
+        catSelect.appendChild(opt);
+      });
+
+      respSelect.innerHTML = '<option value="">' + t('allResponsaveis') + '</option>';
+      respList.forEach(function(r) {
+        var opt = document.createElement('option');
+        opt.value = r;
+        opt.textContent = r;
+        respSelect.appendChild(opt);
       });
     }
 
@@ -1316,96 +1372,87 @@
     // RENDERIZAR TABELA
     // ============================================================
     function renderTable() {
-      if (tasks.length === 0) {
-        document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-state"><p>Defina as datas do curso e clique em "Gerar Cronograma" para comecar</p></td></tr>';
+      var search = document.getElementById('searchInput').value.toLowerCase();
+      var filterCat = document.getElementById('filterCategoria').value;
+      var filterSt = document.getElementById('filterStatus').value;
+      var filterResp = document.getElementById('filterResponsavel').value;
+
+      var filtered = tasks.filter(function(task) {
+        if (search && (task.entrega.toLowerCase().indexOf(search) === -1 && task.observacoes.toLowerCase().indexOf(search) === -1 && task.categoria.toLowerCase().indexOf(search) === -1)) return false;
+        if (filterCat && task.categoria !== filterCat) return false;
+        if (filterSt && task.status !== filterSt) return false;
+        if (filterResp && task.responsavel !== filterResp) return false;
+        return true;
+      });
+
+      var tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        var emptyMsg = tasks.length === 0 ? t('emptyTextNoData') : t('emptyText');
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><p>' + emptyMsg + '</p></td></tr>';
         document.getElementById('resultsCount').textContent = '';
         return;
       }
 
-      const search = document.getElementById('searchInput').value.toLowerCase().trim();
-      const catFilter = document.getElementById('filterCategoria').value;
-      const statusFilter = document.getElementById('filterStatus').value;
-      const respFilter = document.getElementById('filterResponsavel').value;
+      var currentCat = '';
+      var today = new Date(new Date().toDateString());
 
-      const filtered = tasks.filter(t => {
-        if (catFilter && t.categoria !== catFilter) return false;
-        if (statusFilter && t.status !== statusFilter) return false;
-        if (respFilter && t.responsavel !== respFilter) return false;
-        if (search) {
-          const hay = [t.entrega, t.responsavel, t.observacoes, t.categoria, t.prazoPlanejado, t.prazoReal].join(' ').toLowerCase();
-          if (!hay.includes(search)) return false;
+      filtered.forEach(function(task) {
+        if (task.categoria !== currentCat) {
+          currentCat = task.categoria;
+          var catRow = document.createElement('tr');
+          catRow.className = 'cat-row';
+          catRow.innerHTML = '<td colspan="9">' + catL(currentCat) + '</td>';
+          tbody.appendChild(catRow);
         }
-        return true;
+
+        var row = document.createElement('tr');
+        var isOverdue = false;
+        if (task.prazoPlanejado) {
+          var pp = parseDate(task.prazoPlanejado);
+          isOverdue = pp && pp < today && task.status !== 'Concluido' && task.status !== 'Cancelado';
+        }
+        if (isOverdue) row.className = 'row-atrasado';
+        else if (task.status === 'Concluido') row.className = 'row-concluido';
+        else if (task.status === 'Em andamento') row.className = 'row-em-andamento';
+
+        var offsetStr = task.offset < 0 ? task.offset + 'd' : (task.offset > 0 ? '+' + task.offset + 'd' : 'D0');
+        var ppStr = task.prazoPlanejado ? formatDateBR(parseDate(task.prazoPlanejado)) : '';
+        var prStr = task.prazoReal ? formatDateBR(parseDate(task.prazoReal)) : '';
+        var ppClass = isOverdue ? 'td-data vencida' : 'td-data';
+
+        row.innerHTML =
+          '<td class="td-categoria">' + catL(task.categoria) + '</td>' +
+          '<td class="td-entrega"><span class="editable-cell" onclick="startEdit(' + task.id + ',\'entrega\')" title="' + t('clickEdit') + '">' + (task.entrega || '<span class="empty-cell">—</span>') + '</span></td>' +
+          '<td><span class="editable-cell" onclick="startEdit(' + task.id + ',\'responsavel\')" title="' + t('clickEdit') + '">' + (task.responsavel || '<span class="empty-cell">—</span>') + '</span></td>' +
+          '<td class="td-offset">' + offsetStr + '</td>' +
+          '<td class="' + ppClass + '">' + (ppStr || '—') + '</td>' +
+          '<td class="td-data">' + (prStr || '<span class="editable-cell empty" onclick="startEdit(' + task.id + ',\'prazoReal\')" title="' + t('clickEdit') + '">—</span>') + '</td>' +
+          '<td><select class="status-select status-' + statusClass(task.status) + '" onchange="updateField(' + task.id + ',\'status\',this.value)">' +
+            '<option value="Nao iniciado"' + (task.status === 'Nao iniciado' ? ' selected' : '') + '>' + t('stNI') + '</option>' +
+            '<option value="Em andamento"' + (task.status === 'Em andamento' ? ' selected' : '') + '>' + t('stEA') + '</option>' +
+            '<option value="Concluido"' + (task.status === 'Concluido' ? ' selected' : '') + '>' + t('stOK') + '</option>' +
+            '<option value="Atrasado"' + (task.status === 'Atrasado' ? ' selected' : '') + '>' + t('stAT') + '</option>' +
+            '<option value="Cancelado"' + (task.status === 'Cancelado' ? ' selected' : '') + '>' + t('stCan') + '</option>' +
+          '</select></td>' +
+          '<td><span class="editable-cell" onclick="startEdit(' + task.id + ',\'observacoes\')" title="' + t('clickEdit') + '">' + (task.observacoes || '<span class="empty-cell">—</span>') + '</span></td>' +
+          '<td class="action-btns"><button class="btn-action" onclick="editTask(' + task.id + ')" title="' + t('modalEdit') + '">✎</button><button class="btn-action delete" onclick="confirmDelete(' + task.id + ')" title="' + t('btnExcluir') + '">✕</button></td>';
+
+        tbody.appendChild(row);
       });
 
-      const grouped = {};
-      CATEGORIAS_ORDER.forEach(c => { grouped[c] = []; });
-      filtered.forEach(t => { if (grouped[t.categoria]) grouped[t.categoria].push(t); });
-
-      let html = '';
-      let visibleCount = 0;
-      const today = new Date(); today.setHours(0,0,0,0);
-
-      CATEGORIAS_ORDER.forEach(cat => {
-        const catTasks = grouped[cat];
-        if (!catTasks || catTasks.length === 0) return;
-
-        html += '<tr class="cat-row"><td colspan="9">' + escapeHtml(cat) + '</td></tr>';
-
-        catTasks.forEach(t => {
-          visibleCount++;
-          const rowCls = t.status === 'Concluido' ? 'row-concluido' :
-                         t.status === 'Atrasado' ? 'row-atrasado' :
-                         t.status === 'Em andamento' ? 'row-em-andamento' : '';
-          const stCls = 'status-' + t.status.toLowerCase().replace(/ /g, '-');
-
-          const eEmpty = !t.entrega ? ' empty' : '';
-          const rEmpty = !t.responsavel ? ' empty' : '';
-          const prEmpty = !t.prazoReal ? ' empty' : '';
-          const oEmpty = !t.observacoes ? ' empty' : '';
-
-          const ppDate = parseDate(t.prazoPlanejado);
-          const isVencida = ppDate && ppDate < today && t.status !== 'Concluido' && t.status !== 'Cancelado';
-          const vencidaCls = isVencida ? ' vencida' : '';
-
-          const statusOpts = ['Nao iniciado','Em andamento','Concluido','Atrasado','Cancelado'].map(s =>
-            '<option value="' + s + '"' + (t.status === s ? ' selected' : '') + '>' + s + '</option>'
-          ).join('');
-
-          const offVal = t.offset !== undefined ? t.offset : '';
-          const offDisplay = offVal !== '' ? offsetLabel(offVal) : '';
-
-          html += '<tr class="' + rowCls + '" data-id="' + t.id + '">' +
-            '<td class="td-categoria">' + escapeHtml(t.categoria) + '</td>' +
-            '<td class="td-entrega"><span class="editable-cell' + eEmpty + '" onclick="startEdit(this,' + t.id + ',\'entrega\',\'text\')" title="' + escapeHtml(t.entrega) + '">' + (t.entrega ? escapeHtml(t.entrega) : 'Clicar para editar') + '</span></td>' +
-            '<td><span class="editable-cell' + rEmpty + '" onclick="startEdit(this,' + t.id + ',\'responsavel\',\'text\')">' + (t.responsavel ? escapeHtml(t.responsavel) : 'Clicar para editar') + '</span></td>' +
-            '<td class="td-offset">' + offDisplay + '</td>' +
-            '<td class="td-data' + vencidaCls + '">' + (t.prazoPlanejado ? escapeHtml(t.prazoPlanejado) : '--') + '</td>' +
-            '<td class="td-data"><span class="editable-cell' + prEmpty + '" onclick="startEdit(this,' + t.id + ',\'prazoReal\',\'date\')">' + (t.prazoReal ? escapeHtml(t.prazoReal) : 'Clicar para editar') + '</span></td>' +
-            '<td><select class="status-select ' + stCls + '" onchange="updateField(' + t.id + ',\'status\',this.value)" aria-label="Status">' + statusOpts + '</select></td>' +
-            '<td><span class="editable-cell' + oEmpty + '" onclick="startEdit(this,' + t.id + ',\'observacoes\',\'text\')" title="' + escapeHtml(t.observacoes) + '">' + (t.observacoes ? escapeHtml(t.observacoes) : 'Clicar para editar') + '</span></td>' +
-            '<td><div class="action-btns">' +
-              '<button class="btn-action" onclick="openModal(' + t.id + ')" title="Editar" aria-label="Editar">E</button>' +
-              '<button class="btn-action delete" onclick="requestDelete(' + t.id + ')" title="Excluir" aria-label="Excluir">X</button>' +
-            '</div></td>' +
-          '</tr>';
-        });
-      });
-
-      if (visibleCount === 0) {
-        html = '<tr><td colspan="9" class="empty-state"><p>Nenhuma tarefa encontrada</p></td></tr>';
-      }
-
-      document.getElementById('tableBody').innerHTML = html;
-      document.getElementById('resultsCount').textContent = 'Mostrando ' + visibleCount + ' de ' + tasks.length + ' tarefas';
+      document.getElementById('resultsCount').textContent = t('showing') + filtered.length + t('of2') + tasks.length + t('tasks');
     }
 
     // ============================================================
     // DASHBOARD
     // ============================================================
     function updateDashboard() {
-      const counts = { 'Nao iniciado': 0, 'Em andamento': 0, 'Concluido': 0, 'Atrasado': 0, 'Cancelado': 0 };
-      tasks.forEach(t => { if (counts.hasOwnProperty(t.status)) counts[t.status]++; });
+      var counts = { 'Nao iniciado': 0, 'Em andamento': 0, 'Concluido': 0, 'Atrasado': 0, 'Cancelado': 0 };
+      tasks.forEach(function(task) {
+        if (counts.hasOwnProperty(task.status)) counts[task.status]++;
+      });
 
       document.getElementById('countNaoIniciado').textContent = counts['Nao iniciado'];
       document.getElementById('countEmAndamento').textContent = counts['Em andamento'];
@@ -1413,14 +1460,16 @@
       document.getElementById('countAtrasado').textContent = counts['Atrasado'];
       document.getElementById('countCancelado').textContent = counts['Cancelado'];
 
-      const total = tasks.length;
-      const done = counts['Concluido'];
-      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      var total = tasks.length;
+      var done = counts['Concluido'];
+      var pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
       document.getElementById('progressPercent').textContent = pct + '%';
       document.getElementById('progressBar').style.width = pct + '%';
-      document.getElementById('progressDone').textContent = done + ' de ' + total + ' tarefas concluidas';
-      document.getElementById('progressRemain').textContent = (total - done) + ' restantes';
+      document.getElementById('progressDone').textContent = done + t('progDone');
+      document.getElementById('progressRemain').textContent = (total - done) + t('progRemain');
+
+      updateTimelineBar();
     }
 
     // ============================================================
@@ -1431,68 +1480,72 @@
         document.getElementById('daysNum').textContent = '--';
         return;
       }
-      const today = new Date(); today.setHours(0,0,0,0);
-      const diff = Math.ceil((EVENT_DATE - today) / (1000 * 60 * 60 * 24));
-      const el = document.getElementById('daysNum');
-      const counter = document.getElementById('daysCounter');
+      var today = new Date(new Date().toDateString());
+      var diff = Math.round((EVENT_DATE - today) / (1000 * 60 * 60 * 24));
+      var numEl = document.getElementById('daysNum');
       if (diff > 0) {
-        el.textContent = diff;
-        counter.querySelector('span:first-child').textContent = 'Faltam';
-        counter.querySelector('span:last-child').textContent = 'dias';
+        numEl.textContent = diff;
+        numEl.style.color = 'var(--primary)';
       } else if (diff === 0) {
-        el.textContent = 'HOJE';
-        counter.querySelector('span:first-child').textContent = '';
-        counter.querySelector('span:last-child').textContent = '';
+        numEl.textContent = '0';
+        numEl.style.color = 'var(--warning)';
       } else {
-        el.textContent = Math.abs(diff);
-        counter.querySelector('span:first-child').textContent = 'Ha';
-        counter.querySelector('span:last-child').textContent = 'dias';
+        numEl.textContent = Math.abs(diff);
+        numEl.style.color = 'var(--danger)';
       }
     }
 
     // ============================================================
     // EDIÇÃO INLINE
     // ============================================================
-    function startEdit(cell, id, field, type) {
-      if (cell.querySelector('.inline-input')) return;
-      const task = tasks.find(t => t.id === id);
+    function startEdit(id, field) {
+      var task = tasks.find(function(t) { return t.id === id; });
       if (!task) return;
 
-      const currentVal = task[field] || '';
-      let inputVal = type === 'date' ? dateToISO(currentVal) : currentVal;
+      var displayEl = event.target;
+      var currentVal = task[field] || '';
+      var isDate = (field === 'prazoReal');
+      var inputType = isDate ? 'date' : 'text';
 
-      const input = document.createElement('input');
+      var input = document.createElement('input');
+      input.type = inputType;
       input.className = 'inline-input';
-      input.type = type;
-      input.value = inputVal;
+      input.value = currentVal;
 
-      cell.textContent = '';
-      cell.classList.remove('empty');
-      cell.appendChild(input);
+      var originalVal = currentVal;
+      displayEl.textContent = '';
+      displayEl.appendChild(input);
       input.focus();
 
-      function commit() {
-        let newVal = input.value.trim();
-        if (type === 'date' && newVal) newVal = isoToDate(newVal);
-        task[field] = newVal;
-        saveToStorage();
-        renderTable();
-        updateDashboard();
-        populateFilters();
+      async function save() {
+        var newVal = input.value.trim();
+        if (newVal && newVal !== originalVal) {
+          task[field] = newVal;
+          if (field === 'status') {
+            showToast(t('tStatus') + newVal, 'info');
+          } else {
+            showToast(t('tUpdated'), 'success');
+          }
+          await saveToFirebase();
+          renderTable();
+          updateDashboard();
+        } else {
+          displayEl.textContent = currentVal || '—';
+        }
       }
 
-      input.addEventListener('blur', commit);
+      input.addEventListener('blur', save);
       input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-        if (e.key === 'Escape') { input.value = type === 'date' ? dateToISO(currentVal) : currentVal; input.blur(); }
+        if (e.key === 'Enter') { input.removeEventListener('blur', save); save(); input.blur(); }
+        if (e.key === 'Escape') { input.removeEventListener('blur', save); displayEl.textContent = currentVal || '—'; }
       });
     }
 
-    function updateField(id, field, value) {
-      const task = tasks.find(t => t.id === id);
+    async function updateField(id, field, value) {
+      var task = tasks.find(function(t) { return t.id === id; });
       if (!task) return;
       task[field] = value;
-      saveToStorage();
+      await saveToFirebase();
       renderTable();
       updateDashboard();
     }
@@ -1501,23 +1554,25 @@
     // MODAL
     // ============================================================
     function openModal(id) {
-      editingId = id || null;
-      const title = document.getElementById('modalTitle');
+      var modal = document.getElementById('taskModal');
+      var titleEl = document.getElementById('modalTitle');
 
-      if (editingId) {
-        title.textContent = 'Editar Tarefa';
-        const t = tasks.find(x => x.id === editingId);
-        if (!t) return;
-        document.getElementById('formCategoria').value = t.categoria;
-        document.getElementById('formEntrega').value = t.entrega;
-        document.getElementById('formResponsavel').value = t.responsavel;
-        document.getElementById('formStatus').value = t.status;
-        document.getElementById('formOffset').value = t.offset !== undefined ? t.offset : '';
-        document.getElementById('formPrazoReal').value = dateToISO(t.prazoReal);
-        document.getElementById('formObservacoes').value = t.observacoes;
+      if (id) {
+        var task = tasks.find(function(t) { return t.id === id; });
+        if (!task) return;
+        editTaskId = id;
+        titleEl.textContent = t('modalEdit');
+        document.getElementById('formCategoria').value = task.categoria;
+        document.getElementById('formEntrega').value = task.entrega;
+        document.getElementById('formResponsavel').value = task.responsavel;
+        document.getElementById('formStatus').value = task.status;
+        document.getElementById('formOffset').value = task.offset;
+        document.getElementById('formPrazoReal').value = task.prazoReal;
+        document.getElementById('formObservacoes').value = task.observacoes;
       } else {
-        title.textContent = 'Nova Tarefa';
-        document.getElementById('formCategoria').value = CATEGORIAS_ORDER[0];
+        editTaskId = null;
+        titleEl.textContent = t('modalNew');
+        document.getElementById('formCategoria').value = '';
         document.getElementById('formEntrega').value = '';
         document.getElementById('formResponsavel').value = '';
         document.getElementById('formStatus').value = 'Nao iniciado';
@@ -1526,49 +1581,69 @@
         document.getElementById('formObservacoes').value = '';
       }
 
-      document.getElementById('taskModal').classList.add('active');
-      setTimeout(() => document.getElementById('formEntrega').focus(), 100);
+      // Populate category select
+      var catSel = document.getElementById('formCategoria');
+      catSel.innerHTML = '';
+      CATEGORIAS_ORDER.forEach(function(c) {
+        var opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        catSel.appendChild(opt);
+      });
+
+      modal.classList.add('active');
     }
 
     function closeModal() {
       document.getElementById('taskModal').classList.remove('active');
-      editingId = null;
+      editTaskId = null;
     }
 
-    function saveTask() {
-      const cat = document.getElementById('formCategoria').value;
-      const entrega = document.getElementById('formEntrega').value.trim();
-      const resp = document.getElementById('formResponsavel').value.trim();
-      const status = document.getElementById('formStatus').value;
-      const offsetVal = document.getElementById('formOffset').value;
-      const pr = isoToDate(document.getElementById('formPrazoReal').value);
-      const obs = document.getElementById('formObservacoes').value.trim();
+    async function saveTask() {
+      var categoria = document.getElementById('formCategoria').value;
+      var entrega = document.getElementById('formEntrega').value.trim();
+      var responsavel = document.getElementById('formResponsavel').value.trim();
+      var status = document.getElementById('formStatus').value;
+      var offsetStr = document.getElementById('formOffset').value;
+      var prazoReal = document.getElementById('formPrazoReal').value;
+      var observacoes = document.getElementById('formObservacoes').value.trim();
 
-      if (!entrega) { showToast('Preencha o campo Entrega', 'warning'); return; }
-
-      const offset = offsetVal !== '' ? parseInt(offsetVal) : 0;
-      let pp = '';
-      if (EVENT_DATE) pp = formatDate(addDays(EVENT_DATE, offset));
-
-      if (editingId) {
-        const t = tasks.find(x => x.id === editingId);
-        if (t) {
-          t.categoria = cat;
-          t.entrega = entrega;
-          t.responsavel = resp;
-          t.status = status;
-          t.offset = offset;
-          t.prazoPlanejado = pp;
-          t.prazoReal = pr;
-          t.observacoes = obs;
-        }
-        showToast('Tarefa atualizada', 'success');
-      } else {
-        tasks.push({ id: nextId++, categoria: cat, entrega: entrega, responsavel: resp, offset: offset, prazoPlanejado: pp, prazoReal: pr, status: status, observacoes: obs });
-        showToast('Tarefa criada', 'success');
+      if (!entrega) {
+        showToast(t('tFill'), 'warning');
+        return;
       }
 
-      saveToStorage();
+      var offset = parseInt(offsetStr) || 0;
+
+      if (editTaskId) {
+        var task = tasks.find(function(t) { return t.id === editTaskId; });
+        if (task) {
+          task.categoria = categoria;
+          task.entrega = entrega;
+          task.responsavel = responsavel;
+          task.status = status;
+          task.offset = offset;
+          task.prazoReal = prazoReal;
+          task.observacoes = observacoes;
+          showToast(t('tEdited'), 'success');
+        }
+      } else {
+        var newTask = {
+          id: nextId++,
+          categoria: categoria,
+          entrega: entrega,
+          responsavel: responsavel,
+          offset: offset,
+          prazoPlanejado: '',
+          prazoReal: prazoReal,
+          status: status,
+          observacoes: observacoes
+        };
+        tasks.push(newTask);
+        showToast(t('tAdded'), 'success');
+      }
+
+      await saveToFirebase();
       closeModal();
       renderTable();
       updateDashboard();
@@ -1578,268 +1653,348 @@
     // ============================================================
     // EXCLUIR / RESETAR
     // ============================================================
-    function requestDelete(id) {
-      deleteTargetId = id;
-      confirmAction = 'delete';
+    function confirmDelete(id) {
+      var modal = document.getElementById('confirmModal');
+      document.getElementById('confirmIcon').innerHTML = '✕';
       document.getElementById('confirmIcon').className = 'confirm-icon';
-      document.getElementById('confirmIcon').textContent = 'X';
-      document.getElementById('confirmText').textContent = 'Tem certeza que deseja excluir esta tarefa?';
+      document.getElementById('confirmText').textContent = t('confDelete');
       document.getElementById('confirmYesBtn').className = 'btn-confirm-yes';
-      document.getElementById('confirmModal').classList.add('active');
+      confirmCallback = function() { executeConfirm('delete', id); };
+      modal.classList.add('active');
     }
 
     function requestReset() {
-      confirmAction = 'reset';
+      var modal = document.getElementById('confirmModal');
+      document.getElementById('confirmIcon').innerHTML = '!';
       document.getElementById('confirmIcon').className = 'confirm-icon warn';
-      document.getElementById('confirmIcon').textContent = '!';
-      document.getElementById('confirmText').textContent = 'Tem certeza que deseja resetar? Defina as datas e gere o cronograma novamente.';
+      document.getElementById('confirmText').textContent = t('confReset');
       document.getElementById('confirmYesBtn').className = 'btn-confirm-yes warn';
-      document.getElementById('confirmModal').classList.add('active');
-    }
-
-    function executeConfirm() {
-      if (confirmAction === 'delete' && deleteTargetId !== null) {
-        tasks = tasks.filter(t => t.id !== deleteTargetId);
-        deleteTargetId = null;
-        saveToStorage();
-        renderTable();
-        updateDashboard();
-        populateFilters();
-        showToast('Tarefa excluida', 'info');
-      } else if (confirmAction === 'reset') {
-        tasks = [];
-        EVENT_DATE = null;
-        localStorage.removeItem('essential_tasks');
-        localStorage.removeItem('essential_start');
-        localStorage.removeItem('essential_end');
-        document.getElementById('eventStartDate').value = '';
-        document.getElementById('eventEndDate').value = '';
-        document.getElementById('timelineFill').style.width = '0%';
-        document.getElementById('timelineInfo').innerHTML = 'Defina as datas e clique em <strong>Gerar Cronograma</strong>';
-        renderTable();
-        updateDashboard();
-        updateDaysCounter();
-        showToast('Dados resetados', 'warning');
-      }
-      closeConfirmModal();
+      confirmCallback = function() { executeConfirm('reset', null); };
+      modal.classList.add('active');
     }
 
     function closeConfirmModal() {
       document.getElementById('confirmModal').classList.remove('active');
-      confirmAction = null;
-      deleteTargetId = null;
+      confirmCallback = null;
     }
 
-    function clearFilters() {
-      document.getElementById('searchInput').value = '';
-      document.getElementById('filterCategoria').value = '';
-      document.getElementById('filterStatus').value = '';
-      document.getElementById('filterResponsavel').value = '';
-      renderTable();
+    async function executeConfirm(action, id) {
+      closeConfirmModal();
+      if (action === 'delete' && id) {
+        tasks = tasks.filter(function(t) { return t.id !== id; });
+        showToast(t('tDeleted'), 'success');
+        await saveToFirebase();
+        renderTable();
+        updateDashboard();
+        populateFilters();
+      } else if (action === 'reset') {
+        if (fbDb) {
+          try {
+            await fbDb.ref(FB_PATH).remove();
+          } catch(err) {
+            console.error('Firebase remove error:', err);
+          }
+        }
+        tasks = [];
+        nextId = 116;
+        showToast(t('tReset'), 'success');
+        renderTable();
+        updateDashboard();
+        populateFilters();
+      }
     }
 
     // ============================================================
     // TOAST
     // ============================================================
-    function showToast(msg, type) {
-      type = type || 'info';
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = 'toast ' + type;
-      toast.textContent = msg;
-      container.appendChild(toast);
-      requestAnimationFrame(() => { toast.classList.add('show'); });
-      setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 350);
-      }, 3500);
-    }
+    // (showToast defined above in UTILITÁRIOS)
 
     // ============================================================
     // IMPORTAR / EXPORTAR
     // ============================================================
-    function triggerImport() { document.getElementById('fileImport').click(); }
-    function handleImport(e) {
-      const file = e.target.files[0];
+    function triggerImport() {
+      document.getElementById('fileImport').click();
+    }
+
+    async function handleImport(event) {
+      var file = event.target.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(ev) {
+      var reader = new FileReader();
+      reader.onload = async function(e) {
         try {
-          const data = JSON.parse(ev.target.result);
-          if (Array.isArray(data) && data.length > 0) {
-            tasks = data;
-            nextId = Math.max(...tasks.map(t => t.id)) + 1;
-            saveToStorage();
-            populateFilters();
+          var data = JSON.parse(e.target.result);
+          if (data && Array.isArray(data.tasks)) {
+            tasks = data.tasks;
+            nextId = Math.max.apply(null, tasks.map(function(t) { return t.id; })) + 1;
+            if (data.eventStartDate) document.getElementById('eventStartDate').value = data.eventStartDate;
+            if (data.eventEndDate) document.getElementById('eventEndDate').value = data.eventEndDate;
+            if (data.eventStartDate) EVENT_DATE = parseDate(data.eventStartDate);
+            if (data.lang) {
+              lang = data.lang;
+              localStorage.setItem('essential_lang', lang);
+              applyLang();
+            }
+            await saveToFirebase();
             renderTable();
             updateDashboard();
-            showToast('Dados importados (' + data.length + ' tarefas)', 'success');
-          } else { showToast('Arquivo invalido', 'error'); }
-        } catch(err) { showToast('Erro ao ler: ' + err.message, 'error'); }
+            populateFilters();
+            showToast(t('tImported') + tasks.length + t('tTasks'), 'success');
+          } else {
+            showToast(t('tInvalid'), 'error');
+          }
+        } catch(err) {
+          showToast(t('tReadErr') + err.message, 'error');
+        }
       };
       reader.readAsText(file);
-      e.target.value = '';
+      event.target.value = '';
     }
 
     function exportData() {
-      if (tasks.length === 0) { showToast('Nenhum dado para exportar', 'warning'); return; }
-      const blob = new Blob([JSON.stringify(tasks, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      var data = {
+        tasks: tasks,
+        eventStartDate: document.getElementById('eventStartDate').value,
+        eventEndDate: document.getElementById('eventEndDate').value,
+        lang: lang
+      };
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
       a.href = url;
-      a.download = 'essential_' + new Date().toISOString().slice(0,10) + '.json';
+      a.download = 'essential_cronograma_' + new Date().toISOString().slice(0, 10) + '.json';
       a.click();
       URL.revokeObjectURL(url);
-      showToast('JSON exportado', 'success');
+      showToast(t('tExported'), 'success');
     }
 
     function exportToExcel() {
-      if (tasks.length === 0) { showToast('Nenhum dado para exportar', 'warning'); return; }
-      try {
-        const rows = tasks.map(t => ({
-          'Categoria': t.categoria, 'Entrega': t.entrega, 'Responsavel': t.responsavel,
-          'Offset (dias)': t.offset, 'Prazo Planejado': t.prazoPlanejado,
-          'Prazo Real': t.prazoReal, 'Status': t.status, 'Observacoes': t.observacoes
-        }));
-        const ws = XLSX.utils.json_to_sheet(rows);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Essential');
-        XLSX.writeFile(wb, 'essential_' + new Date().toISOString().slice(0,10) + '.xlsx');
-        showToast('Excel exportado', 'success');
-      } catch(err) { showToast('Erro: ' + err.message, 'error'); }
+      if (typeof XLSX === 'undefined') { showToast(t('tXlsxErr') + 'SheetJS not loaded', 'error'); return; }
+      var rows = [];
+      rows.push([t('thCat'), t('thEnt'), t('thResp'), t('thOffset'), t('thPP'), t('thPR'), t('thSt'), t('thObs')]);
+      tasks.forEach(function(task) {
+        rows.push([task.categoria, task.entrega, task.responsavel, task.offset, task.prazoPlanejado, task.prazoReal, task.status, task.observacoes]);
+      });
+      var ws = XLSX.utils.aoa_to_sheet(rows);
+      var wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
+      XLSX.writeFile(wb, 'essential_cronograma_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+      showToast(t('tExcel'), 'success');
     }
 
     function exportToPDF() {
-      if (tasks.length === 0) { showToast('Nenhum dado para exportar', 'warning'); return; }
-      try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('l', 'mm', 'a4');
-        const startD = document.getElementById('eventStartDate').value;
-        const endD = document.getElementById('eventEndDate').value;
-        doc.setFontSize(16);
-        doc.text('Curso Essential — Cronograma', 14, 15);
-        doc.setFontSize(10);
-        doc.text('Periodo: ' + isoToDate(startD) + ' a ' + isoToDate(endD) + ' | Gerado: ' + new Date().toLocaleDateString('pt-BR'), 14, 22);
+      if (typeof jspdf === 'undefined') { showToast(t('tPdfErr') + 'jsPDF not loaded', 'error'); return; }
+      var doc = new jspdf.jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      doc.setFontSize(16);
+      doc.text(t('pdfTitle'), 14, 18);
+      doc.setFontSize(10);
+      var period = document.getElementById('eventStartDate').value + ' — ' + document.getElementById('eventEndDate').value;
+      doc.text(t('pdfPeriod') + period, 14, 25);
+      doc.text(t('pdfGenerated') + formatDateBR(new Date()), 14, 31);
 
-        const rows = tasks.map(t => [t.categoria, t.entrega, t.responsavel, offsetLabel(t.offset), t.prazoPlanejado, t.prazoReal, t.status, t.observacoes]);
+      var head = [[t('thCat'), t('thEnt'), t('thResp'), t('thOffset'), t('thPP'), t('thPR'), t('thSt')]];
+      var body = tasks.map(function(task) {
+        return [task.categoria, task.entrega, task.responsavel, String(task.offset), task.prazoPlanejado, task.prazoReal, task.status];
+      });
 
-        doc.autoTable({
-          startY: 28,
-          head: [['Categoria', 'Entrega', 'Responsavel', 'Offset', 'Prazo Planejado', 'Prazo Real', 'Status', 'Observacoes']],
-          body: rows,
-          styles: { fontSize: 6.5, font: 'helvetica', cellPadding: 2 },
-          headStyles: { fillColor: [26, 26, 46], textColor: 255, fontSize: 7, fontStyle: 'bold' },
-          columnStyles: { 0: { cellWidth: 26, fontStyle: 'bold' }, 1: { cellWidth: 46 }, 2: { cellWidth: 24 }, 3: { cellWidth: 14 }, 4: { cellWidth: 20 }, 5: { cellWidth: 20 }, 6: { cellWidth: 18 }, 7: { cellWidth: 'auto' } },
-          alternateRowStyles: { fillColor: [248, 248, 248] },
-          didParseCell: function(data) {
-            if (data.section === 'body' && data.column.index === 6) {
-              const v = data.cell.raw;
-              if (v === 'Concluido') data.cell.styles.textColor = [45, 138, 78];
-              else if (v === 'Atrasado') data.cell.styles.textColor = [192, 57, 43];
-              else if (v === 'Em andamento') data.cell.styles.textColor = [184, 134, 11];
-            }
-          }
-        });
-        doc.save('essential_' + new Date().toISOString().slice(0,10) + '.pdf');
-        showToast('PDF exportado', 'success');
-      } catch(err) { showToast('Erro: ' + err.message, 'error'); }
+      doc.autoTable({
+        head: head,
+        body: body,
+        startY: 36,
+        styles: { fontSize: 7, cellPadding: 1.5 },
+        headStyles: { fillColor: [26, 26, 46], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [247, 247, 247] },
+        margin: { left: 14, right: 14 }
+      });
+
+      doc.save('essential_cronograma_' + new Date().toISOString().slice(0, 10) + '.pdf');
+      showToast(t('tPdf'), 'success');
     }
 
     // ============================================================
     // FECHAR MODAIS
     // ============================================================
+    document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+          overlay.classList.remove('active');
+          if (overlay.id === 'confirmModal') confirmCallback = null;
+        }
+      });
+    });
+
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
-        if (document.getElementById('confirmModal').classList.contains('active')) closeConfirmModal();
-        else if (document.getElementById('taskModal').classList.contains('active')) closeModal();
+        document.querySelectorAll('.modal-overlay.active').forEach(function(overlay) {
+          overlay.classList.remove('active');
+        });
+        confirmCallback = null;
       }
     });
-    document.getElementById('taskModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
-    document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target === this) closeConfirmModal(); });
 
     // ============================================================
     // TOGGLE IDIOMA
     // ============================================================
-    function toggleLang(){
-      lang = lang === 'pt' ? 'en' : 'pt';
+    function toggleLang() {
+      lang = (lang === 'pt') ? 'en' : 'pt';
       localStorage.setItem('essential_lang', lang);
-      applyLanguage();
-      updateDashboard();
-      renderTable();
-      populateFilters();
+      applyLang();
     }
 
-    function applyLanguage(){
-      document.querySelector('.header-title').innerHTML = t('headerTitle');
-      document.querySelector('.header-subtitle').textContent = t('headerSub');
-      document.getElementById('langLabel').textContent = lang === 'pt' ? 'EN' : 'PT';
-      
-      // Date banner
-      document.querySelector('.date-banner-info h2').innerHTML = t('dateBannerTitle');
-      const tags = document.querySelectorAll('.info-tag');
-      if (tags.length >= 5) {
-        tags[0].innerHTML = t('dateBannerTag1');
-        tags[1].innerHTML = t('dateBannerTag2');
-        tags[2].innerHTML = t('dateBannerTag3');
-        tags[3].innerHTML = t('dateBannerTag4');
-        tags[4].innerHTML = t('dateBannerTag5');
+    function applyLang() {
+      document.getElementById('langLabel').textContent = (lang === 'pt') ? 'EN' : 'PT';
+
+      var mapping = {
+        '.header-title': 'headerTitle',
+        '.header-subtitle': 'headerSub',
+        '.date-banner-info h2': 'dateBannerTitle',
+        '.tag-row': null,
+        '.date-field label[for="eventStartDate"], .date-field:first-of-type label': 'dateStartLabel',
+        '.date-field:nth-of-type(2) label': 'dateEndLabel',
+        '.btn-generate': 'btnGenerate',
+        '.timeline-mini-label': 'timelineLabel',
+        '.timeline-mini-info': 'timelineInfo',
+        '.dashboard-label': 'dashLabel',
+        '.days-counter': null,
+        '.stat-card:nth-child(1) .stat-label': 'labelNI',
+        '.stat-card:nth-child(2) .stat-label': 'labelEA',
+        '.stat-card:nth-child(3) .stat-label': 'labelOK',
+        '.stat-card:nth-child(4) .stat-label': 'labelAT',
+        '.stat-card:nth-child(5) .stat-label': 'labelCA',
+        '.progress-title': 'progTitle',
+        '#progressDone': null,
+        '#progressRemain': null,
+        '.search-box input': 'searchPh',
+        '#filterStatus option:nth-child(1)': 'allStatus',
+        '#filterCategoria option:nth-child(1)': 'allCats',
+        '#filterResponsavel option:nth-child(1)': 'allResponsaveis',
+        '.btn-clear-filters': 'btnClear',
+        '.btn-reset': 'btnReset',
+        '.btn-add': 'btnAdd',
+        'thead th:nth-child(1)': 'thCat',
+        'thead th:nth-child(2)': 'thEnt',
+        'thead th:nth-child(3)': 'thResp',
+        'thead th:nth-child(4)': 'thOffset',
+        'thead th:nth-child(5)': 'thPP',
+        'thead th:nth-child(6)': 'thPR',
+        'thead th:nth-child(7)': 'thSt',
+        'thead th:nth-child(8)': 'thObs',
+        'thead th:nth-child(9)': 'thAct'
+      };
+
+      // Update simple text elements
+      document.querySelectorAll('.header-title').forEach(function(el) { el.innerHTML = t('headerTitle'); });
+      document.querySelectorAll('.header-subtitle').forEach(function(el) { el.textContent = t('headerSub'); });
+      document.querySelectorAll('.date-banner-info h2').forEach(function(el) { el.innerHTML = t('dateBannerTitle'); });
+
+      // Update date labels
+      var dateLabels = document.querySelectorAll('.date-field label');
+      if (dateLabels.length >= 2) {
+        dateLabels[0].textContent = t('dateStartLabel');
+        dateLabels[1].textContent = t('dateEndLabel');
       }
-      
-      // Date fields
-      document.querySelector('.date-field:first-child label').textContent = t('dateStartLabel');
-      document.querySelector('.date-field:last-child label').textContent = t('dateEndLabel');
-      document.querySelector('.btn-generate').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> ' + t('btnGenerate');
-      
-      // Timeline
-      document.querySelector('.timeline-mini-label').textContent = t('timelineLabel');
+
+      // Update buttons
+      document.querySelectorAll('.btn-generate').forEach(function(el) { el.childNodes[el.childNodes.length - 1].textContent = ' ' + t('btnGenerate'); });
+      document.querySelectorAll('.timeline-mini-label').forEach(function(el) { el.textContent = t('timelineLabel'); });
+      document.querySelectorAll('.dashboard-label').forEach(function(el) { el.textContent = t('dashLabel'); });
+      document.querySelectorAll('.btn-clear-filters').forEach(function(el) { el.textContent = t('btnClear'); });
+      document.querySelectorAll('.btn-reset').forEach(function(el) { el.textContent = t('btnReset'); });
+      document.querySelectorAll('.btn-add').forEach(function(el) { el.textContent = t('btnAdd'); });
+
+      // Update stat labels
+      var statCards = document.querySelectorAll('.stat-card');
+      var statKeys = ['labelNI', 'labelEA', 'labelOK', 'labelAT', 'labelCA'];
+      statCards.forEach(function(card, i) {
+        if (statKeys[i]) {
+          var label = card.querySelector('.stat-label');
+          if (label) label.textContent = t(statKeys[i]);
+        }
+      });
+
+      // Update progress
+      document.querySelectorAll('.progress-title').forEach(function(el) { el.textContent = t('progTitle'); });
+
+      // Update search placeholder
+      var searchInput = document.getElementById('searchInput');
+      if (searchInput) searchInput.placeholder = t('searchPh');
+
+      // Update filter first options
+      var filterStatus = document.getElementById('filterStatus');
+      if (filterStatus && filterStatus.options[0]) filterStatus.options[0].textContent = t('allStatus');
+      var filterCat = document.getElementById('filterCategoria');
+      if (filterCat && filterCat.options[0]) filterCat.options[0].textContent = t('allCats');
+      var filterResp = document.getElementById('filterResponsavel');
+      if (filterResp && filterResp.options[0]) filterResp.options[0].textContent = t('allResponsaveis');
+
+      // Update table headers
+      var ths = document.querySelectorAll('thead th');
+      var thKeys = ['thCat', 'thEnt', 'thResp', 'thOffset', 'thPP', 'thPR', 'thSt', 'thObs', 'thAct'];
+      ths.forEach(function(th, i) {
+        if (thKeys[i]) th.textContent = t(thKeys[i]);
+      });
+
+      // Update days counter
+      var daysCounter = document.querySelector('.days-counter');
+      if (daysCounter) {
+        var html = daysCounter.innerHTML;
+        var parts = html.split(/(<span[^>]*>.*?<\/span>)/);
+        var newHtml = '';
+        parts.forEach(function(part) {
+          if (part.indexOf('<span') === 0) {
+            newHtml += part;
+          } else {
+            newHtml = newHtml.replace('Faltam', t('daysBefore')).replace('dias', t('daysAfter'));
+          }
+        });
+        // Rebuild
+        var num = document.getElementById('daysNum');
+        daysCounter.innerHTML = '<span>' + t('daysBefore') + '</span> <span class="days-num" id="daysNum">' + (num ? num.textContent : '--') + '</span> <span>' + t('daysAfter') + '</span>';
+      }
+
+      // Update progress details
+      updateDashboard();
+
+      // Update timeline info
       if (!EVENT_DATE) {
-        document.getElementById('timelineInfo').innerHTML = t('timelineInfo');
+        var tlInfo = document.getElementById('timelineInfo');
+        if (tlInfo) tlInfo.innerHTML = t('timelineInfo');
       }
-      
-      // Dashboard
-      document.getElementById('dashLabel').textContent = t('dashLabel');
-      document.getElementById('labelNI').textContent = t('labelNI');
-      document.getElementById('labelEA').textContent = t('labelEA');
-      document.getElementById('labelOK').textContent = t('labelOK');
-      document.getElementById('labelAT').textContent = t('labelAT');
-      document.getElementById('labelCA').textContent = t('labelCA');
-      document.getElementById('progTitle').textContent = t('progTitle');
-      
-      // Search
-      document.getElementById('searchInput').placeholder = t('searchPh');
-      
-      // Toolbar buttons
-      document.querySelector('.btn-clear-filters').textContent = t('btnClear');
-      document.querySelector('.btn-reset').textContent = t('btnReset');
-      document.querySelector('.btn-add').textContent = t('btnAdd');
-      
-      // Table headers
-      const ths = document.querySelectorAll('#taskTable thead th');
-      if (ths.length >= 9) {
-        ths[0].textContent = t('thCat');
-        ths[1].textContent = t('thEnt');
-        ths[2].textContent = t('thResp');
-        ths[3].textContent = t('thOffset');
-        ths[4].textContent = t('thPP');
-        ths[5].textContent = t('thPR');
-        ths[6].textContent = t('thSt');
-        ths[7].textContent = t('thObs');
-        ths[8].textContent = t('thAct');
+
+      // Update tag row
+      var tagRow = document.querySelector('.tag-row');
+      if (tagRow) {
+        var tags = tagRow.querySelectorAll('.info-tag');
+        var tagKeys = ['dateBannerTag1', 'dateBannerTag2', 'dateBannerTag3', 'dateBannerTag4', 'dateBannerTag5'];
+        tags.forEach(function(tag, i) {
+          if (tagKeys[i]) tag.innerHTML = t(tagKeys[i]);
+        });
       }
+
+      // Update filter status options
+      if (filterStatus) {
+        var stOptions = ['stNI', 'stEA', 'stOK', 'stAT', 'stCan'];
+        for (var i = 1; i <= 5; i++) {
+          if (filterStatus.options[i]) filterStatus.options[i].textContent = t(stOptions[i - 1]);
+        }
+      }
+
+      // Re-render table to update status labels
+      renderTable();
     }
 
     // ============================================================
     // INICIALIZAR
     // ============================================================
-    function init() {
-      loadFromStorage();
-      applyLanguage();
-      populateFilters();
+    async function init() {
+      await loadFromFirebase();
+      applyLang();
       renderTable();
       updateDashboard();
       updateDaysCounter();
-      if (EVENT_DATE) updateTimelineBar();
+      populateFilters();
+      setInterval(updateDaysCounter, 60000);
     }
+
     init();
   </script>
 </body>
