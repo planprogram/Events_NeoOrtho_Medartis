@@ -203,18 +203,56 @@ async function handleRegister(e) {
     if (pw.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
     btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
     try {
+        // Step 1: Check if Firebase Auth is available
+        if (!auth) {
+            showAuthError('Firebase Auth not initialized. Please refresh the page.');
+            return;
+        }
+        // Step 2: Create auth user
         const isFirst = await isFirstUser();
         const role = isFirst ? 'admin' : 'viewer';
-        const result = await auth.createUserWithEmailAndPassword(email, pw);
-        await result.user.updateProfile({ displayName: name });
-        await db.ref('users/' + result.user.uid).set({
-            name: name,
-            email: email,
-            role: role,
-            color: COLORS[Math.floor(Math.random() * COLORS.length)],
-            createdAt: new Date().toISOString(),
-            lastLogin: new Date().toISOString()
-        });
+        let result;
+        try {
+            result = await auth.createUserWithEmailAndPassword(email, pw);
+        } catch(authErr) {
+            console.error('Auth creation error:', authErr);
+            let msg = 'Account creation failed. ';
+            if (authErr.code === 'auth/email-already-in-use') msg += 'This email is already registered.';
+            else if (authErr.code === 'auth/invalid-email') msg += 'Invalid email format.';
+            else if (authErr.code === 'auth/weak-password') msg += 'Password is too weak.';
+            else if (authErr.code === 'auth/configuration-not-found') msg += 'Firebase Auth (Email/Password) is not enabled. Go to Firebase Console > Authentication > Sign-in method > Enable Email/Password.';
+            else if (authErr.code === 'auth/invalid-api-key') msg += 'Invalid API key. Check Firebase config.';
+            else if (authErr.code === 'auth/network-request-failed') msg += 'Network error. Check your connection.';
+            else if (authErr.code === 'auth/operation-not-allowed') msg += 'Email/Password sign-in is not enabled in Firebase Console.';
+            else msg += authErr.message;
+            showAuthError(msg);
+            return;
+        }
+        // Step 3: Update profile
+        try {
+            await result.user.updateProfile({ displayName: name });
+        } catch(profErr) {
+            console.warn('Profile update failed (non-critical):', profErr);
+        }
+        // Step 4: Save user data to database
+        try {
+            await db.ref('users/' + result.user.uid).set({
+                name: name,
+                email: email,
+                role: role,
+                color: COLORS[Math.floor(Math.random() * COLORS.length)],
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString()
+            });
+        } catch(dbErr) {
+            console.error('Database write error:', dbErr);
+            let msg = 'Account created but database write failed. ';
+            if (dbErr.code === 'PERMISSION_DENIED') msg += 'Database rules do not allow writing. Check Firebase Realtime Database rules.';
+            else msg += dbErr.message;
+            showAuthError(msg);
+            return;
+        }
+        // Success
         if (isFirst) {
             showAuthSuccess('Account created! You are the Administrator. Please sign in.');
         } else {
@@ -233,6 +271,7 @@ async function handleRegister(e) {
         else if (err.code === 'auth/configuration-not-found') msg += 'Firebase Auth is not configured. Check project settings.';
         else if (err.code === 'auth/invalid-api-key') msg += 'Invalid API key. Check Firebase config.';
         else if (err.code === 'auth/network-request-failed') msg += 'Network error. Check your connection.';
+        else if (err.code === 'PERMISSION_DENIED') msg += 'Database permission denied. Check Firebase Realtime Database rules.';
         else msg += err.message;
         showAuthError(msg);
     } finally {
