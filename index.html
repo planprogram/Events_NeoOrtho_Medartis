@@ -209,6 +209,9 @@
         .page-section{display:none}
         .page-section.active{display:block}
         .mobile-menu-btn{display:none!important}
+        .cover-preview{height:100px;border-radius:8px;background-size:cover;background-position:center;background-color:var(--neo-gray-100);border:1px solid var(--neo-border);display:flex;align-items:center;justify-content:center;overflow:hidden;transition:all .2s}
+        .cover-preview.has-image{height:120px}
+        .cover-preview img{width:100%;height:100%;object-fit:cover}
         @media(max-width:1024px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:768px){
             .login-left{display:none}
@@ -271,7 +274,7 @@
         <div class="sidebar-footer">
             <div class="sidebar-user">
                 <div class="avatar" id="sidebarAvatar">AD</div>
-                <div class="user-info"><div class="name" id="sidebarName">Admin</div><div class="role">Administrator <span class="sync-ind"><span class="sync-dot"></span>synced</span></div></div>
+                <div class="user-info"><div class="name" id="sidebarName">Admin</div><div class="role">Administrator <span class="sync-ind"><span class="sync-dot"></span> synced</span></div></div>
                 <div class="logout-btn" onclick="logout()" title="Sign Out"><i class="fas fa-sign-out-alt"></i></div>
             </div>
         </div>
@@ -302,7 +305,7 @@
         <section class="page-section" id="page-draft"><div class="page-content"><div class="page-header"><h2>Draft Projects</h2><p>Still being planned</p></div><div class="projects-grid" id="draftProjects"></div></div></section>
     </main>
 </div>
-<div class="modal-overlay" id="projectModal"><div class="modal"><div class="modal-header"><h3 id="projectModalTitle">New Project</h3><button class="modal-close" onclick="closeModal('projectModal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="projectForm" onsubmit="saveProject(event)"><input type="hidden" id="projectId"><div class="mf-group"><label>Project Name</label><input type="text" id="projectName" placeholder="e.g. 3D Bracket Design v2" required></div><div class="mf-row"><div class="mf-group"><label>Category</label><select id="projectCategory"><option value="Design">Design</option><option value="Engineering">Engineering</option><option value="Research">Research</option><option value="Software">Software</option><option value="Marketing">Marketing</option><option value="Clinical">Clinical</option><option value="Other">Other</option></select></div><div class="mf-group"><label>Status</label><select id="projectStatus"><option value="active">Active</option><option value="paused">Paused</option><option value="completed">Completed</option><option value="draft">Draft</option></select></div></div><div class="mf-group"><label>Description</label><textarea id="projectDesc" placeholder="Brief description..."></textarea></div><div style="margin-top:.3rem"><div class="perm-title"><i class="fas fa-shield-alt"></i> Access & Permissions</div><div class="perm-list" id="permList"></div><div style="position:relative;width:100%" id="addPermWrap"><button type="button" class="add-perm-btn" onclick="togglePermDD()"><i class="fas fa-user-plus"></i> Add person to this project</button><div class="dd-menu" id="permDD"><div class="dd-search"><input type="text" placeholder="Search people..." id="permSearchIn" oninput="filterPermDD(this.value)"></div><div id="permDDList"></div></div></div></div><div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeModal('projectModal')">Cancel</button><button type="submit" class="btn-primary" id="projectSubmitBtn">Save Project</button></div></form></div></div></div>
+<div class="modal-overlay" id="projectModal"><div class="modal"><div class="modal-header"><h3 id="projectModalTitle">New Project</h3><button class="modal-close" onclick="closeModal('projectModal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="projectForm" onsubmit="saveProject(event)"><input type="hidden" id="projectId"><div class="mf-group"><label>Project Name</label><input type="text" id="projectName" placeholder="e.g. 3D Bracket Design v2" required></div><div class="mf-row"><div class="mf-group"><label>Category</label><select id="projectCategory"><option value="Neoortho">Neoortho</option><option value="Medartis">Medartis</option><option value="IBRA">IBRA</option><option value="Outros">Outros</option></select></div><div class="mf-group"><label>Status</label><select id="projectStatus"><option value="active">Active</option><option value="paused">Paused</option><option value="completed">Completed</option><option value="draft">Draft</option></select></div></div><div class="mf-group"><label>Cover Image URL</label><input type="url" id="projectCover" placeholder="https://example.com/image.jpg" oninput="previewCover(this.value)"><div id="coverPreview" class="cover-preview"><i class="fas fa-image" style="color:var(--neo-gray-400);font-size:1.5rem"></i></div></div><div class="mf-group"><label>Description</label><textarea id="projectDesc" placeholder="Brief description..."></textarea></div><div style="margin-top:.3rem"><div class="perm-title"><i class="fas fa-shield-alt"></i> Access & Permissions</div><div class="perm-list" id="permList"></div><div style="position:relative;width:100%" id="addPermWrap"><button type="button" class="add-perm-btn" onclick="togglePermDD()"><i class="fas fa-user-plus"></i> Add person to this project</button><div class="dd-menu" id="permDD"><div class="dd-search"><input type="text" placeholder="Search people..." id="permSearchIn" oninput="filterPermDD(this.value)"></div><div id="permDDList"></div></div></div></div><div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeModal('projectModal')">Cancel</button><button type="submit" class="btn-primary" id="projectSubmitBtn">Save Project</button></div></form></div></div></div>
 <div class="modal-overlay" id="peopleModal"><div class="modal" style="max-width:440px"><div class="modal-header"><h3 id="peopleModalTitle">Add Person</h3><button class="modal-close" onclick="closeModal('peopleModal')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="peopleForm" onsubmit="savePerson(event)"><input type="hidden" id="personId"><div class="mf-group"><label>Full Name</label><input type="text" id="personName" placeholder="e.g. Maria Silva" required></div><div class="mf-group"><label>Email</label><input type="email" id="personEmail" placeholder="e.g. maria@neoortho.com" required></div><div class="mf-group"><label>Global Role</label><select id="personRole"><option value="viewer">Viewer — Can only view</option><option value="editor">Editor — Can view and edit</option><option value="admin">Admin — Full access</option></select></div><div class="modal-actions"><button type="button" class="btn-secondary" onclick="closeModal('peopleModal')">Cancel</button><button type="submit" class="btn-primary">Save Person</button></div></form></div></div></div>
 <div class="modal-overlay" id="confirmModal"><div class="modal" style="max-width:390px"><div class="modal-body"><div class="confirm-dialog"><i class="fas fa-exclamation-triangle"></i><h4 id="confirmTitle">Delete?</h4><p id="confirmMsg">This cannot be undone.</p><div class="confirm-actions"><button class="btn-secondary" onclick="closeModal('confirmModal')">Cancel</button><button class="btn-danger" id="confirmBtn" onclick="confirmAction()">Delete</button></div></div></div></div></div>
 <div class="modal-overlay" id="detailModal"><div class="modal" style="max-width:620px"><div class="modal-header"><h3>Project Details</h3><button class="modal-close" onclick="closeModal('detailModal')"><i class="fas fa-times"></i></button></div><div class="modal-body" id="detailContent"></div></div></div>
@@ -354,12 +357,12 @@ function seedPeople() {
 }
 function seedProjects() {
     return {
-        pr1:{name:'3D Bracket Design v2',category:'Design',status:'active',desc:'Redesign of the self-ligating bracket with improved torque control.',cover:COVERS[0],date:'2024-12-10',permissions:{a:{personId:'p1',role:'editor'},b:{personId:'p2',role:'editor'},c:{personId:'p4',role:'viewer'}}},
-        pr2:{name:'AI Treatment Planner',category:'Software',status:'active',desc:'ML model to predict optimal tooth movement sequences.',cover:COVERS[1],date:'2024-11-28',permissions:{d:{personId:'p1',role:'editor'},e:{personId:'p3',role:'editor'},f:{personId:'p5',role:'viewer'}}},
-        pr3:{name:'NiTi Wire Thermal Study',category:'Research',status:'completed',desc:'Comparative analysis of superelastic NiTi wires.',cover:COVERS[2],date:'2024-10-15',permissions:{g:{personId:'p1',role:'editor'},h:{personId:'p6',role:'editor'},i:{personId:'p4',role:'viewer'}}},
-        pr4:{name:'Patient App Redesign',category:'Software',status:'paused',desc:'Complete UX overhaul of the patient-facing mobile app.',cover:COVERS[3],date:'2024-11-05',permissions:{j:{personId:'p2',role:'editor'},k:{personId:'p3',role:'viewer'}}},
-        pr5:{name:'Clear Aligner Material Test',category:'Research',status:'active',desc:'Testing new multi-layer polymer for clear aligners.',cover:COVERS[4],date:'2024-12-01',permissions:{l:{personId:'p1',role:'editor'},m:{personId:'p6',role:'editor'},n:{personId:'p5',role:'viewer'},o:{personId:'p4',role:'viewer'}}},
-        pr6:{name:'Clinic Dashboard Analytics',category:'Software',status:'draft',desc:'BI dashboard for clinic managers.',cover:COVERS[5],date:'2024-12-18',permissions:{p:{personId:'p1',role:'editor'},q:{personId:'p3',role:'editor'}}}
+        pr1:{name:'3D Bracket Design v2',category:'Neoortho',status:'active',desc:'Redesign of the self-ligating bracket with improved torque control.',cover:COVERS[0],date:'2024-12-10',permissions:{a:{personId:'p1',role:'editor'},b:{personId:'p2',role:'editor'},c:{personId:'p4',role:'viewer'}}},
+        pr2:{name:'AI Treatment Planner',category:'Neoortho',status:'active',desc:'ML model to predict optimal tooth movement sequences.',cover:COVERS[1],date:'2024-11-28',permissions:{d:{personId:'p1',role:'editor'},e:{personId:'p3',role:'editor'},f:{personId:'p5',role:'viewer'}}},
+        pr3:{name:'NiTi Wire Thermal Study',category:'Medartis',status:'completed',desc:'Comparative analysis of superelastic NiTi wires.',cover:COVERS[2],date:'2024-10-15',permissions:{g:{personId:'p1',role:'editor'},h:{personId:'p6',role:'editor'},i:{personId:'p4',role:'viewer'}}},
+        pr4:{name:'Patient App Redesign',category:'Neoortho',status:'paused',desc:'Complete UX overhaul of the patient-facing mobile app.',cover:COVERS[3],date:'2024-11-05',permissions:{j:{personId:'p2',role:'editor'},k:{personId:'p3',role:'viewer'}}},
+        pr5:{name:'Clear Aligner Material Test',category:'Medartis',status:'active',desc:'Testing new multi-layer polymer for clear aligners.',cover:COVERS[4],date:'2024-12-01',permissions:{l:{personId:'p1',role:'editor'},m:{personId:'p6',role:'editor'},n:{personId:'p5',role:'viewer'},o:{personId:'p4',role:'viewer'}}},
+        pr6:{name:'Clinic Dashboard Analytics',category:'IBRA',status:'draft',desc:'BI dashboard for clinic managers.',cover:COVERS[5],date:'2024-12-18',permissions:{p:{personId:'p1',role:'editor'},q:{personId:'p3',role:'editor'}}}
     };
 }
 
@@ -534,10 +537,27 @@ function renderHubCards() {
 function setFilter(f,btn) { currentFilter=f; btn.closest('.filter-bar').querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); renderProjectGrids(); }
 function handleSearch(q) { searchQuery=q; renderProjectGrids(); }
 
+// Cover image preview
+function previewCover(url) {
+    const preview = document.getElementById('coverPreview');
+    if (url && url.trim()) {
+        preview.innerHTML = `<img src="${url}" alt="Cover preview" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-exclamation-triangle\\' style=\\'color:var(--neo-danger);font-size:1.5rem\\'></i>';this.parentElement.classList.remove('has-image')">`;
+        preview.classList.add('has-image');
+        preview.style.backgroundImage = `url('${url}')`;
+    } else {
+        preview.innerHTML = '<i class="fas fa-image" style="color:var(--neo-gray-400);font-size:1.5rem"></i>';
+        preview.classList.remove('has-image');
+        preview.style.backgroundImage = '';
+    }
+}
+
 // Project CRUD
 async function openProjectModal(fbKey) {
     document.getElementById('projectForm').reset();
     document.getElementById('projectId').value = '';
+    document.getElementById('coverPreview').innerHTML = '<i class="fas fa-image" style="color:var(--neo-gray-400);font-size:1.5rem"></i>';
+    document.getElementById('coverPreview').classList.remove('has-image');
+    document.getElementById('coverPreview').style.backgroundImage = '';
     if(fbKey) {
         const pr = projects.find(p=>p._fbKey===fbKey);
         if(!pr) return;
@@ -547,6 +567,8 @@ async function openProjectModal(fbKey) {
         document.getElementById('projectCategory').value = pr.category;
         document.getElementById('projectStatus').value = pr.status;
         document.getElementById('projectDesc').value = pr.desc||'';
+        document.getElementById('projectCover').value = pr.cover||'';
+        previewCover(pr.cover||'');
         tempPermissions = getPerms(pr).map(pm=>({personId:pm.personId,role:pm.role}));
     } else {
         document.getElementById('projectModalTitle').textContent = 'New Project';
@@ -564,22 +586,23 @@ async function saveProject(e) {
     const fbKey = document.getElementById('projectId').value;
     const permObj = {};
     tempPermissions.forEach((pm,i) => { permObj['p'+i] = {personId:pm.personId,role:pm.role}; });
+    const coverUrl = document.getElementById('projectCover').value.trim();
     const data = {
         name: document.getElementById('projectName').value.trim(),
         category: document.getElementById('projectCategory').value,
         status: document.getElementById('projectStatus').value,
         desc: document.getElementById('projectDesc').value.trim(),
+        cover: coverUrl || COVERS[Math.floor(Math.random()*COVERS.length)],
         permissions: permObj
     };
     try {
         if(fbKey) {
             const existing = projects.find(p=>p._fbKey===fbKey);
-            if(existing) { data.date = existing.date; data.cover = existing.cover||COVERS[0]; }
+            if(existing) { data.date = existing.date; if(!coverUrl) data.cover = existing.cover||COVERS[0]; }
             await db.ref('projects/'+fbKey).update(data);
             showToast('Project updated','success');
         } else {
             data.date = new Date().toISOString().split('T')[0];
-            data.cover = COVERS[Math.floor(Math.random()*COVERS.length)];
             await db.ref('projects').push(data);
             showToast('Project created','success');
         }
@@ -611,7 +634,10 @@ function openDetail(fbKey) {
         return `<div class="perm-item"><div class="perm-av" style="background:${ps.color}">${initials(ps.name)}</div><div class="perm-nm">${ps.name}</div><span class="p-role-badge ${pm.role}" style="margin:0">${pm.role}</span></div>`;
     }).join('');
     document.getElementById('detailContent').innerHTML = `
-        <div style="height:170px;border-radius:11px;background-image:url('${pr.cover||COVERS[0]}');background-size:cover;background-position:center;margin-bottom:1.15rem;position:relative"><span class="status-badge ${pr.status}" style="position:absolute;top:10px;right:10px">${pr.status}</span></div>
+        <div style="height:170px;border-radius:11px;background-image:url('${pr.cover||COVERS[0]}');background-size:cover;background-position:center;margin-bottom:1.15rem;position:relative">
+            <span class="status-badge ${pr.status}" style="position:absolute;top:10px;right:10px">${pr.status}</span>
+            <button class="card-act-btn" style="position:absolute;top:10px;left:10px" onclick="editProject('${pr._fbKey}')" title="Edit cover"><i class="fas fa-camera"></i></button>
+        </div>
         <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--neo-purple);margin-bottom:.3rem">${pr.category}</div>
         <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.35rem;font-weight:700;margin-bottom:.45rem">${pr.name}</h3>
         <p style="color:var(--neo-text-muted);font-size:.9rem;line-height:1.6;margin-bottom:1.15rem">${pr.desc||'No description.'}</p>
