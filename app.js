@@ -1,14 +1,16 @@
 // Firebase Config
-firebase.initializeApp({
-    apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
-    authDomain: "neoorthomedartis.firebaseapp.com",
-    databaseURL: "https://neoorthomedartis-default-rtdb.firebaseio.com",
-    projectId: "neoorthomedartis",
-    storageBucket: "neoorthomedartis.firebasestorage.app",
-    messagingSenderId: "48492402152",
-    appId: "1:48492402152:web:c395acaf1e365d491bc05d",
-    measurementId: "G-W4JC235S2Y"
-});
+if (!firebase.apps.length) {
+    firebase.initializeApp({
+        apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
+        authDomain: "neoorthomedartis.firebaseapp.com",
+        databaseURL: "https://neoorthomedartis-default-rtdb.firebaseio.com",
+        projectId: "neoorthomedartis",
+        storageBucket: "neoorthomedartis.firebasestorage.app",
+        messagingSenderId: "48492402152",
+        appId: "1:48492402152:web:c395acaf1e365d491bc05d",
+        measurementId: "G-W4JC235S2Y"
+    });
+}
 const db = firebase.database();
 const auth = firebase.auth();
 
@@ -179,6 +181,9 @@ async function handleLogin(e) {
         else if (err.code === 'auth/wrong-password') msg += 'Incorrect password.';
         else if (err.code === 'auth/invalid-email') msg += 'Invalid email format.';
         else if (err.code === 'auth/too-many-requests') msg += 'Too many attempts. Try later.';
+        else if (err.code === 'auth/configuration-not-found') msg += 'Firebase Auth is not configured. Check project settings.';
+        else if (err.code === 'auth/invalid-api-key') msg += 'Invalid API key. Check Firebase config.';
+        else if (err.code === 'auth/network-request-failed') msg += 'Network error. Check your connection.';
         else msg += err.message;
         showAuthError(msg);
     } finally {
@@ -225,6 +230,9 @@ async function handleRegister(e) {
         if (err.code === 'auth/email-already-in-use') msg += 'This email is already registered.';
         else if (err.code === 'auth/invalid-email') msg += 'Invalid email format.';
         else if (err.code === 'auth/weak-password') msg += 'Password is too weak.';
+        else if (err.code === 'auth/configuration-not-found') msg += 'Firebase Auth is not configured. Check project settings.';
+        else if (err.code === 'auth/invalid-api-key') msg += 'Invalid API key. Check Firebase config.';
+        else if (err.code === 'auth/network-request-failed') msg += 'Network error. Check your connection.';
         else msg += err.message;
         showAuthError(msg);
     } finally {
@@ -233,7 +241,7 @@ async function handleRegister(e) {
 }
 
 // Auth state listener
-firebase.auth().onAuthStateChanged(async function(user) {
+auth.onAuthStateChanged(async function(user) {
     if (user) {
         currentUser = user;
         const snap = await db.ref('users/' + user.uid).once('value');

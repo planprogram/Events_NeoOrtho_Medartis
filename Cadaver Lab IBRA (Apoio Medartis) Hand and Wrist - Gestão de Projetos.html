@@ -654,16 +654,18 @@
     // ============================================================
     // FIREBASE
     // ============================================================
-    firebase.initializeApp({
-        apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
-        authDomain: "neoorthomedartis.firebaseapp.com",
-        databaseURL: "https://neoorthomedartis-default-rtdb.firebaseio.com",
-        projectId: "neoorthomedartis",
-        storageBucket: "neoorthomedartis.firebasestorage.app",
-        messagingSenderId: "48492402152",
-        appId: "1:48492402152:web:c395acaf1e365d491bc05d",
-        measurementId: "G-W4JC235S2Y"
-    });
+    if (!firebase.apps.length) {
+        firebase.initializeApp({
+            apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
+            authDomain: "neoorthomedartis.firebaseapp.com",
+            databaseURL: "https://neoorthomedartis-default-rtdb.firebaseio.com",
+            projectId: "neoorthomedartis",
+            storageBucket: "neoorthomedartis.firebasestorage.app",
+            messagingSenderId: "48492402152",
+            appId: "1:48492402152:web:c395acaf1e365d491bc05d",
+            measurementId: "G-W4JC235S2Y"
+        });
+    }
     var hwDb = firebase.database();
 
     // ============================================================

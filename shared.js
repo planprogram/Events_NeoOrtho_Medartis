@@ -3,7 +3,10 @@
    Common JS functions across all NeoOrtho pages
    ============================================= */
 
-/* ---- Firebase Init (shared config) ---- */
+/* ---- Firebase Config (shared) ---- */
+/* Note: Initialization is performed by each host page (app.js, Gantt, etc.)
+   to avoid double-initializeApp errors from shared.js. This file only
+   exports the config constant for reference. */
 var NEO_FIREBASE_CONFIG = {
     apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
     authDomain: "neoorthomedartis.firebaseapp.com",
@@ -14,17 +17,6 @@ var NEO_FIREBASE_CONFIG = {
     appId: "1:48492402152:web:c395acaf1e365d491bc05d",
     measurementId: "G-W4JC235S2Y"
 };
-
-/* Auto-init Firebase if SDK is loaded */
-if (typeof firebase !== 'undefined' && firebase.initializeApp) {
-    try {
-        if (!firebase.apps.length) {
-            firebase.initializeApp(NEO_FIREBASE_CONFIG);
-        }
-    } catch (e) {
-        // Firebase may already be initialized by the host page
-    }
-}
 
 /* ---- Toast Notification ---- */
 function sharedToast(msg, type) {
