@@ -56,25 +56,36 @@ function seedProjects() {
 
 // Load data from Firebase
 async function loadData() {
+    let p, pr, u;
+    // Load people
     try {
-        const [pSnap, prSnap, uSnap] = await Promise.all([
-            db.ref('people').once('value'),
-            db.ref('projects').once('value'),
-            db.ref('users').once('value')
-        ]);
-        let p = pSnap.val(), pr = prSnap.val(), u = uSnap.val();
+        const pSnap = await db.ref('people').once('value');
+        p = pSnap.val();
         if (!p || Object.keys(p).length === 0) { await db.ref('people').set(seedPeople()); p = seedPeople(); }
-        if (!pr || Object.keys(pr).length === 0) { await db.ref('projects').set(seedProjects()); pr = seedProjects(); }
-        people = toArray(p);
-        projects = toArray(pr);
-        allUsers = toArray(u);
     } catch(err) {
-        console.error('Firebase error:', err);
-        showToast('Database connection failed. Using local data.', 'error');
-        people = toArray(seedPeople());
-        projects = toArray(seedProjects());
-        allUsers = [];
+        console.error('People load error:', err.code, err.message);
+        p = seedPeople();
     }
+    // Load projects
+    try {
+        const prSnap = await db.ref('projects').once('value');
+        pr = prSnap.val();
+        if (!pr || Object.keys(pr).length === 0) { await db.ref('projects').set(seedProjects()); pr = seedProjects(); }
+    } catch(err) {
+        console.error('Projects load error:', err.code, err.message);
+        pr = seedProjects();
+    }
+    // Load users
+    try {
+        const uSnap = await db.ref('users').once('value');
+        u = uSnap.val();
+    } catch(err) {
+        console.error('Users load error:', err.code, err.message);
+        u = null;
+    }
+    people = toArray(p);
+    projects = toArray(pr);
+    allUsers = toArray(u);
 }
 function toArray(obj) {
     if (!obj) return [];
@@ -489,6 +500,10 @@ async function saveProject(e) {
     var btn = document.getElementById('projectSubmitBtn');
     btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
     var fbKey = document.getElementById('projectId').value;
+    // Ensure current user is in permissions so Firebase rules allow the write
+    if (currentUser && !tempPermissions.some(function(pm){ return pm.personId === currentUser.uid; })) {
+        tempPermissions.push({personId: currentUser.uid, role: 'editor'});
+    }
     var permObj = {};
     tempPermissions.forEach(function(pm,i) { permObj['p'+i] = {personId:pm.personId,role:pm.role}; });
     var coverUrl = document.getElementById('projectCover').value.trim();
