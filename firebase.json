@@ -1,0 +1,15 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "deploy.js",
+      "run-node.bat"
+    ]
+  },
+  "database": {
+    "rules": "database.rules.json"
+  }
+}
