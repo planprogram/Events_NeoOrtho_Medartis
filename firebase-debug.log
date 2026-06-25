@@ -968,3 +968,60 @@ ENOENT: no such file or directory, open 'C:\Users\usr13261\Desktop\nodejs-portab
 [debug] [2026-06-24T19:07:00.346Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/neoorthomedartis/channels/live/releases versionName=projects%2F48492402152%2Fsites%2Fneoorthomedartis%2Fversions%2Fb88891aaf2f7c279
 [debug] [2026-06-24T19:07:00.346Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/neoorthomedartis/channels/live/releases {}
 [debug] [2026-06-24T19:07:01.073Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/neoorthomedartis/channels/live/releases 200
+[debug] [2026-06-25T14:11:37.073Z] ----------------------------------------------------------------------
+[debug] [2026-06-25T14:11:37.075Z] Command:       C:\Users\usr13261\Desktop\nodejs-portable\node-v20.12.2-win-x64\node.exe C:\Users\usr13261\Desktop\nodejs-portable\node-v20.12.2-win-x64\node_modules\firebase-tools\lib\bin\firebase.js deploy --only database
+[debug] [2026-06-25T14:11:37.076Z] CLI Version:   15.22.1
+[debug] [2026-06-25T14:11:37.076Z] Platform:      win32
+[debug] [2026-06-25T14:11:37.076Z] Node Version:  v20.12.2
+[debug] [2026-06-25T14:11:37.076Z] Detected Agent: unknown
+[debug] [2026-06-25T14:11:37.076Z] Time:          Thu Jun 25 2026 11:11:37 GMT-0300 (Horário Padrão de Brasília)
+[debug] [2026-06-25T14:11:37.076Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-06-25T14:13:00.795Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-06-25T14:13:00.797Z] > authorizing via signed-in user (fpdegasperi@gmail.com)
+[debug] [2026-06-25T14:13:00.797Z] [iam] checking project neoorthomedartis for permissions ["firebase.projects.get","firebasedatabase.instances.update"]
+[debug] [2026-06-25T14:13:00.800Z] Checked if tokens are valid: false, expires at: 1782395946904
+[debug] [2026-06-25T14:13:00.801Z] Checked if tokens are valid: false, expires at: 1782395946904
+[debug] [2026-06-25T14:13:00.801Z] > refreshing access token with scopes: []
+[debug] [2026-06-25T14:13:00.804Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-25T14:13:00.804Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-25T14:13:01.114Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-06-25T14:13:01.115Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-25T14:13:01.139Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/neoorthomedartis:testIamPermissions [none]
+[debug] [2026-06-25T14:13:01.139Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/neoorthomedartis:testIamPermissions  x-goog-user-project=neoorthomedartis
+[debug] [2026-06-25T14:13:01.139Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/neoorthomedartis:testIamPermissions {"permissions":["firebase.projects.get","firebasedatabase.instances.update"]}
+[debug] [2026-06-25T14:13:01.572Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/neoorthomedartis:testIamPermissions 200
+[debug] [2026-06-25T14:13:01.572Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/neoorthomedartis:testIamPermissions {"permissions":["firebase.projects.get","firebasedatabase.instances.update"]}
+[debug] [2026-06-25T14:13:01.573Z] Checked if tokens are valid: true, expires at: 1782400380115
+[debug] [2026-06-25T14:13:01.573Z] Checked if tokens are valid: true, expires at: 1782400380115
+[debug] [2026-06-25T14:13:01.573Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/neoorthomedartis [none]
+[debug] [2026-06-25T14:13:02.077Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/neoorthomedartis 200
+[debug] [2026-06-25T14:13:02.077Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/neoorthomedartis {"projectId":"neoorthomedartis","projectNumber":"48492402152","displayName":"NeoOrthoMedartis","name":"projects/neoorthomedartis","resources":{"hostingSite":"neoorthomedartis","realtimeDatabaseInstance":"neoorthomedartis-default-rtdb"},"state":"ACTIVE","etag":"1_735e5087-4c39-41e1-a8ae-d213e10d666a"}
+[info] 
+[info] === Deploying to 'neoorthomedartis'...
+[info] 
+[info] i  deploying database 
+[info] i  database: checking rules syntax... 
+[debug] [2026-06-25T14:13:02.093Z] Checked if tokens are valid: true, expires at: 1782400380115
+[debug] [2026-06-25T14:13:02.093Z] Checked if tokens are valid: true, expires at: 1782400380115
+[debug] [2026-06-25T14:13:02.093Z] >>> [apiv2][query] GET https://firebasedatabase.googleapis.com/v1beta/projects/neoorthomedartis/locations/-/instances/neoorthomedartis-default-rtdb [none]
+[debug] [2026-06-25T14:13:03.184Z] <<< [apiv2][status] GET https://firebasedatabase.googleapis.com/v1beta/projects/neoorthomedartis/locations/-/instances/neoorthomedartis-default-rtdb 200
+[debug] [2026-06-25T14:13:03.185Z] <<< [apiv2][body] GET https://firebasedatabase.googleapis.com/v1beta/projects/neoorthomedartis/locations/-/instances/neoorthomedartis-default-rtdb {"name":"projects/48492402152/locations/us-central1/instances/neoorthomedartis-default-rtdb","project":"projects/48492402152","databaseUrl":"https://neoorthomedartis-default-rtdb.firebaseio.com","type":"DEFAULT_DATABASE","state":"ACTIVE"}
+[debug] [2026-06-25T14:13:03.186Z] Checked if tokens are valid: true, expires at: 1782400380115
+[debug] [2026-06-25T14:13:03.186Z] Checked if tokens are valid: true, expires at: 1782400380115
+[debug] [2026-06-25T14:13:03.187Z] >>> [apiv2][query] PUT https://neoorthomedartis-default-rtdb.firebaseio.com/.settings/rules.json dryRun=true
+[debug] [2026-06-25T14:13:03.187Z] >>> [apiv2][body] PUT https://neoorthomedartis-default-rtdb.firebaseio.com/.settings/rules.json "{\r\n  \"rules\": {\r\n    \"users\": {\r\n      \"$uid\": {\r\n        \".read\": \"auth != null && auth.uid == $uid\",\r\n        \".write\": \"auth != null && auth.uid == $uid\"\r\n      }\r\n    },\r\n    \"people\": {\r\n      \".read\": \"auth != null\",\r\n      \".write\": \"auth != null && root.child('users/' + auth.uid + '/role').val() === 'admin'\"\r\n    },\r\n    \"projects\": {\r\n      \".read\": \"auth != null\",\r\n      \"$projectId\": {\r\n        \".write\": \"auth != null && (root.child('users/' + auth.uid + '/role').val() === 'admin' || data.child('permissions').child(auth.uid).exists() || newData.child('permissions').child(auth.uid).exists())\"\r\n      }\r\n    },\r\n    \"essential_cronograma\": {\r\n      \".read\": true,\r\n      \".write\": true\r\n    }\r\n  }\r\n}\r\n"
+[debug] [2026-06-25T14:13:03.611Z] <<< [apiv2][status] PUT https://neoorthomedartis-default-rtdb.firebaseio.com/.settings/rules.json 200
+[debug] [2026-06-25T14:13:03.611Z] <<< [apiv2][body] PUT https://neoorthomedartis-default-rtdb.firebaseio.com/.settings/rules.json {"status":"ok"}
+[info] +  database: rules syntax for database neoorthomedartis-default-rtdb is valid 
+[info] i  database: releasing rules... 
+[debug] [2026-06-25T14:13:03.611Z] Checked if tokens are valid: true, expires at: 1782400380115
+[debug] [2026-06-25T14:13:03.611Z] Checked if tokens are valid: true, expires at: 1782400380115
+[debug] [2026-06-25T14:13:03.611Z] >>> [apiv2][query] GET https://firebasedatabase.googleapis.com/v1beta/projects/neoorthomedartis/locations/-/instances/neoorthomedartis-default-rtdb [none]
+[debug] [2026-06-25T14:13:03.883Z] <<< [apiv2][status] GET https://firebasedatabase.googleapis.com/v1beta/projects/neoorthomedartis/locations/-/instances/neoorthomedartis-default-rtdb 200
+[debug] [2026-06-25T14:13:03.883Z] <<< [apiv2][body] GET https://firebasedatabase.googleapis.com/v1beta/projects/neoorthomedartis/locations/-/instances/neoorthomedartis-default-rtdb {"name":"projects/48492402152/locations/us-central1/instances/neoorthomedartis-default-rtdb","project":"projects/48492402152","databaseUrl":"https://neoorthomedartis-default-rtdb.firebaseio.com","type":"DEFAULT_DATABASE","state":"ACTIVE"}
+[debug] [2026-06-25T14:13:03.884Z] Checked if tokens are valid: true, expires at: 1782400380115
+[debug] [2026-06-25T14:13:03.884Z] Checked if tokens are valid: true, expires at: 1782400380115
+[debug] [2026-06-25T14:13:03.884Z] >>> [apiv2][query] PUT https://neoorthomedartis-default-rtdb.firebaseio.com/.settings/rules.json 
+[debug] [2026-06-25T14:13:03.884Z] >>> [apiv2][body] PUT https://neoorthomedartis-default-rtdb.firebaseio.com/.settings/rules.json "{\r\n  \"rules\": {\r\n    \"users\": {\r\n      \"$uid\": {\r\n        \".read\": \"auth != null && auth.uid == $uid\",\r\n        \".write\": \"auth != null && auth.uid == $uid\"\r\n      }\r\n    },\r\n    \"people\": {\r\n      \".read\": \"auth != null\",\r\n      \".write\": \"auth != null && root.child('users/' + auth.uid + '/role').val() === 'admin'\"\r\n    },\r\n    \"projects\": {\r\n      \".read\": \"auth != null\",\r\n      \"$projectId\": {\r\n        \".write\": \"auth != null && (root.child('users/' + auth.uid + '/role').val() === 'admin' || data.child('permissions').child(auth.uid).exists() || newData.child('permissions').child(auth.uid).exists())\"\r\n      }\r\n    },\r\n    \"essential_cronograma\": {\r\n      \".read\": true,\r\n      \".write\": true\r\n    }\r\n  }\r\n}\r\n"
+[debug] [2026-06-25T14:13:04.145Z] <<< [apiv2][status] PUT https://neoorthomedartis-default-rtdb.firebaseio.com/.settings/rules.json 200
