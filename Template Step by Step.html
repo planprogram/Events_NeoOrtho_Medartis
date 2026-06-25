@@ -845,6 +845,8 @@
             </div>
         </div>
         <div class="home-actions">
+            <button class="btn" onclick="exportAllDatabase()" title="Exportar banco de dados completo"><i class="fas fa-download"></i> Exportar Banco</button>
+            <button class="btn" onclick="importDatabase()" title="Importar banco de dados"><i class="fas fa-upload"></i> Importar Banco</button>
             <button class="btn btn-primary" onclick="openNewTemplateModal()"><i class="fas fa-plus"></i> Novo Template</button>
         </div>
     </header>
@@ -1029,6 +1031,7 @@
 
 <!-- Input oculto para importacao -->
 <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportFile(event)">
+<input type="file" id="importDbInput" accept=".json" style="display:none" onchange="handleDatabaseImport(event)">
 
 <script>
     // ====================================
@@ -1803,6 +1806,69 @@
         // Reset input so the same file can be re-selected
         const importInput = document.getElementById('importFileInput');
         if (importInput) importInput.value = '';
+    }
+
+    // ====================================
+    // Exportar / Importar Banco de Dados Completo
+    // ====================================
+    function exportAllDatabase() {
+        const db = {
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            templates: [],
+            templateData: []
+        };
+        templates.forEach(meta => {
+            db.templates.push(meta);
+            const data = loadTemplateData(meta.id);
+            if (data) db.templateData.push({ id: meta.id, data: data });
+        });
+        const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'neoortho_db_' + new Date().toISOString().slice(0, 10) + '.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        showToast('Banco de dados exportado com sucesso (' + templates.length + ' templates)', 'success');
+    }
+
+    function importDatabase() {
+        document.getElementById('importDbInput').click();
+    }
+
+    function handleDatabaseImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const db = JSON.parse(e.target.result);
+                if (!db.templates || !Array.isArray(db.templates)) {
+                    showToast('Arquivo invalido: formato de banco de dados nao reconhecido', 'error');
+                    return;
+                }
+                let imported = 0;
+                db.templates.forEach(meta => {
+                    const id = generateId();
+                    const now = new Date().toISOString();
+                    const newMeta = { ...meta, id: id, createdAt: now, updatedAt: now };
+                    templates.push(newMeta);
+                    if (db.templateData) {
+                        const td = db.templateData.find(t => t.id === meta.id);
+                        if (td && td.data) saveTemplateData(id, td.data);
+                    }
+                    imported++;
+                });
+                saveTemplatesList();
+                renderHomePage();
+                showToast('Banco de dados importado: ' + imported + ' template(s) adicionado(s)', 'success');
+            } catch(err) {
+                showToast('Erro ao importar: arquivo JSON invalido', 'error');
+            }
+        };
+        reader.readAsText(file);
+        const input = document.getElementById('importDbInput');
+        if (input) input.value = '';
     }
 
     // ====================================
