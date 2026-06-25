@@ -311,6 +311,7 @@
             <div class="nav-item" data-page="people" onclick="switchPage('people')"><i class="fas fa-users"></i> People</div>
             <div class="nav-label">Quick Filters</div>
             <div class="nav-item" data-page="active" onclick="filterByStatus('active')"><i class="fas fa-bolt"></i> Active</div>
+            <div class="nav-item" data-page="paused" onclick="filterByStatus('paused')"><i class="fas fa-pause-circle"></i> Paused</div>
             <div class="nav-item" data-page="completed" onclick="filterByStatus('completed')"><i class="fas fa-check-circle"></i> Completed</div>
             <div class="nav-item" data-page="draft" onclick="filterByStatus('draft')"><i class="fas fa-pencil-alt"></i> Drafts</div>
             <div class="nav-label">Administration</div>
@@ -353,6 +354,7 @@
         <section class="page-section" id="page-projects"><div class="page-content"><div class="page-header"><h2>All Projects</h2><p>Complete catalog of your projects</p></div><div class="filter-bar" id="allFilters"><button class="filter-tab active" onclick="setFilter('all',this)">All</button><button class="filter-tab" onclick="setFilter('active',this)">Active</button><button class="filter-tab" onclick="setFilter('paused',this)">Paused</button><button class="filter-tab" onclick="setFilter('completed',this)">Completed</button><button class="filter-tab" onclick="setFilter('draft',this)">Draft</button></div><div class="projects-grid" id="allProjects"></div></div></section>
         <section class="page-section" id="page-people"><div class="page-content"><div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;"><div><h2>People</h2><p>Manage team members and their project access</p></div><button class="btn-primary" onclick="openPeopleModal()"><i class="fas fa-user-plus"></i> Add Person</button></div><div class="people-grid" id="peopleGrid"></div></div></section>
         <section class="page-section" id="page-active"><div class="page-content"><div class="page-header"><h2>Active Projects</h2><p>Currently in progress</p></div><div class="projects-grid" id="activeProjects"></div></div></section>
+        <section class="page-section" id="page-paused"><div class="page-content"><div class="page-header"><h2>Paused Projects</h2><p>Temporarily on hold</p></div><div class="projects-grid" id="pausedProjects"></div></div></section>
         <section class="page-section" id="page-completed"><div class="page-content"><div class="page-header"><h2>Completed Projects</h2><p>Finished projects</p></div><div class="projects-grid" id="completedProjects"></div></div></section>
         <section class="page-section" id="page-draft"><div class="page-content"><div class="page-header"><h2>Draft Projects</h2><p>Still being planned</p></div><div class="projects-grid" id="draftProjects"></div></div></section>
         <section class="page-section" id="page-users">

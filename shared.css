@@ -5,7 +5,9 @@
 
 /* ---- CSS Reset ---- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+}
 body { overflow-x: hidden; }
 
 /* ---- Scrollbar ---- */
@@ -56,9 +58,9 @@ select.form-input { cursor: pointer; }
 .btn-secondary:hover { border-color: #a0a0b0; color: #1a1a2e; }
 .btn-danger { background: #DC3545; color: #fff; }
 .btn-danger:hover { background: #C82333; transform: translateY(-1px); }
-.btn-ghost { background: transparent; color: #7B2D8E; border: none; padding: 7px 9px; border-radius: 8px; cursor: pointer; transition: all .15s; font-size: .82rem; }
+.btn-ghost { background: transparent; color: #7B2D8E; border: none; padding: 7px 9px; border-radius: 8px; cursor: pointer; transition: all .15s; font-size: .82rem; font-family: inherit; }
 .btn-ghost:hover { background: #F0E4F5; }
-.btn-danger-ghost { background: transparent; color: #EF4444; border: none; padding: 7px 9px; border-radius: 8px; cursor: pointer; transition: all .15s; font-size: .82rem; }
+.btn-danger-ghost { background: transparent; color: #EF4444; border: none; padding: 7px 9px; border-radius: 8px; cursor: pointer; transition: all .15s; font-size: .82rem; font-family: inherit; }
 .btn-danger-ghost:hover { background: #FEF2F2; }
 
 /* ---- Cards ---- */

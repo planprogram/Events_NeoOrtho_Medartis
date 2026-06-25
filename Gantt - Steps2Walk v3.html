@@ -619,7 +619,7 @@
                 document.getElementById('zoomIn').addEventListener('click', () => Gantt.changeZoom(1));
                 document.getElementById('zoomOut').addEventListener('click', () => Gantt.changeZoom(-1));
                 document.getElementById('ganttBox').addEventListener('click', (e) => { const row = e.target.closest('.timeline-row') || e.target.closest('.sidebar-row'); if (row && row.dataset.id) Modal.openEdit(parseInt(row.dataset.id, 10)); });
-                document.getElementById('delivGrid').addEventListener('click', (e) => { if (e.target.classList.contains('dcheck')) { const id = parseInt(e.target.dataset.delivId, 10); if (!isNaN(id)) Deliverables.toggle(id); } });
+                document.getElementById('delivGrid').addEventListener('click', (e) => { if (e.target.classList.contains('dcheck')) { e.preventDefault(); const id = parseInt(e.target.dataset.delivId, 10); if (!isNaN(id)) Deliverables.toggle(id); } });
                 document.getElementById('btnCancel').addEventListener('click', Modal.close);
                 document.getElementById('btnSave').addEventListener('click', Modal.save);
                 document.getElementById('delBtn').addEventListener('click', Modal.deleteItem);

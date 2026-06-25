@@ -361,6 +361,19 @@ function switchPage(page) {
     if(page === 'users') { renderUserTable(); }
     renderAll();
 }
+// Close modal on overlay click
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) {
+        e.target.classList.remove('show');
+    }
+});
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.show').forEach(function(m){ m.classList.remove('show'); });
+        pendingConfirmAction = null;
+    }
+});
 function filterByStatus(st) { switchPage(st); currentFilter = st; renderProjectGrids(); }
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('mobile-open'); }
 
@@ -393,13 +406,15 @@ function cardHtml(pr) {
         return '<div class="p-avatar" style="background:'+ps.color+'" title="'+ps.name+'">'+initials(ps.name)+'</div>';
     }).join('');
     var more = perms.length>3 ? '<div class="p-avatar more">+'+(perms.length-3)+'</div>' : '';
+    var canEdit = currentUserRole !== 'viewer';
+    var actions = canEdit ? '<div class="project-card-actions">'+
+        '<button class="card-act-btn" onclick="event.stopPropagation();editProject(\''+pr._fbKey+'\')" title="Edit"><i class="fas fa-pen"></i></button>'+
+        '<button class="card-act-btn del" onclick="event.stopPropagation();deleteProject(\''+pr._fbKey+'\')" title="Delete"><i class="fas fa-trash"></i></button>'+
+    '</div>' : '';
     return '<div class="project-card" onclick="openDetail(\''+pr._fbKey+'\')">'+
         '<div class="project-card-cover" style="background-image:url(\''+(pr.cover||COVERS[0])+'\')">'+
             '<span class="status-badge '+pr.status+'">'+pr.status+'</span>'+
-            '<div class="project-card-actions">'+
-                '<button class="card-act-btn" onclick="event.stopPropagation();editProject(\''+pr._fbKey+'\')" title="Edit"><i class="fas fa-pen"></i></button>'+
-                '<button class="card-act-btn del" onclick="event.stopPropagation();deleteProject(\''+pr._fbKey+'\')" title="Delete"><i class="fas fa-trash"></i></button>'+
-            '</div>'+
+            actions+
         '</div>'+
         '<div class="project-card-body">'+
             '<div class="project-category">'+pr.category+'</div>'+
@@ -416,7 +431,7 @@ function renderProjectGrids() {
     var h = f.length ? f.map(cardHtml).join('') : emptyHtml('Try changing filters or create a new project');
     document.getElementById('dashboardProjects').innerHTML = h;
     document.getElementById('allProjects').innerHTML = h;
-    ['active','completed','draft'].forEach(function(st){
+    ['active','paused','completed','draft'].forEach(function(st){
         var sp = projects.filter(function(p){return p.status===st;});
         var el = document.getElementById(st+'Projects');
         if(el) el.innerHTML = sp.length ? sp.map(cardHtml).join('') : emptyHtml('No '+st+' projects yet');
@@ -456,7 +471,15 @@ function handleSearch(q) { searchQuery=q; renderProjectGrids(); }
 function previewCover(url) {
     var preview = document.getElementById('coverPreview');
     if (url && url.trim()) {
-        preview.innerHTML = '<img src="'+url+'" alt="Cover preview" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-exclamation-triangle\\\' style=\\\'color:var(--neo-danger);font-size:1.5rem\\\'></i>\';this.parentElement.classList.remove(\'has-image\')">';
+        var img = document.createElement('img');
+        img.src = url;
+        img.alt = 'Cover preview';
+        img.onerror = function() {
+            preview.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--neo-danger);font-size:1.5rem"></i>';
+            preview.classList.remove('has-image');
+        };
+        preview.innerHTML = '';
+        preview.appendChild(img);
         preview.classList.add('has-image');
         preview.style.backgroundImage = 'url(\''+url+'\')';
     } else {
@@ -554,10 +577,13 @@ function openDetail(fbKey) {
         if(!ps) return '';
         return '<div class="perm-item"><div class="perm-av" style="background:'+ps.color+'">'+initials(ps.name)+'</div><div class="perm-nm">'+ps.name+'</div><span class="p-role-badge '+pm.role+'" style="margin:0">'+pm.role+'</span></div>';
     }).join('');
+    var canEdit = currentUserRole !== 'viewer';
+    var coverBtn = canEdit ? '<button class="card-act-btn" style="position:absolute;top:10px;left:10px" onclick="editProject(\''+pr._fbKey+'\')" title="Edit cover"><i class="fas fa-camera"></i></button>' : '';
+    var editBtn = canEdit ? '<button class="btn-primary" onclick="closeModal(\'detailModal\');editProject(\''+pr._fbKey+'\')"><i class="fas fa-pen"></i> Edit</button>' : '';
     document.getElementById('detailContent').innerHTML =
         '<div style="height:170px;border-radius:11px;background-image:url(\''+(pr.cover||COVERS[0])+'\');background-size:cover;background-position:center;margin-bottom:1.15rem;position:relative">'+
             '<span class="status-badge '+pr.status+'" style="position:absolute;top:10px;right:10px">'+pr.status+'</span>'+
-            '<button class="card-act-btn" style="position:absolute;top:10px;left:10px" onclick="editProject(\''+pr._fbKey+'\')" title="Edit cover"><i class="fas fa-camera"></i></button>'+
+            coverBtn+
         '</div>'+
         '<div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--neo-purple);margin-bottom:.3rem">'+pr.category+'</div>'+
         '<h3 style="font-family:\'Space Grotesk\',sans-serif;font-size:1.35rem;font-weight:700;margin-bottom:.45rem">'+pr.name+'</h3>'+
@@ -570,7 +596,7 @@ function openDetail(fbKey) {
         '<div class="perm-list">'+(ph||'<p style="color:var(--neo-text-muted);font-size:.83rem;padding:.4rem 0">No one assigned</p>')+'</div>'+
         '<div class="modal-actions" style="margin-top:1.15rem">'+
             '<button class="btn-secondary" onclick="closeModal(\'detailModal\')">Close</button>'+
-            '<button class="btn-primary" onclick="closeModal(\'detailModal\');editProject(\''+pr._fbKey+'\')"><i class="fas fa-pen"></i> Edit</button>'+
+            editBtn+
         '</div>';
     document.getElementById('detailModal').classList.add('show');
 }
@@ -694,15 +720,34 @@ async function saveUser(e) {
             await db.ref('users/' + editId).update(updates);
             showToast('User updated successfully', 'success');
         } else {
-            // Create new user via Auth + DB
-            var color = COLORS[Math.floor(Math.random() * COLORS.length)];
-            // We need to create the auth user. Since we can't create without password, we use a temp approach.
-            // For admin-created users, we generate a random password and ask them to reset.
-            // Actually, Firebase admin SDK can do this, but from client we need the user to register themselves.
-            // Better approach: Admin can only edit existing users' roles, not create new auth users.
-            // But we'll allow creating a DB record that can be claimed.
-            // For simplicity: we'll show a message that the user needs to register first.
-            showToast('Ask the user to register first, then edit their role here.', 'info');
+            // Create new user via Auth + DB with password and send reset email
+            if (!password || password.length < 6) {
+                showToast('Password must be at least 6 characters to create a new user.', 'error');
+                btn.disabled = false; btn.innerHTML = 'Save User';
+                return;
+            }
+            try {
+                var result = await auth.createUserWithEmailAndPassword(email, password);
+                await result.user.updateProfile({ displayName: name });
+                await db.ref('users/' + result.user.uid).set({
+                    name: name,
+                    email: email,
+                    role: role,
+                    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+                    createdAt: new Date().toISOString(),
+                    lastLogin: null
+                });
+                try { await auth.sendPasswordResetEmail(email); } catch(_) {}
+                showToast('User created. A password reset email has been sent to ' + email, 'success');
+            } catch(createErr) {
+                var msg = 'Error creating user: ';
+                if (createErr.code === 'auth/email-already-in-use') msg += 'This email is already registered.';
+                else if (createErr.code === 'auth/invalid-email') msg += 'Invalid email format.';
+                else if (createErr.code === 'auth/weak-password') msg += 'Password is too weak.';
+                else msg += createErr.message;
+                showToast(msg, 'error');
+                return;
+            }
         }
         await loadData(); closeModal('userModal'); renderUserTable(); renderAll();
     } catch(err) {
@@ -798,7 +843,7 @@ function renderUserTable() {
 
 // ==================== UTILITIES ====================
 
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); pendingConfirmAction = null; }
 function confirmAction() { if(pendingConfirmAction) pendingConfirmAction(); closeModal('confirmModal'); pendingConfirmAction = null; }
 function showToast(msg, type) { sharedToast(msg, type); }
 function fmtDate(d) { if(!d) return '\u2014'; try { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); } catch(e) { return d; } }

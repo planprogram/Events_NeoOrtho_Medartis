@@ -286,7 +286,7 @@
 
     <section class="toolbar">
       <div class="search-box">
-        <input type="text" id="searchInput" placeholder="" oninput="renderTable()" id="searchPlaceholder">
+        <input type="text" id="searchInput" placeholder="" oninput="renderTable()">
       </div>
       <select class="filter-select" id="filterCategoria" onchange="renderTable()" aria-label="Filter category"></select>
       <select class="filter-select" id="filterStatus" onchange="renderTable()" aria-label="Filter status"></select>
@@ -420,7 +420,7 @@
         tExcel: 'Exportado para Excel com sucesso', tPdf: 'Exportado para PDF com sucesso',
         tRestored: 'Dados restaurados do navegador', tFill: 'Preencha o campo "Entrega"',
         tXlsxErr: 'Biblioteca XLSX nao carregada', tPdfErr: 'Biblioteca jsPDF nao carregada',
-        btnImport: 'IMPORTAR', btnExport: 'EXPORTAR',
+        btnSave: 'SALVAR', btnImport: 'IMPORTAR', btnExport: 'EXPORTAR',
         pdfTitle: 'IBRA Foot and Ankle - Cronograma de Execucao',
         pdfSub: '16 e 17 de outubro de 2026 - Sao Paulo, SP',
         pdfGen: 'Gerado em: '
@@ -458,7 +458,7 @@
         tExcel: 'Exported to Excel successfully', tPdf: 'Exported to PDF successfully',
         tRestored: 'Data restored from browser', tFill: 'Please fill the "Delivery" field',
         tXlsxErr: 'XLSX library not loaded', tPdfErr: 'jsPDF library not loaded',
-        btnImport: 'IMPORT', btnExport: 'EXPORT',
+        btnSave: 'SAVE', btnImport: 'IMPORT', btnExport: 'EXPORT',
         pdfTitle: 'IBRA Foot and Ankle - Execution Timeline',
         pdfSub: 'October 16-17, 2026 - Sao Paulo, SP',
         pdfGen: 'Generated on: '
@@ -656,6 +656,7 @@
       document.getElementById('headerTitle').textContent = t('headerTitle');
       document.getElementById('headerSub').textContent = t('headerSub');
       document.getElementById('langLabel').textContent = lang === 'pt' ? 'EN' : 'PT';
+      document.getElementById('btnSaveLabel').textContent = t('btnSave');
       document.getElementById('btnImportLabel').textContent = t('btnImport');
       document.getElementById('btnExportLabel').textContent = t('btnExport');
       document.getElementById('infoLabelEvent').textContent = t('infoEvent');

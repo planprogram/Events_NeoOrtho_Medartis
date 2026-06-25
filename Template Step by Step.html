@@ -1397,6 +1397,10 @@
     // ====================================
     function handleMaterialGalleryImages(files) {
         if (!files || files.length === 0) return;
+        // Reset input so the same file(s) can be re-selected
+        const gallery = document.getElementById('materialsGallery');
+        const addInput = gallery ? gallery.querySelector('.gallery-add input[type="file"]') : null;
+        if (addInput) addInput.value = '';
         Array.from(files).forEach(file => {
             if (file.size > 5*1024*1024) { showToast('Imagem muito grande (max 5MB): ' + file.name, 'error'); return; }
             const reader = new FileReader();
@@ -1502,6 +1506,9 @@
             renderSteps(); autoSave(); showToast('Imagem carregada','success');
         };
         reader.readAsDataURL(file);
+        // Reset input so the same file can be re-selected
+        const input = document.getElementById('stepImg'+index);
+        if (input) input.value = '';
     }
 
     function removeStepImage(index) { appState.steps[index].image = null; appState.steps[index].imageName = ''; renderSteps(); autoSave(); }
@@ -1564,29 +1571,36 @@
     // Auto-save
     // ====================================
     function autoSave() {
+        if (!currentTemplateId) return;
         clearTimeout(autoSaveTimer);
         const ind = document.getElementById('saveIndicator');
-        ind.className = 'save-indicator saving';
-        ind.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:10px"></i><span>Salvando...</span>';
+        if (ind) {
+            ind.className = 'save-indicator saving';
+            ind.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:10px"></i><span>Salvando...</span>';
+        }
         autoSaveTimer = setTimeout(() => {
             collectFormData();
             saveCurrentTemplate();
-            ind.className = 'save-indicator saved';
-            ind.innerHTML = '<i class="fas fa-circle-check" style="font-size:10px"></i><span>Salvo</span>';
-            document.getElementById('lastSaveTime').textContent = new Date().toLocaleTimeString('pt-BR');
+            if (ind) {
+                ind.className = 'save-indicator saved';
+                ind.innerHTML = '<i class="fas fa-circle-check" style="font-size:10px"></i><span>Salvo</span>';
+            }
+            const lastSave = document.getElementById('lastSaveTime');
+            if (lastSave) lastSave.textContent = new Date().toLocaleTimeString('pt-BR');
         }, 800);
     }
 
     function collectFormData() {
-        appState.training.title = document.getElementById('trainingTitle').value;
-        appState.training.category = document.getElementById('trainingCategory').value;
-        appState.training.description = document.getElementById('trainingDescription').value;
-        appState.training.implDate = document.getElementById('implDate').value;
-        appState.training.notes = document.getElementById('trainingNotes').value;
-        appState.signatures.elaborado = document.getElementById('signatureElaborado').value;
-        appState.signatures.aprovado = document.getElementById('signatureAprovado').value;
-        appState.signatures.dateElaborado = document.getElementById('dateElaborado').value;
-        appState.signatures.dateAprovado = document.getElementById('dateAprovado').value;
+        const el = id => { const e = document.getElementById(id); return e ? e.value : ''; };
+        appState.training.title = el('trainingTitle');
+        appState.training.category = el('trainingCategory');
+        appState.training.description = el('trainingDescription');
+        appState.training.implDate = el('implDate');
+        appState.training.notes = el('trainingNotes');
+        appState.signatures.elaborado = el('signatureElaborado');
+        appState.signatures.aprovado = el('signatureAprovado');
+        appState.signatures.dateElaborado = el('dateElaborado');
+        appState.signatures.dateAprovado = el('dateAprovado');
     }
 
     // ====================================
@@ -1730,7 +1744,10 @@
         const printWindow = window.open('','_blank','width=900,height=700');
         printWindow.document.write(printHTML);
         printWindow.document.close();
-        printWindow.onload = function() { setTimeout(function() { printWindow.print(); }, 400); };
+        // Use readyState + onload for cross-browser compatibility
+        const doPrint = function() { setTimeout(function() { printWindow.print(); }, 300); };
+        if (printWindow.document.readyState === 'complete') { doPrint(); }
+        else { printWindow.onload = doPrint; }
     }
 
     // ====================================
@@ -1783,7 +1800,9 @@
             } catch(err) { showToast('Arquivo JSON invalido','error'); }
         };
         reader.readAsText(file);
-        event.target.value = '';
+        // Reset input so the same file can be re-selected
+        const importInput = document.getElementById('importFileInput');
+        if (importInput) importInput.value = '';
     }
 
     // ====================================

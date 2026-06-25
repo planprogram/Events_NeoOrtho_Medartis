@@ -256,7 +256,8 @@ function saveState(){
             expandedPillars:[...state.expandedPillars],expandedSubs:[...state.expandedSubs],
             expandedLevels:[...state.expandedLevels],expandedModules:[...state.expandedModules],activePillar:state.activePillar};
         localStorage.setItem('ead_md_data',JSON.stringify(d));
-    }catch(e){console.warn('Erro ao salvar:',e);}
+        return true;
+    }catch(e){console.warn('Erro ao salvar:',e);return false;}
 }
 
 function loadState(){
@@ -621,7 +622,8 @@ function moveLesson(levelId,modId,lesId,dir){
 function deleteLesson(levelId,modId,lesId){
     const mod=(state.modules[levelId]||[]).find(m=>m.id===modId);if(!mod)return;
     const les=mod.lessons.find(l=>l.id===lesId);
-    openConfirmModal(`Excluir a aula "${les?les.title:''}"?`,()=>{
+    if(!les)return;
+    openConfirmModal(`Excluir a aula "${les.title}"?`,()=>{
         mod.lessons=mod.lessons.filter(l=>l.id!==lesId);saveState();renderView();showToast('Aula excluída','info');
     });
 }
@@ -636,7 +638,7 @@ function openLessonPanel(levelId,modId,lesId){
     const isEdit=!!les;
     const info=getLevelInfo(levelId);
     const ctx=info?`${info.pillarName}${info.subName?' › '+info.subName:''} › ${info.levelName} › ${mod.title}`:'';
-    const ytId=isEdit&&les.videoType==='youtube'?extractYoutubeId(les.videoUrl):null;
+    const ytId=isEdit&&les.videoType==='youtube'?extractYoutubeId(les.videoUrl||''):null;
     const vType=isEdit?(les.videoType||'youtube'):'youtube';
 
     state.editingLesson={levelId,modId,lesId:lesId||null};
@@ -809,7 +811,11 @@ function handleFileUpload(fileList){
 }
 
 function checkUploadDone(added,total){
-    if(added===total){try{saveState();}catch(e){showToast('Limite de armazenamento atingido','error');}renderView();showToast(`${added} arquivo(s) enviado(s)`);}
+    if(added===total){
+        const ok=saveState();
+        renderView();
+        if(ok)showToast(`${added} arquivo(s) enviado(s)`);
+    }
 }
 
 function deleteFile(id){
@@ -853,7 +859,7 @@ function renderPreviewLevel(levelId,levelName,theme){
     modules.forEach((mod,mi)=>{
         html+=`<div class="mb-3 ml-2 border-l-2 pl-4" style="border-color:${theme.border}"><h4 class="font-display font-semibold text-surface-850 text-sm mb-2">${mi+1}. ${escapeHtml(mod.title)}</h4>`;
         (mod.lessons||[]).forEach((les,li)=>{
-            const ytId=les.videoType==='youtube'?extractYoutubeId(les.videoUrl):null;
+            const ytId=les.videoType==='youtube'?extractYoutubeId(les.videoUrl||''):null;
             const lFiles=(les.files||[]).map(fid=>state.files.find(f=>f.id===fid)).filter(Boolean);
             html+=`<div class="mb-3 ml-3"><p class="text-sm font-medium text-surface-850 mb-2">${mi+1}.${li+1} ${escapeHtml(les.title)}</p>`;
             if(ytId) html+=`<div class="rounded-xl overflow-hidden bg-black mb-2"><iframe src="https://www.youtube.com/embed/${ytId}" class="w-full aspect-video" frameborder="0" allowfullscreen></iframe></div>`;
@@ -920,14 +926,27 @@ function importJSON(event){
 /* =============================================
    DRAG & DROP
 ============================================= */
+let dragCounter=0;
 document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('dragenter',e=>{
+    e.preventDefault();
+    if(state.currentView!=='files')return;
+    dragCounter++;
+    const dz=document.getElementById('dropZone');
+    if(dz)dz.classList.add('dragover');
+});
+document.addEventListener('dragleave',e=>{
+    e.preventDefault();
+    if(state.currentView!=='files')return;
+    dragCounter--;
+    if(dragCounter<=0){dragCounter=0;const dz=document.getElementById('dropZone');if(dz)dz.classList.remove('dragover');}
+});
 document.addEventListener('drop',e=>{
     e.preventDefault();
+    dragCounter=0;
     const dz=document.getElementById('dropZone');
     if(dz&&state.currentView==='files'){dz.classList.remove('dragover');handleFileUpload(e.dataTransfer.files);}
 });
-document.addEventListener('dragenter',e=>{if(state.currentView==='files'){const dz=document.getElementById('dropZone');if(dz)dz.classList.add('dragover');}});
-document.addEventListener('dragleave',e=>{if(state.currentView==='files'){const dz=document.getElementById('dropZone');if(dz&&!dz.contains(e.relatedTarget))dz.classList.remove('dragover');}});
 
 /* =============================================
    ATALHOS E MODAL

@@ -65,8 +65,9 @@ function sharedFormatDateUS(iso) {
 }
 
 function sharedFormatFileSize(bytes) {
-    if (!bytes) return '0 B';
-    var k = 1024, s = ['B', 'KB', 'MB', 'GB'], i = Math.floor(Math.log(bytes) / Math.log(k));
+    bytes = Number(bytes);
+    if (!isFinite(bytes) || bytes <= 0) return '0 B';
+    var k = 1024, s = ['B', 'KB', 'MB', 'GB'], i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), s.length - 1);
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + s[i];
 }
 
@@ -79,7 +80,7 @@ function sharedEscapeHtml(str) {
 
 function sharedInitials(name) {
     if (!name) return '';
-    return name.split(' ').map(function (n) { return n[0]; }).join('').substring(0, 2).toUpperCase();
+    return name.split(' ').map(function (n) { return n.charAt(0); }).filter(function (c) { return c; }).join('').substring(0, 2).toUpperCase();
 }
 
 /* ---- YouTube ID Extractor ---- */
