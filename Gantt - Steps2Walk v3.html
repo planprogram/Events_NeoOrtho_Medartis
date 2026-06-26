@@ -217,7 +217,7 @@
                 <input type="text" id="editName" placeholder="Nome da atividade">
             </div>
             <div class="fg">
-                <label>Responsável</label>
+                <label for="editResp">Responsável</label>
                 <input type="text" id="editResp" placeholder="Ex: Marketing Produto" list="respList">
                 <datalist id="respList"></datalist>
             </div>
@@ -675,31 +675,34 @@
         }
 
         function applyLanguage(){
-            document.getElementById('headerTitle').textContent = lang === 'pt' ? 'Cadaver Lab IBRA / Medartis' : 'Cadaver Lab IBRA / Medartis';
-            document.getElementById('headerSub').textContent = lang === 'pt' ? '24 e 25 de agosto de 2026' : 'August 24-25, 2026';
-            document.getElementById('langLabel').textContent = lang === 'pt' ? 'EN' : 'PT';
-            document.getElementById('btnSaveLabel').textContent = t('btnSave');
-            document.getElementById('btnLoadLabel').textContent = t('btnLoad');
-            document.getElementById('btnExportLabel').textContent = t('btnExport');
-            document.getElementById('btnImportLabel').textContent = t('btnImport');
-            document.getElementById('btnDelivLabel').textContent = t('btnDeliv');
-            document.getElementById('btnAddLabel').textContent = t('btnAdd');
-            document.getElementById('labelName').textContent = t('labelName');
-            document.querySelector('label[for="editResp"]').textContent = t('labelResp');
-            document.querySelectorAll('#taskFields label')[0].textContent = t('labelPlannedStart');
-            document.querySelectorAll('#taskFields label')[1].textContent = t('labelPlannedEnd');
-            document.querySelectorAll('#taskFields label')[2].textContent = t('labelRealStart');
-            document.querySelectorAll('#taskFields label')[3].textContent = t('labelRealEnd');
-            document.querySelector('label[for="editDone"]').textContent = t('labelDone');
-            document.getElementById('delBtn').innerHTML = '<i class="fas fa-trash-alt mr-1"></i>' + t('btnDelete');
-            document.getElementById('btnCancel').textContent = t('btnCancel');
-            document.getElementById('btnSave').textContent = t('btnSaveChanges');
-            document.querySelector('.gantt-sidebar-header span:first-child').textContent = t('activity');
-            document.querySelectorAll('.gantt-sidebar-header span')[1].textContent = t('planned');
-            document.querySelectorAll('.gantt-sidebar-header span')[2].textContent = t('realized');
-            document.getElementById('delivSec').querySelector('h2').textContent = t('delivTitle');
-            document.getElementById('btnAddDeliv').innerHTML = '<i class="fas fa-plus text-xs"></i> ' + t('btnAddDeliv');
-            document.getElementById('legendBox').previousElementSibling.textContent = t('legendTitle');
+            var el;
+            el = document.getElementById('headerTitle'); if (el) el.textContent = lang === 'pt' ? 'Cadaver Lab IBRA / Medartis' : 'Cadaver Lab IBRA / Medartis';
+            el = document.getElementById('headerSub'); if (el) el.textContent = lang === 'pt' ? '24 e 25 de agosto de 2026' : 'August 24-25, 2026';
+            el = document.getElementById('langLabel'); if (el) el.textContent = lang === 'pt' ? 'EN' : 'PT';
+            el = document.getElementById('btnSaveLabel'); if (el) el.textContent = t('btnSave');
+            el = document.getElementById('btnLoadLabel'); if (el) el.textContent = t('btnLoad');
+            el = document.getElementById('btnExportLabel'); if (el) el.textContent = t('btnExport');
+            el = document.getElementById('btnImportLabel'); if (el) el.textContent = t('btnImport');
+            el = document.getElementById('btnDelivLabel'); if (el) el.textContent = t('btnDeliv');
+            el = document.getElementById('btnAddLabel'); if (el) el.textContent = t('btnAdd');
+            el = document.getElementById('labelName'); if (el) el.textContent = t('labelName');
+            el = document.querySelector('label[for="editResp"]'); if (el) el.textContent = t('labelResp');
+            var taskLabels = document.querySelectorAll('#taskFields label');
+            if (taskLabels[0]) taskLabels[0].textContent = t('labelPlannedStart');
+            if (taskLabels[1]) taskLabels[1].textContent = t('labelPlannedEnd');
+            if (taskLabels[2]) taskLabels[2].textContent = t('labelRealStart');
+            if (taskLabels[3]) taskLabels[3].textContent = t('labelRealEnd');
+            el = document.querySelector('label[for="editDone"]'); if (el) el.textContent = t('labelDone');
+            el = document.getElementById('delBtn'); if (el) el.innerHTML = '<i class="fas fa-trash-alt mr-1"></i>' + t('btnDelete');
+            el = document.getElementById('btnCancel'); if (el) el.textContent = t('btnCancel');
+            el = document.getElementById('btnSave'); if (el) el.textContent = t('btnSaveChanges');
+            el = document.querySelector('.gantt-sidebar-header span:first-child'); if (el) el.textContent = t('activity');
+            var sideSpans = document.querySelectorAll('.gantt-sidebar-header span');
+            if (sideSpans[1]) sideSpans[1].textContent = t('planned');
+            if (sideSpans[2]) sideSpans[2].textContent = t('realized');
+            el = document.getElementById('delivSec'); if (el) { var h2 = el.querySelector('h2'); if (h2) h2.textContent = t('delivTitle'); }
+            el = document.getElementById('btnAddDeliv'); if (el) el.innerHTML = '<i class="fas fa-plus text-xs"></i> ' + t('btnAddDeliv');
+            el = document.getElementById('legendBox'); if (el && el.previousElementSibling) el.previousElementSibling.textContent = t('legendTitle');
         }
 
         const App = {
