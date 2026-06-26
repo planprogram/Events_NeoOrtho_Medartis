@@ -96,6 +96,7 @@
         .toast.success { background: #00A651 !important; border: none !important; }
         .toast.error { background: #E2183C !important; border: none !important; }
         .toast.info { background: #00AEEF !important; border: none !important; }
+        .toast.warning { background: #F7941D !important; border: none !important; }
         @keyframes tIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes tOut { from { opacity: 1; } to { opacity: 0; } }
 
@@ -256,7 +257,7 @@
         // ============================================================
         // FIREBASE
         // ============================================================
-        if (!firebase.apps.length) {
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
             firebase.initializeApp({
                 apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
                 authDomain: "neoorthomedartis.firebaseapp.com",
@@ -268,7 +269,7 @@
                 measurementId: "G-W4JC235S2Y"
             });
         }
-        var ganttDb = firebase.database();
+        var ganttDb = (typeof firebase !== 'undefined') ? firebase.database() : null;
 
         // ============================================================
         // IDIOMA
@@ -423,15 +424,22 @@
         AppState.totalDays = DateUtils.diffDays(AppState.timelineStart, AppState.timelineEnd) + 1;
 
         const Storage = {
+            isOnline() { return ganttDb !== null; },
             save() {
+                if (!ganttDb) { UI.toast('Sem conexao com o servidor - dados mantidos localmente', 'warning'); return; }
                 Promise.all([
                     ganttDb.ref('gantt_tasks').set(AppState.tasks),
                     ganttDb.ref('gantt_deliverables').set(AppState.deliverables)
                 ]).then(function() { UI.toast(t('toastSaved'), "success"); })
                  .catch(function(e) { UI.toast(t('toastError'), "error"); });
             },
-            saveSilent() { ganttDb.ref('gantt_tasks').set(AppState.tasks).catch(function() {}); ganttDb.ref('gantt_deliverables').set(AppState.deliverables).catch(function() {}); },
+            saveSilent() {
+                if (!ganttDb) return;
+                ganttDb.ref('gantt_tasks').set(AppState.tasks).catch(function() {});
+                ganttDb.ref('gantt_deliverables').set(AppState.deliverables).catch(function() {});
+            },
             load() {
+                if (!ganttDb) { App.renderAll(); UI.toast('Sem conexao - usando dados locais', 'info'); return; }
                 ganttDb.ref('gantt_tasks').once('value').then(function(snap) {
                     var v = snap.val();
                     if (v && Array.isArray(v) && v.length > 0) {
@@ -453,6 +461,7 @@
                 });
             },
             autoLoad() {
+                if (!ganttDb) { App.renderAll(); return; }
                 ganttDb.ref('gantt_tasks').once('value').then(function(snap) {
                     var v = snap.val();
                     if (v && Array.isArray(v) && v.length > 0) {
