@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeoOrtho — Template de Treinamento Hands-On</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="libs/fonts/space-grotesk.css">
+    <link rel="stylesheet" href="libs/fonts/inter.css">
+    <link rel="stylesheet" href="libs/css/font-awesome-6.5.0.min.css">
     <style>
         :root {
             --roxo: #7a5dd6;
@@ -1651,8 +1652,9 @@
         const dateAprov = appState.signatures.dateAprovado ? formatDateShort(appState.signatures.dateAprovado) : '';
 
         const printHTML = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>'+escapeHTML(title)+' — NeoOrtho</title>' +
-            '<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">' +
-            '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">' +
+            '<link rel="stylesheet" href="libs/fonts/space-grotesk.css">' +
+            '<link rel="stylesheet" href="libs/fonts/inter.css">' +
+            '<link rel="stylesheet" href="libs/css/font-awesome-6.5.0.min.css">' +
             '<style>' +
                 '@page { size:A4; margin:10mm 12mm; }' +
                 '* { margin:0; padding:0; box-sizing:border-box; }' +

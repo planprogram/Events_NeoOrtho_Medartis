@@ -1,5 +1,5 @@
 // Firebase Config
-if (!firebase.apps.length) {
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
     firebase.initializeApp({
         apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
         authDomain: "neoorthomedartis.firebaseapp.com",
@@ -11,8 +11,8 @@ if (!firebase.apps.length) {
         measurementId: "G-W4JC235S2Y"
     });
 }
-const db = firebase.database();
-const auth = firebase.auth();
+const db = (typeof firebase !== 'undefined') ? firebase.database() : null;
+const auth = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth() : null;
 
 // Hub links data
 const hubLinks = [
@@ -26,7 +26,10 @@ const hubLinks = [
 
 // State
 const COLORS = ['#7B2D8E','#1A3E6B','#28A745','#E67E22','#DC3545','#F0AD4E','#16A085','#2980B9','#8E44AD','#D35400'];
-const COVERS = Array.from({length:12},(_,i) => `https://picsum.photos/seed/neodart${i+1}/600/300.jpg`);
+const COVERS = Array.from({length:12},(_,i) => {
+    const hue = (i*30+200)%360;
+    return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300"><rect width="600" height="300" fill="hsl(${hue},40%,85%)"/><text x="300" y="150" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="24" fill="hsl(${hue},40%,40%)">NeoOrtho Medartis</text></svg>`)}`;
+});
 let people = [], projects = [], allUsers = [];
 let currentUser = null, currentUserRole = '';
 let currentFilter = 'all', searchQuery = '';

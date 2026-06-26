@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EAD Builder - Medical Device</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="libs/js/tailwindcss.js"></script>
+    <link rel="stylesheet" href="libs/fonts/outfit.css">
+    <link rel="stylesheet" href="libs/fonts/dm-sans.css">
+    <link rel="stylesheet" href="libs/css/font-awesome.min.css">
     <script>
     tailwind.config={theme:{extend:{colors:{brand:{50:'#F5F3FA',100:'#EDE9FE',200:'#DDD6FE',300:'#C4B5FD',400:'#A78BFA',500:'#8B5CF6',600:'#7C3AED',700:'#6D28D9',800:'#5B21B6',900:'#4C1D95',950:'#2E1065'},navy:{600:'#2563EB',700:'#1D4ED8',800:'#1E40AF',900:'#1E3A8A'},surface:{850:'#1E1B2E',900:'#171426',950:'#110F1D'}},fontFamily:{display:['Outfit','sans-serif'],body:['"DM Sans"','sans-serif']}}}}
     </script>
@@ -67,7 +68,7 @@
     <!-- Header Mobile -->
     <header class="mobile-header fixed top-0 left-0 right-0 z-40 bg-white border-b border-brand-100 px-4 py-3 items-center justify-between" style="display:none">
         <button onclick="toggleMobileMenu()" class="btn-ghost text-lg"><i class="fas fa-bars"></i></button>
-        <img src="https://z-cdn-media.chatglm.cn/files/a85d1aca-138d-400a-a1a5-7cce17dceb9a.png?auth_key=1882217303-653b2db34d664939aba3709f0edb6eb8-0-01dc55d6a13c2a7f5d14674a76cce0ab" alt="Logo" class="h-9">
+        <img src="libs/img/logo.png" alt="Logo" class="h-9">
         <div class="w-8"></div>
     </header>
 
@@ -75,7 +76,7 @@
     <div id="mobileMenuWrap" class="mobile-menu-wrap fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
         <div class="absolute left-0 top-0 bottom-0 w-72 sidebar-bg p-5 flex flex-col overflow-y-auto">
-            <img src="https://z-cdn-media.chatglm.cn/files/a85d1aca-138d-400a-a1a5-7cce17dceb9a.png?auth_key=1882217303-653b2db34d664939aba3709f0edb6eb8-0-01dc55d6a13c2a7f5d14674a76cce0ab" alt="Logo" class="h-11 mb-5">
+            <img src="libs/img/logo.png" alt="Logo" class="h-11 mb-5">
             <div id="mobileNavContent"></div>
         </div>
     </div>
@@ -84,7 +85,7 @@
         <!-- Sidebar -->
         <aside class="sidebar-desktop sidebar-bg w-72 flex-shrink-0 flex flex-col text-white/80 overflow-y-auto">
             <div class="p-5 pb-3">
-                <img src="https://z-cdn-media.chatglm.cn/files/a85d1aca-138d-400a-a1a5-7cce17dceb9a.png?auth_key=1882217303-653b2db34d664939aba3709f0edb6eb8-0-01dc55d6a13c2a7f5d14674a76cce0ab" alt="Logo" class="h-12 mb-3">
+                <img src="libs/img/logo.png" alt="Logo" class="h-12 mb-3">
                 <h2 id="sidebarCourseName" class="font-display font-bold text-base text-white cursor-pointer hover:text-brand-300 transition-colors truncate" onclick="openCourseModal()" title="Clique para editar"></h2>
                 <p class="text-[11px] text-white/35 mt-0.5">Medical Device EAD</p>
             </div>
@@ -835,7 +836,7 @@ function renderPreview(){
     return `<div class="max-w-4xl mx-auto">
         <div class="card p-8 mb-6" style="background:linear-gradient(135deg,#4C1D95,#6D28D9);border:none">
             <div class="flex items-center gap-4 mb-4">
-                <img src="https://z-cdn-media.chatglm.cn/files/a85d1aca-138d-400a-a1a5-7cce17dceb9a.png?auth_key=1882217303-653b2db34d664939aba3709f0edb6eb8-0-01dc55d6a13c2a7f5d14674a76cce0ab" alt="Logo" class="h-12 bg-white/10 rounded-lg p-1.5">
+                <img src="libs/img/logo.png" alt="Logo" class="h-12 bg-white/10 rounded-lg p-1.5">
                 <div><h1 class="font-display font-extrabold text-2xl text-white">${escapeHtml(state.course.name||'Nome do Curso')}</h1>${state.course.instructor?`<p class="text-brand-200 text-sm">Instrutor: ${escapeHtml(state.course.instructor)}</p>`:''}</div>
             </div>
             ${state.course.description?`<p class="text-brand-100 text-sm leading-relaxed">${escapeHtml(state.course.description)}</p>`:''}

@@ -6,15 +6,14 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Curso Essential - Gestão de Projetos</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="libs/fonts/outfit.css">
   <link rel="stylesheet" href="shared.css">
   <script src="shared.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+  <script src="libs/js/firebase-app-compat-9.js"></script>
+  <script src="libs/js/firebase-database-compat-9.js"></script>
+  <script src="libs/js/xlsx.full.min.js"></script>
+  <script src="libs/js/jspdf.umd.min.js"></script>
+  <script src="libs/js/jspdf.plugin.autotable.min.js"></script>
   <style>
     :root {
       --primary: #1a1a2e;
@@ -769,7 +768,7 @@
     // ============================================================
     var fbApp, fbDb;
     try {
-      if (!firebase.apps.length) {
+      if (typeof firebase !== 'undefined' && !firebase.apps.length) {
         fbApp = firebase.initializeApp({
           apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
           authDomain: "neoorthomedartis.firebaseapp.com",
@@ -780,10 +779,10 @@
           appId: "1:48492402152:web:c395acaf1e365d491bc05d",
           measurementId: "G-W4JC235S2Y"
         });
-      } else {
+      } else if (typeof firebase !== 'undefined') {
         fbApp = firebase.app();
       }
-      fbDb = firebase.database();
+      fbDb = (typeof firebase !== 'undefined') ? firebase.database() : null;
     } catch(e) {
       console.error('Firebase init error:', e);
     }
