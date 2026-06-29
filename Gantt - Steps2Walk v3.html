@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gantt - Cadaver Lab IBRA / Medartis Mão e Punho</title>
+    <title>Gantt - Cadaver Lab IBRA / Medartis Mão e Punho | Neoortho</title>
     <script src="libs/js/tailwindcss.js"></script>
     <link rel="stylesheet" href="libs/fonts/space-grotesk.css">
     <link rel="stylesheet" href="libs/fonts/dm-sans.css">
@@ -13,239 +13,431 @@
     <script src="libs/js/firebase-app-compat.js"></script>
     <script src="libs/js/firebase-database-compat.js"></script>
     <style>
-        body { font-family: 'DM Sans', sans-serif; background: #f3f4f6; color: #1e293b; }
+        * { box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: #F0F1F3; color: #1e293b; margin: 0; }
         h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
-        
+
         :root {
-            --bg: #f3f4f6; --surface: #ffffff; --card: #ffffff; --border: #e2e8f0;
-            --text: #1e293b; --muted: #64748b; 
-            --accent: #00AEEF; 
-            --accent-dark: #5C2D91; 
+            --neo-purple: #5C2D91;
+            --neo-purple-light: #7B4FAB;
+            --neo-purple-dark: #461F73;
+            --neo-cyan: #00AEEF;
+            --neo-cyan-dark: #0088BF;
+            --neo-blue: #003A70;
+            --neo-green: #00A651;
+            --neo-orange: #F7941D;
+            --neo-red: #E2183C;
+            --neo-yellow: #FDB913;
+            --neo-gray: #58595B;
+            --bg: #F0F1F3;
+            --surface: #ffffff;
+            --card: #ffffff;
+            --border: #E2E5EA;
+            --text: #1e293b;
+            --muted: #6B7280;
         }
 
-        .gantt-container { overflow: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); max-height: 70vh; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        /* ── Header Neoortho ── */
+        .neo-header {
+            background: linear-gradient(135deg, var(--neo-purple-dark) 0%, var(--neo-purple) 50%, var(--neo-purple-light) 100%);
+            border-bottom: 3px solid var(--neo-cyan);
+            position: sticky; top: 0; z-index: 30;
+        }
+        .neo-header-inner {
+            max-width: 1600px; margin: 0 auto; padding: 16px 24px;
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+        }
+        .neo-header h1 { color: #fff; font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+        .neo-header h1 span.cyan { color: var(--neo-cyan); }
+        .neo-header h1 span.white { color: #fff; }
+        .neo-header p { color: rgba(255,255,255,0.6); font-size: 0.8rem; margin: 4px 0 0; font-weight: 400; }
+        .neo-header-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+        /* ── Botões Neoortho ── */
+        .neo-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px; border-radius: 8px; font-size: 11px; font-weight: 600;
+            cursor: pointer; border: none; transition: all 0.2s; white-space: nowrap;
+            font-family: 'DM Sans', sans-serif; text-decoration: none;
+        }
+        .neo-btn i { font-size: 10px; }
+        .neo-btn-primary { background: var(--neo-cyan); color: #fff; }
+        .neo-btn-primary:hover { background: var(--neo-cyan-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,174,239,0.35); }
+        .neo-btn-ghost { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.15); }
+        .neo-btn-ghost:hover { background: rgba(255,255,255,0.2); color: #fff; }
+        .neo-btn-white { background: #fff; color: var(--neo-purple); border: 1px solid var(--border); }
+        .neo-btn-white:hover { background: #f8f5fc; border-color: var(--neo-purple-light); }
+        .neo-btn-danger { background: rgba(225,24,60,0.08); color: var(--neo-red); border: 1px solid rgba(225,24,60,0.2); }
+        .neo-btn-danger:hover { background: var(--neo-red); color: #fff; }
+        .neo-btn-muted { background: #F3F4F6; color: var(--neo-gray); border: 1px solid var(--border); }
+        .neo-btn-muted:hover { background: #E5E7EB; }
+        .neo-sep { width: 1px; height: 22px; background: rgba(255,255,255,0.15); margin: 0 4px; flex-shrink: 0; }
+
+        /* ── Sub-header filtros ── */
+        .neo-subheader {
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .neo-subheader-inner {
+            max-width: 1600px; margin: 0 auto; padding: 10px 24px;
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        }
+
+        /* ── Stats Cards ── */
+        .neo-stat {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+            padding: 18px 20px; position: relative; overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .neo-stat:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        .neo-stat::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        }
+        .neo-stat.cyan::before { background: var(--neo-cyan); }
+        .neo-stat.blue::before { background: var(--neo-blue); }
+        .neo-stat.orange::before { background: var(--neo-orange); }
+        .neo-stat.green::before { background: var(--neo-green); }
+        .neo-stat-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+        .neo-stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; line-height: 1; }
+        .neo-stat.cyan .neo-stat-value { color: var(--neo-cyan); }
+        .neo-stat.blue .neo-stat-value { color: var(--neo-blue); }
+        .neo-stat.orange .neo-stat-value { color: var(--neo-orange); }
+        .neo-stat.green .neo-stat-value { color: var(--neo-green); }
+
+        /* ── Filter Tags ── */
+        .ftag {
+            padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
+            cursor: pointer; border: 1.5px solid var(--border); background: #fff; color: var(--muted);
+            transition: all 0.2s; white-space: nowrap; font-family: 'DM Sans', sans-serif;
+        }
+        .ftag:hover { border-color: var(--neo-purple-light); color: var(--neo-purple); }
+        .ftag.active { border-color: var(--neo-purple); background: var(--neo-purple); color: #fff; }
+
+        /* ── Zoom ── */
+        .neo-zoom { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .neo-zoom-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+        .neo-zoom-btn {
+            width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+            background: #F3F4F6; border: 1px solid var(--border); cursor: pointer; transition: all 0.15s; color: var(--muted);
+        }
+        .neo-zoom-btn:hover { background: var(--neo-purple); color: #fff; border-color: var(--neo-purple); }
+        .neo-zoom-val { font-family: 'Space Grotesk', monospace; font-size: 12px; font-weight: 600; color: var(--text); width: 16px; text-align: center; }
+
+        /* ── Gantt Container ── */
+        .gantt-container {
+            overflow: auto; border: 1px solid var(--border); border-radius: 12px;
+            background: var(--surface); max-height: 70vh;
+            box-shadow: 0 2px 8px rgba(92,45,145,0.06), 0 1px 3px rgba(0,0,0,0.04);
+        }
         .gantt-chart { display: inline-flex; min-width: 100%; }
-        
-        .gantt-sidebar { position: sticky; left: 0; z-index: 10; background: var(--surface); border-right: 2px solid var(--border); width: 650px; min-width: 650px; }
-        .gantt-sidebar-header { position: sticky; top: 0; z-index: 16; background: #f8fafc; border-bottom: 2px solid var(--border); padding: 14px 16px; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: flex; }
-        
-        .sidebar-row { padding: 10px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; display: flex; align-items: center; height: 52px; }
-        .sidebar-row:hover { background: #f1f5f9; }
-        
+
+        .gantt-sidebar {
+            position: sticky; left: 0; z-index: 10; background: var(--surface);
+            border-right: 2px solid var(--border); width: 640px; min-width: 640px;
+        }
+        .gantt-sidebar-header {
+            position: sticky; top: 0; z-index: 16;
+            background: linear-gradient(135deg, #F8F5FC 0%, #F0EDF5 100%);
+            border-bottom: 2px solid var(--border);
+            padding: 12px 16px; font-weight: 700; font-size: 10.5px;
+            text-transform: uppercase; letter-spacing: 0.08em; color: var(--neo-purple);
+            display: flex;
+        }
+        .sidebar-row {
+            padding: 10px 16px; border-bottom: 1px solid #F0F1F3; cursor: pointer;
+            transition: background 0.15s; display: flex; align-items: center; height: 52px;
+        }
+        .sidebar-row:hover { background: #FAF8FC; }
         .sidebar-cell { flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
         .sidebar-cell.main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; font-weight: 500; color: var(--text); }
-        .sidebar-cell .cdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-        .sidebar-cell.date { width: 110px; text-align: center; color: var(--muted); font-size: 11px; }
-        .sidebar-cell.date.realized { color: #00A651; font-weight: 600; }
+        .sidebar-cell .cdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(0,0,0,0.04); }
+        .sidebar-cell.date { width: 115px; text-align: center; color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+        .sidebar-cell.date.realized { color: var(--neo-green); font-weight: 600; }
 
+        /* ── Timeline ── */
         .gantt-timeline { position: relative; }
-        .timeline-header { position: sticky; top: 0; z-index: 12; background: #f8fafc; border-bottom: 2px solid var(--border); height: 50px; }
-        .month-hdr { position: absolute; top: 0; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 600; border-right: 1px solid var(--border); border-left: 1px solid var(--border); color: var(--text); }
-        .week-hdr { position: absolute; top: 28px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 9.5px; color: var(--muted); border-right: 1px solid rgba(0,0,0,0.05); }
-
+        .timeline-header {
+            position: sticky; top: 0; z-index: 12;
+            background: linear-gradient(135deg, #F8F5FC 0%, #F0EDF5 100%);
+            border-bottom: 2px solid var(--border); height: 50px;
+        }
+        .month-hdr {
+            position: absolute; top: 0; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; font-family: 'Space Grotesk', sans-serif;
+            border-right: 1px solid var(--border); border-left: 1px solid var(--border);
+            color: var(--neo-purple);
+        }
+        .week-hdr {
+            position: absolute; top: 28px; height: 22px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9.5px; color: var(--muted); border-right: 1px solid rgba(0,0,0,0.04);
+        }
         .timeline-body { position: relative; }
-        .timeline-row { position: relative; height: 52px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
-        .timeline-row:hover { background: rgba(0,174,239,0.03); }
-        
-        .grid-line { position: absolute; top: 0; width: 1px; background: rgba(0,0,0,0.05); pointer-events: none; z-index: 0; }
-        
-        .today-marker {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background-color: #ef4444;
-            z-index: 5;
-            pointer-events: none;
-            border-left: 1px dashed rgba(255,255,255,0.5);
+        .timeline-row { position: relative; height: 52px; border-bottom: 1px solid #F0F1F3; cursor: pointer; transition: background 0.15s; }
+        .timeline-row:hover { background: rgba(92,45,145,0.02); }
+        .grid-line { position: absolute; top: 0; width: 1px; background: rgba(0,0,0,0.04); pointer-events: none; z-index: 0; }
+
+        /* ── Today Marker ── */
+        .today-marker { position: absolute; top: 0; bottom: 0; width: 2px; background-color: var(--neo-red); z-index: 5; pointer-events: none; }
+        .today-marker::before {
+            content: ""; position: absolute; top: 0; left: -4px; width: 10px; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(225,24,60,0.06), transparent);
         }
         .today-marker::after {
-            content: "Hoje";
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #ef4444;
-            color: #fff;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 0 0 4px 4px;
-            white-space: nowrap;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            content: "Hoje"; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            background: var(--neo-red); color: #fff; font-size: 8px; font-weight: 700;
+            padding: 2px 7px; border-radius: 0 0 4px 4px; white-space: nowrap;
+            font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.04em;
         }
 
-        .gantt-bar { position: absolute; height: 20px; border-radius: 4px; display: flex; align-items: center; padding: 0 6px; font-size: 10px; font-weight: 600; color: #fff; cursor: pointer; overflow: hidden; white-space: nowrap; }
-        .gantt-bar.planned { top: 16px; z-index: 1; background: #ffffff; border: 2px solid; }
-        .gantt-bar.planned .bfill { opacity: 0.15; }
-        .gantt-bar.realized { top: 6px; height: 24px; z-index: 2; border: 1px solid rgba(0,0,0,0.2); box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
-        .gantt-bar.realized .bfill { opacity: 0.9; }
+        /* ── Gantt Bars ── */
+        .gantt-bar {
+            position: absolute; height: 18px; border-radius: 4px;
+            display: flex; align-items: center; padding: 0 6px;
+            font-size: 9.5px; font-weight: 600; color: #fff; cursor: pointer;
+            overflow: hidden; white-space: nowrap; transition: filter 0.15s, transform 0.15s;
+        }
+        .gantt-bar:hover { filter: brightness(1.1); transform: scaleY(1.15); }
+        .gantt-bar.planned { top: 18px; z-index: 1; background: #fff; border: 2px solid; }
+        .gantt-bar.planned .bfill { opacity: 0.12; }
+        .gantt-bar.realized { top: 6px; height: 22px; z-index: 2; border: 1px solid rgba(0,0,0,0.15); box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+        .gantt-bar.realized .bfill { opacity: 0.92; }
         .gantt-bar .bfill { position: absolute; inset: 0; border-radius: 3px; }
-        .gantt-bar .btxt { position: relative; z-index: 1; text-shadow: 0 1px 2px rgba(0,0,0,0.3); color: #fff; }
+        .gantt-bar .btxt { position: relative; z-index: 1; text-shadow: 0 1px 2px rgba(0,0,0,0.25); color: #fff; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 100; display: flex !important; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(46,16,74,0.55); backdrop-filter: blur(6px);
+            z-index: 100; display: flex !important; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.25s;
+        }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px 32px; width: 550px; max-width: 90vw; transform: translateY(20px); transition: transform 0.3s; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-        .modal-overlay.active .modal-box { transform: translateY(0); }
+        .modal-box {
+            background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 28px 32px; width: 540px; max-width: 92vw;
+            transform: translateY(24px) scale(0.97); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+            box-shadow: 0 24px 48px rgba(92,45,145,0.18), 0 8px 16px rgba(0,0,0,0.06);
+        }
+        .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
+        .modal-box h3 { font-size: 1.1rem; font-weight: 700; color: var(--neo-purple); margin: 0 0 20px; }
         .fg { margin-bottom: 14px; }
-        .fg label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
-        .fg input, .fg select { width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; outline: none; transition: border 0.2s; }
-        .fg input:focus, .fg select:focus { border-color: var(--accent); background: #fff; }
+        .fg label { display: block; font-size: 10.5px; font-weight: 700; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+        .fg input, .fg select {
+            width: 100%; padding: 10px 14px; background: #FAFAFA; border: 1.5px solid var(--border);
+            border-radius: 8px; color: var(--text); font-size: 13px; outline: none;
+            transition: border 0.2s, box-shadow 0.2s; font-family: 'DM Sans', sans-serif;
+        }
+        .fg input:focus, .fg select:focus { border-color: var(--neo-purple); background: #fff; box-shadow: 0 0 0 3px rgba(92,45,145,0.08); }
 
+        /* ── Deliverables ── */
+        .neo-deliv-card {
+            display: flex; align-items: flex-start; gap: 12px; border-radius: 10px;
+            padding: 12px 14px; border: 1px solid var(--border); background: #fff;
+            cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+        }
+        .neo-deliv-card::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+            transition: background 0.2s;
+        }
+        .neo-deliv-card:hover { border-color: var(--neo-purple-light); box-shadow: 0 4px 12px rgba(92,45,145,0.08); transform: translateY(-1px); }
+        .neo-deliv-card.done { opacity: 0.5; }
+        .neo-deliv-card.done .deliv-name { text-decoration: line-through; color: var(--muted); }
+
+        /* ── Checkbox ── */
+        .dcheck {
+            appearance: none; -webkit-appearance: none; width: 18px; height: 18px;
+            border: 2px solid var(--border); border-radius: 5px; background: #fff;
+            cursor: pointer; transition: all 0.15s; flex-shrink: 0; margin-top: 1px;
+        }
+        .dcheck:checked {
+            background: var(--neo-green); border-color: var(--neo-green);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
+            background-size: 12px; background-position: center; background-repeat: no-repeat;
+        }
+
+        /* ── Toast ── */
         .toast-box { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-        .toast { padding: 12px 20px !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 500 !important; color: #fff !important; animation: tIn 0.3s ease-out, tOut 0.3s ease-in 2.7s forwards !important; box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; background-image: none !important; }
-        .toast.success { background: #00A651 !important; border: none !important; }
-        .toast.error { background: #E2183C !important; border: none !important; }
-        .toast.info { background: #00AEEF !important; border: none !important; }
-        .toast.warning { background: #F7941D !important; border: none !important; }
+        .toast {
+            padding: 12px 20px !important; border-radius: 10px !important; font-size: 13px !important;
+            font-weight: 500 !important; color: #fff !important;
+            animation: tIn 0.3s ease-out, tOut 0.3s ease-in 2.7s forwards !important;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2) !important; background-image: none !important;
+            font-family: 'DM Sans', sans-serif !important;
+        }
+        .toast.success { background: var(--neo-green) !important; }
+        .toast.error { background: var(--neo-red) !important; }
+        .toast.info { background: var(--neo-cyan) !important; }
+        .toast.warning { background: var(--neo-orange) !important; }
         @keyframes tIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes tOut { from { opacity: 1; } to { opacity: 0; } }
 
-        .dcheck { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; background: #fff; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
-        .dcheck:checked { background: #00A651; border-color: #00A651; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E"); background-size: 12px; background-position: center; background-repeat: no-repeat; }
-        
-        .ftag { padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: #fff; color: var(--muted); transition: all 0.15s; white-space: nowrap; }
-        .ftag:hover { border-color: var(--accent); color: var(--accent); }
-        .ftag.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+        /* ── Legend ── */
+        .neo-legend {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+            padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .neo-legend h3 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--neo-purple); margin: 0 0 12px; }
+        .neo-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 500; color: var(--text); }
+        .neo-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        /* ── Progress bar ── */
+        .neo-progress { height: 6px; border-radius: 3px; background: #E5E7EB; overflow: hidden; }
+        .neo-progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--neo-green), #34D399); transition: width 0.4s ease; }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #C4C8CF; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+        .gantt-container::-webkit-scrollbar-track { background: #F8F9FA; }
+
+        /* ── Section title ── */
+        .neo-section-title { font-size: 1rem; font-weight: 700; color: var(--neo-purple); margin: 0; display: flex; align-items: center; gap: 8px; }
+        .neo-section-title::before { content: ''; width: 4px; height: 20px; background: var(--neo-cyan); border-radius: 2px; }
     </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden">
 
-    <header class="sticky top-0 z-30 border-b bg-white/80" style="backdrop-filter: blur(12px);">
-        <div class="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
+    <!-- ═══ HEADER ═══ -->
+    <header class="neo-header">
+        <div class="neo-header-inner">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight"><span style="color: var(--accent-dark);">Gantt</span> <span id="headerTitle">Cadaver Lab IBRA / Medartis</span></h1>
-                <p class="text-sm mt-1 text-gray-500" id="headerSub">24 e 25 de agosto de 2026</p>
+                <h1><span class="cyan">Gantt</span> <span class="white" id="headerTitle">Cadaver Lab IBRA / Medartis</span></h1>
+                <p id="headerSub">24 e 25 de agosto de 2026 &middot; Mão e Punho</p>
             </div>
-            <div class="flex items-center gap-2">
-                <button id="btnTranslate" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-purple-500 text-purple-600 hover:bg-purple-50">
+            <div class="neo-header-actions">
+                <button id="btnTranslate" class="neo-btn neo-btn-ghost">
                     <i class="fas fa-globe"></i> <span id="langLabel">EN</span>
                 </button>
-                <div class="border-l border-gray-200 h-6 mx-1"></div>
-                <button id="btnSaveData" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-green-500 text-green-600 hover:bg-green-50">
+                <div class="neo-sep"></div>
+                <button id="btnSaveData" class="neo-btn neo-btn-ghost">
                     <i class="fas fa-floppy-disk"></i> <span id="btnSaveLabel">Salvar</span>
                 </button>
-                <button id="btnLoadData" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-blue-500 text-blue-600 hover:bg-blue-50">
+                <button id="btnLoadData" class="neo-btn neo-btn-ghost">
                     <i class="fas fa-folder-open"></i> <span id="btnLoadLabel">Carregar</span>
                 </button>
-                <button id="btnExportData" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-orange-500 text-orange-600 hover:bg-orange-50">
+                <button id="btnExportData" class="neo-btn neo-btn-ghost">
                     <i class="fas fa-file-export"></i> <span id="btnExportLabel">Exportar</span>
                 </button>
-                <button id="btnImportData" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-purple-500 text-purple-600 hover:bg-purple-50">
+                <button id="btnImportData" class="neo-btn neo-btn-ghost">
                     <i class="fas fa-file-import"></i> <span id="btnImportLabel">Importar</span>
                 </button>
-                <div class="border-l border-gray-200 h-6 mx-1"></div>
-                <button id="btnDeliv" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all bg-white border-gray-200 text-gray-600">
-                    <i class="fas fa-clipboard-check text-xs"></i> <span id="btnDelivLabel">Entregas</span>
+                <div class="neo-sep"></div>
+                <button id="btnDeliv" class="neo-btn neo-btn-ghost">
+                    <i class="fas fa-clipboard-check"></i> <span id="btnDelivLabel">Entregas</span>
                 </button>
-                <button id="btnAdd" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all text-white" style="background: var(--accent-dark);">
-                    <i class="fas fa-plus text-xs"></i> <span id="btnAddLabel">Nova Atividade</span>
+                <button id="btnAdd" class="neo-btn neo-btn-primary">
+                    <i class="fas fa-plus"></i> <span id="btnAddLabel">Nova Atividade</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <div class="border-b bg-white">
-        <div class="max-w-screen-2xl mx-auto px-6 py-3 flex items-center justify-between">
+    <!-- ═══ SUB-HEADER ═══ -->
+    <div class="neo-subheader">
+        <div class="neo-subheader-inner">
             <div class="flex items-center gap-2 overflow-x-auto pb-1" id="filterTags"></div>
-            <div class="flex items-center gap-3 flex-shrink-0 ml-4">
-                <span class="text-xs font-medium text-gray-500">Zoom</span>
-                <button id="zoomOut" class="w-7 h-7 rounded flex items-center justify-center bg-gray-100 border border-gray-200"><i class="fas fa-minus" style="font-size: 9px; color: #64748b;"></i></button>
-                <span id="zoomLvl" class="text-xs font-mono w-4 text-center">5</span>
-                <button id="zoomIn" class="w-7 h-7 rounded flex items-center justify-center bg-gray-100 border border-gray-200"><i class="fas fa-plus" style="font-size: 9px; color: #64748b;"></i></button>
+            <div class="neo-zoom">
+                <span class="neo-zoom-label" id="zoomLabel">Zoom</span>
+                <button id="zoomOut" class="neo-zoom-btn"><i class="fas fa-minus" style="font-size:8px;"></i></button>
+                <span id="zoomLvl" class="neo-zoom-val">5</span>
+                <button id="zoomIn" class="neo-zoom-btn"><i class="fas fa-plus" style="font-size:8px;"></i></button>
             </div>
         </div>
     </div>
 
-    <main class="max-w-screen-2xl mx-auto px-6 py-6">
+    <!-- ═══ MAIN ═══ -->
+    <main style="max-width:1600px; margin:0 auto; padding:24px;">
+
+        <!-- Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div class="rounded-xl p-4 bg-white border border-gray-200 shadow-sm">
-                <div class="text-xs font-medium mb-1 text-gray-500">Total de Atividades</div>
-                <div class="text-3xl font-bold" style="color: var(--accent);" id="statTasks">0</div>
+            <div class="neo-stat cyan">
+                <div class="neo-stat-label" id="statTasksLabel">Total de Atividades</div>
+                <div class="neo-stat-value" id="statTasks">0</div>
             </div>
-            <div class="rounded-xl p-4 bg-white border border-gray-200 shadow-sm">
-                <div class="text-xs font-medium mb-1 text-gray-500">Áreas Envolvidas</div>
-                <div class="text-3xl font-bold" style="color: #003A70;" id="statAreas">0</div>
+            <div class="neo-stat blue">
+                <div class="neo-stat-label" id="statAreasLabel">Áreas Envolvidas</div>
+                <div class="neo-stat-value" id="statAreas">0</div>
             </div>
-            <div class="rounded-xl p-4 bg-white border border-gray-200 shadow-sm">
-                <div class="text-xs font-medium mb-1 text-gray-500">Duração do Projeto</div>
-                <div class="text-3xl font-bold" style="color: #F7941D;" id="statDays">0 dias</div>
+            <div class="neo-stat orange">
+                <div class="neo-stat-label" id="statDaysLabel">Duração do Projeto</div>
+                <div class="neo-stat-value" id="statDays">0 dias</div>
             </div>
-            <div class="rounded-xl p-4 bg-white border border-gray-200 shadow-sm">
-                <div class="text-xs font-medium mb-1 text-gray-500">Entregas Concluídas</div>
-                <div class="text-3xl font-bold" style="color: #00A651;" id="statDeliv">0/0</div>
+            <div class="neo-stat green">
+                <div class="neo-stat-label" id="statDelivLabel">Entregas Concluídas</div>
+                <div class="neo-stat-value" id="statDeliv">0/0</div>
             </div>
         </div>
 
+        <!-- Gantt -->
         <div class="gantt-container mb-8" id="ganttBox"></div>
 
+        <!-- Deliverables -->
         <div id="delivSec" class="hidden mb-8">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-bold text-gray-800">Entregas Específicas da Neoortho</h2>
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+                <h2 class="neo-section-title" id="delivTitle">Entregas Específicas da Neoortho</h2>
                 <div class="flex items-center gap-4">
-                    <button id="btnAddDeliv" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-white" style="background: var(--accent-dark);">
-                        <i class="fas fa-plus text-xs"></i> Nova Entrega
+                    <button id="btnAddDeliv" class="neo-btn neo-btn-primary" style="background:var(--neo-purple);">
+                        <i class="fas fa-plus"></i> Nova Entrega
                     </button>
                     <div class="flex items-center gap-3">
-                        <span id="delivProgTxt" class="text-xs font-medium text-gray-500">0/0</span>
-                        <div class="h-2 w-32 rounded-full bg-gray-200"><div id="delivBar" class="h-full rounded-full" style="background: #00A651; width: 0%; transition: width 0.3s;"></div></div>
+                        <span id="delivProgTxt" class="text-xs font-semibold" style="color:var(--neo-green);font-variant-numeric:tabular-nums;">0/0</span>
+                        <div class="neo-progress" style="width:120px;"><div id="delivBar" class="neo-progress-fill" style="width:0%;"></div></div>
                     </div>
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="delivGrid"></div>
         </div>
 
-        <div class="rounded-xl p-5 bg-white border border-gray-200 shadow-sm">
-            <h3 class="text-xs font-semibold mb-3 uppercase tracking-wider text-gray-500">Legenda - Áreas Exibidas no Gráfico</h3>
+        <!-- Legend -->
+        <div class="neo-legend">
+            <h3 id="legendTitle">Legenda — Áreas Exibidas no Gráfico</h3>
             <div class="flex flex-wrap gap-x-6 gap-y-2" id="legendBox"></div>
         </div>
     </main>
 
-    <!-- Modal Único (Adapta para Tarefas e Entregas) -->
+    <!-- ═══ MODAL ═══ -->
     <div class="modal-overlay" id="editModal">
         <div class="modal-box">
-            <h3 class="text-lg font-bold mb-6 text-gray-800" id="modalTitle">Editar</h3>
+            <h3 id="modalTitle">Editar</h3>
             <input type="hidden" id="editId">
             <input type="hidden" id="editMode">
-            
+
             <div class="fg">
                 <label id="labelName">Nome</label>
                 <input type="text" id="editName" placeholder="Nome da atividade">
             </div>
             <div class="fg">
-                <label for="editResp">Responsável</label>
+                <label for="editResp" id="labelResp">Responsável</label>
                 <input type="text" id="editResp" placeholder="Ex: Marketing Produto" list="respList">
                 <datalist id="respList"></datalist>
             </div>
-            
+
             <div id="taskFields">
-                <div class="grid grid-cols-2 gap-4 pb-4 border-b border-gray-100">
-                    <div class="fg mb-0"><label class="text-blue-500">Planejado Início</label><input type="date" id="editStart"></div>
-                    <div class="fg mb-0"><label class="text-blue-500">Planejado Fim</label><input type="date" id="editEnd"></div>
+                <div class="grid grid-cols-2 gap-4 pb-4" style="border-bottom:1px solid var(--border);">
+                    <div class="fg mb-0"><label style="color:var(--neo-cyan);" id="labelPlannedStart">Planejado Início</label><input type="date" id="editStart"></div>
+                    <div class="fg mb-0"><label style="color:var(--neo-cyan);" id="labelPlannedEnd">Planejado Fim</label><input type="date" id="editEnd"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mt-4">
-                    <div class="fg"><label class="text-green-600">Realizado Início</label><input type="date" id="editStartReal"></div>
-                    <div class="fg"><label class="text-green-600">Realizado Fim</label><input type="date" id="editEndReal"></div>
+                    <div class="fg"><label style="color:var(--neo-green);" id="labelRealStart">Realizado Início</label><input type="date" id="editStartReal"></div>
+                    <div class="fg"><label style="color:var(--neo-green);" id="labelRealEnd">Realizado Fim</label><input type="date" id="editEndReal"></div>
                 </div>
             </div>
 
             <div id="deliverableFields" class="hidden mt-2">
                 <div class="fg flex items-center gap-3">
-                    <input type="checkbox" id="editDone" class="dcheck mt-1">
-                    <label for="editDone" class="text-sm font-medium text-gray-700 cursor-pointer">Marcar como concluída</label>
+                    <input type="checkbox" id="editDone" class="dcheck">
+                    <label for="editDone" class="text-sm font-medium cursor-pointer" style="color:var(--text);" id="labelDone">Marcar como concluída</label>
                 </div>
             </div>
 
             <div class="flex items-center justify-between mt-8">
-                <button id="delBtn" class="px-4 py-2 rounded-lg text-xs font-medium bg-red-50 text-red-600 border border-red-100 hover:bg-red-100"><i class="fas fa-trash-alt mr-1"></i>Excluir</button>
+                <button id="delBtn" class="neo-btn neo-btn-danger"><i class="fas fa-trash-alt"></i> <span id="btnDeleteLabel">Excluir</span></button>
                 <div class="flex gap-3">
-                    <button id="btnCancel" class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">Cancelar</button>
-                    <button id="btnSave" class="px-5 py-2 rounded-lg text-xs font-semibold text-white" style="background: var(--accent-dark);">Salvar Alterações</button>
+                    <button id="btnCancel" class="neo-btn neo-btn-muted"><span id="btnCancelLabel">Cancelar</span></button>
+                    <button id="btnSave" class="neo-btn" style="background:var(--neo-purple);color:#fff;"><span id="btnSaveChangesLabel">Salvar Alterações</span></button>
                 </div>
             </div>
         </div>
@@ -255,53 +447,59 @@
     <input type="file" id="importDbInput" accept=".json" style="display:none" onchange="handleDbImport(event)">
 
     <script>
-        // ============================================================
-        // FIREBASE — uses shared.js (NEO_FB_APP, NEO_FB_DB)
-        // ============================================================
-        var ganttDb = (typeof NEO_FB_DB !== 'undefined') ? NEO_FB_DB : null;
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+            firebase.initializeApp({
+                apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
+                authDomain: "neoorthomedartis.firebaseapp.com",
+                databaseURL: "https://neoorthomedartis-default-rtdb.firebaseio.com",
+                projectId: "neoorthomedartis",
+                storageBucket: "neoorthomedartis.firebasestorage.app",
+                messagingSenderId: "48492402152",
+                appId: "1:48492402152:web:c395acaf1e365d491bc05d",
+                measurementId: "G-W4JC235S2Y"
+            });
+        }
+        var ganttDb = (typeof firebase !== 'undefined') ? firebase.database() : null;
 
-        // ============================================================
-        // IDIOMA
-        // ============================================================
         var lang = localStorage.getItem('gantt_lang') || 'pt';
 
         var L = {
           pt: {
             title: 'Gantt Cadaver Lab IBRA / Medartis',
-            subtitle: '24 e 25 de agosto de 2026',
+            subtitle: '24 e 25 de agosto de 2026 \u00b7 M\u00e3o e Punho',
             btnSave: 'Salvar', btnLoad: 'Carregar', btnExport: 'Exportar', btnImport: 'Importar',
             btnDeliv: 'Entregas', btnAdd: 'Nova Atividade',
-            statTasks: 'Total de Atividades', statAreas: 'Áreas Envolvidas',
-            statDays: 'Duração do Projeto', statDeliv: 'Entregas Concluídas',
-            zoom: 'Zoom', legendTitle: 'Legenda - Áreas Exibidas no Gráfico',
-            delivTitle: 'Entregas Específicas da Neoortho', btnAddDeliv: 'Nova Entrega',
+            statTasks: 'Total de Atividades', statAreas: '\u00c1reas Envolvidas',
+            statDays: 'Dura\u00e7\u00e3o do Projeto', statDeliv: 'Entregas Conclu\u00eddas',
+            zoom: 'Zoom', legendTitle: 'Legenda \u2014 \u00c1reas Exibidas no Gr\u00e1fico',
+            delivTitle: 'Entregas Espec\u00edficas da Neoortho', btnAddDeliv: 'Nova Entrega',
             modalTitleTask: 'Editar Atividade', modalTitleDeliv: 'Editar Entrega',
             labelName: 'Nome', labelActivity: 'Atividade', labelItem: 'Item de Entrega',
-            labelResp: 'Responsável', labelPlannedStart: 'Planejado Início', labelPlannedEnd: 'Planejado Fim',
-            labelRealStart: 'Realizado Início', labelRealEnd: 'Realizado Fim', labelDone: 'Marcar como concluída',
-            btnDelete: 'Excluir', btnCancel: 'Cancelar', btnSaveChanges: 'Salvar Alterações',
+            labelResp: 'Respons\u00e1vel', labelPlannedStart: 'Planejado In\u00edcio', labelPlannedEnd: 'Planejado Fim',
+            labelRealStart: 'Realizado In\u00edcio', labelRealEnd: 'Realizado Fim', labelDone: 'Marcar como conclu\u00edda',
+            btnDelete: 'Excluir', btnCancel: 'Cancelar', btnSaveChanges: 'Salvar Altera\u00e7\u00f5es',
             toastSaved: 'Progresso salvo com sucesso!', toastLoaded: 'Dados carregados.',
             toastNoData: 'Nenhum salvamento encontrado.', toastExported: 'Dados exportados com sucesso!',
             toastError: 'Erro ao salvar dados.', toastLoadError: 'Erro ao carregar.',
             toastExportError: 'Erro ao exportar dados.', toastActivityUpdated: 'Atividade atualizada!',
             toastActivityAdded: 'Nova atividade adicionada!', toastDelivUpdated: 'Entrega atualizada!',
             toastDelivAdded: 'Nova entrega adicionada!', toastActivityRemoved: 'Atividade removida.',
-            toastDelivRemoved: 'Entrega removida.', toastDelivDone: ' concluída!', toastDelivReopened: ' reaberta',
-            toastFillFields: 'Preencha Nome e Responsável.', toastFillDates: 'Preencha as datas de planejamento.',
-            toastInvalidDate: 'Data de planejamento inválida.', toastInvalidEnd: 'Fim do planejado não pode ser antes do início.',
-            toastFillRealDates: 'Preencha início e fim do realizado, ou deixe ambos vazios.',
-            toastInvalidRealDate: 'Data realizada inválida.', toastInvalidRealEnd: 'Fim do realizado não pode ser antes do início.',
-            toastDrawError: 'Erro ao desenhar o gráfico.', confirmDelete: 'Tem certeza que deseja excluir?',
+            toastDelivRemoved: 'Entrega removida.', toastDelivDone: ' conclu\u00edda!', toastDelivReopened: ' reaberta',
+            toastFillFields: 'Preencha Nome e Respons\u00e1vel.', toastFillDates: 'Preencha as datas de planejamento.',
+            toastInvalidDate: 'Data de planejamento inv\u00e1lida.', toastInvalidEnd: 'Fim do planejado n\u00e3o pode ser antes do in\u00edcio.',
+            toastFillRealDates: 'Preencha in\u00edcio e fim do realizado, ou deixe ambos vazios.',
+            toastInvalidRealDate: 'Data realizada inv\u00e1lida.', toastInvalidRealEnd: 'Fim do realizado n\u00e3o pode ser antes do in\u00edcio.',
+            toastDrawError: 'Erro ao desenhar o gr\u00e1fico.', confirmDelete: 'Tem certeza que deseja excluir?',
             activity: 'Atividade', planned: 'Planejado', realized: 'Realizado', pending: 'Pendente'
           },
           en: {
             title: 'Gantt Cadaver Lab IBRA / Medartis',
-            subtitle: 'August 24-25, 2026',
+            subtitle: 'August 24-25, 2026 \u00b7 Hand & Wrist',
             btnSave: 'Save', btnLoad: 'Load', btnExport: 'Export', btnImport: 'Import',
             btnDeliv: 'Deliverables', btnAdd: 'New Activity',
             statTasks: 'Total Activities', statAreas: 'Areas Involved',
             statDays: 'Project Duration', statDeliv: 'Completed Deliverables',
-            zoom: 'Zoom', legendTitle: 'Legend - Areas Displayed in Chart',
+            zoom: 'Zoom', legendTitle: 'Legend \u2014 Areas Displayed in Chart',
             delivTitle: 'Neoortho Specific Deliverables', btnAddDeliv: 'New Deliverable',
             modalTitleTask: 'Edit Activity', modalTitleDeliv: 'Edit Deliverable',
             labelName: 'Name', labelActivity: 'Activity', labelItem: 'Deliverable Item',
@@ -331,69 +529,69 @@
             toDate(input) { if (!input) return null; if (input instanceof Date && !isNaN(input)) return input; if (typeof input === 'string') { const parts = input.split('-'); if (parts.length === 3) { const [y, m, d] = parts.map(Number); if (y > 0 && m > 0 && d > 0) return new Date(y, m - 1, d); } } return null; },
             diffDays(dateA, dateB) { const dA = this.toDate(dateA); const dB = this.toDate(dateB); if (!dA || !dB) return 0; return Math.round((dB - dA) / this.MSPD); },
             formatShort(date) { const d = this.toDate(date); if (!d) return '-'; return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }); },
-            toInputFormat(date) { const d = this.toDate(date); if (!d) return ''; const y = d.getFullYear(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); return `${y}-${m}-${day}`; }
+            toInputFormat(date) { const d = this.toDate(date); if (!d) return ''; const y = d.getFullYear(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0'); return y + '-' + m + '-' + day; }
         };
 
         const AppState = {
             modalMode: 'task',
             tasks: [
-                {id:4, name:"Quantidade confirmada", responsavel:"Educação/Produto", start:"2026-05-05", end:"2026-05-05", startReal:"2026-05-05", endReal:"2026-05-05"},
-                {id:5, name:"Importação concluída", responsavel:"Supply Chain", start:"2026-07-17", end:"2026-07-17", startReal:"", endReal:""},
-                {id:6, name:"Transporte confirmado", responsavel:"Logística", start:"2026-07-31", end:"2026-07-31", startReal:"", endReal:""},
-                {id:7, name:"Recebimento confirmado", responsavel:"Logística", start:"2026-08-17", end:"2026-08-17", startReal:"", endReal:""},
-                {id:1, name:"Contrato Universidade Positivo", responsavel:"Jurídico", start:"2026-07-10", end:"2026-07-10", startReal:"2026-07-08", endReal:"2026-07-08"},
-                {id:2, name:"Contrato fornecedores", responsavel:"Jurídico", start:"2026-06-30", end:"2026-06-30", startReal:"2026-06-30", endReal:"2026-06-30"},
-                {id:27, name:"Motores cirúrgicos", responsavel:"Educação/Produto", start:"2026-07-30", end:"2026-07-30", startReal:"", endReal:""},
-                {id:28, name:"Arco em C", responsavel:"Educação/Produto", start:"2026-07-30", end:"2026-07-30", startReal:"2026-05-29", endReal:"2026-05-29"},
-                {id:29, name:"Instrumentais Medartis", responsavel:"Educação/Produto", start:"2026-08-21", end:"2026-08-21", startReal:"", endReal:""},
-                {id:30, name:"Instrumentais apoio", responsavel:"Educação/Produto", start:"2026-06-05", end:"2026-06-05", startReal:"2026-06-05", endReal:"2026-06-05"},
-                {id:50, name:"Materiais de demonstração", responsavel:"Educação/Produto", start:"2026-08-21", end:"2026-08-21", startReal:"", endReal:""},
-                {id:51, name:"Cotação espaço evento", responsavel:"Eventos", start:"2026-03-15", end:"2026-03-15", startReal:"2026-03-10", endReal:"2026-03-10"},
-                {id:52, name:"Reserva local confirmada", responsavel:"Eventos", start:"2026-04-30", end:"2026-04-30", startReal:"2026-04-28", endReal:"2026-04-28"},
-                {id:53, name:"Layout sala cirúrgica", responsavel:"Eventos", start:"2026-06-30", end:"2026-06-30", startReal:"", endReal:""},
-                {id:54, name:"Sinalização e identificação", responsavel:"Eventos", start:"2026-08-20", end:"2026-08-20", startReal:"", endReal:""},
-                {id:55, name:"Montagem mesas cirúrgicas", responsavel:"Logística", start:"2026-08-21", end:"2026-08-21", startReal:"", endReal:""},
-                {id:56, name:"Iluminação sala cirúrgica", responsavel:"Logística", start:"2026-08-20", end:"2026-08-20", startReal:"", endReal:""},
-                {id:57, name:"Ventilação e climatização", responsavel:"Logística", start:"2026-08-20", end:"2026-08-20", startReal:"", endReal:""},
-                {id:58, name:"Instalação elétrica", responsavel:"Logística", start:"2026-08-20", end:"2026-08-20", startReal:"", endReal:""},
-                {id:59, name:"Limpeza e preparo do espaço", responsavel:"IBRA", start:"2026-08-21", end:"2026-08-21", startReal:"", endReal:""},
-                {id:60, name:"Formulário inscrição online", responsavel:"Educação/Eventos", start:"2026-04-01", end:"2026-04-01", startReal:"2026-03-28", endReal:"2026-03-28"},
-                {id:61, name:"Lista participantes confirmados", responsavel:"Educação/Eventos", start:"2026-08-10", end:"2026-08-10", startReal:"", endReal:""},
-                {id:62, name:"Crachás e materiais participantes", responsavel:"Eventos", start:"2026-08-18", end:"2026-08-18", startReal:"", endReal:""},
-                {id:63, name:"Emissão certificados", responsavel:"Educação/Eventos", start:"2026-08-30", end:"2026-08-30", startReal:"", endReal:""},
-                {id:64, name:"Materiais descartáveis cirúrgicos", responsavel:"Supply Chain", start:"2026-08-10", end:"2026-08-10", startReal:"", endReal:""},
-                {id:65, name:"Produtos de limpeza e desinfecção", responsavel:"Supply Chain", start:"2026-08-15", end:"2026-08-15", startReal:"", endReal:""},
-                {id:66, name:"EPIs para participantes", responsavel:"Supply Chain", start:"2026-08-15", end:"2026-08-15", startReal:"", endReal:""},
-                {id:67, name:"Materiais escritório e sinalização", responsavel:"Logística", start:"2026-08-18", end:"2026-08-18", startReal:"", endReal:""},
-                {id:68, name:"Kits participantes", responsavel:"Educação", start:"2026-08-20", end:"2026-08-20", startReal:"", endReal:""},
-                {id:69, name:"Confirmação presença professores", responsavel:"Educação", start:"2026-04-30", end:"2026-04-30", startReal:"", endReal:""},
-                {id:70, name:"Passagens aéreas professores", responsavel:"Logística", start:"2026-06-30", end:"2026-06-30", startReal:"", endReal:""},
-                {id:71, name:"Hospedagem professores", responsavel:"Logística", start:"2026-08-10", end:"2026-08-10", startReal:"", endReal:""},
-                {id:72, name:"Transporte local professores", responsavel:"Logística", start:"2026-08-23", end:"2026-08-23", startReal:"", endReal:""},
-                {id:73, name:"Definição programa científico", responsavel:"Educação", start:"2026-04-30", end:"2026-04-30", startReal:"2026-04-22", endReal:"2026-04-22"},
-                {id:74, name:"Apresentações PowerPoint", responsavel:"Educação", start:"2026-08-15", end:"2026-08-15", startReal:"", endReal:""},
-                {id:75, name:"Material didático impresso", responsavel:"Eventos", start:"2026-08-18", end:"2026-08-18", startReal:"", endReal:""},
-                {id:76, name:"Cronograma finalizado", responsavel:"Educação/Eventos", start:"2026-08-20", end:"2026-08-20", startReal:"", endReal:""}
+                {id:4,name:"Quantidade confirmada",responsavel:"Educação/Produto",start:"2026-05-05",end:"2026-05-05",startReal:"2026-05-05",endReal:"2026-05-05"},
+                {id:5,name:"Importação concluída",responsavel:"Supply Chain",start:"2026-07-17",end:"2026-07-17",startReal:"",endReal:""},
+                {id:6,name:"Transporte confirmado",responsavel:"Logística",start:"2026-07-31",end:"2026-07-31",startReal:"",endReal:""},
+                {id:7,name:"Recebimento confirmado",responsavel:"Logística",start:"2026-08-17",end:"2026-08-17",startReal:"",endReal:""},
+                {id:1,name:"Contrato Universidade Positivo",responsavel:"Jurídico",start:"2026-07-10",end:"2026-07-10",startReal:"2026-07-08",endReal:"2026-07-08"},
+                {id:2,name:"Contrato fornecedores",responsavel:"Jurídico",start:"2026-06-30",end:"2026-06-30",startReal:"2026-06-30",endReal:"2026-06-30"},
+                {id:27,name:"Motores cirúrgicos",responsavel:"Educação/Produto",start:"2026-07-30",end:"2026-07-30",startReal:"",endReal:""},
+                {id:28,name:"Arco em C",responsavel:"Educação/Produto",start:"2026-07-30",end:"2026-07-30",startReal:"2026-05-29",endReal:"2026-05-29"},
+                {id:29,name:"Instrumentais Medartis",responsavel:"Educação/Produto",start:"2026-08-21",end:"2026-08-21",startReal:"",endReal:""},
+                {id:30,name:"Instrumentais apoio",responsavel:"Educação/Produto",start:"2026-06-05",end:"2026-06-05",startReal:"2026-06-05",endReal:"2026-06-05"},
+                {id:50,name:"Materiais de demonstração",responsavel:"Educação/Produto",start:"2026-08-21",end:"2026-08-21",startReal:"",endReal:""},
+                {id:51,name:"Cotação espaço evento",responsavel:"Eventos",start:"2026-03-15",end:"2026-03-15",startReal:"2026-03-10",endReal:"2026-03-10"},
+                {id:52,name:"Reserva local confirmada",responsavel:"Eventos",start:"2026-04-30",end:"2026-04-30",startReal:"2026-04-28",endReal:"2026-04-28"},
+                {id:53,name:"Layout sala cirúrgica",responsavel:"Eventos",start:"2026-06-30",end:"2026-06-30",startReal:"",endReal:""},
+                {id:54,name:"Sinalização e identificação",responsavel:"Eventos",start:"2026-08-20",end:"2026-08-20",startReal:"",endReal:""},
+                {id:55,name:"Montagem mesas cirúrgicas",responsavel:"Logística",start:"2026-08-21",end:"2026-08-21",startReal:"",endReal:""},
+                {id:56,name:"Iluminação sala cirúrgica",responsavel:"Logística",start:"2026-08-20",end:"2026-08-20",startReal:"",endReal:""},
+                {id:57,name:"Ventilação e climatização",responsavel:"Logística",start:"2026-08-20",end:"2026-08-20",startReal:"",endReal:""},
+                {id:58,name:"Instalação elétrica",responsavel:"Logística",start:"2026-08-20",end:"2026-08-20",startReal:"",endReal:""},
+                {id:59,name:"Limpeza e preparo do espaço",responsavel:"IBRA",start:"2026-08-21",end:"2026-08-21",startReal:"",endReal:""},
+                {id:60,name:"Formulário inscrição online",responsavel:"Educação/Eventos",start:"2026-04-01",end:"2026-04-01",startReal:"2026-03-28",endReal:"2026-03-28"},
+                {id:61,name:"Lista participantes confirmados",responsavel:"Educação/Eventos",start:"2026-08-10",end:"2026-08-10",startReal:"",endReal:""},
+                {id:62,name:"Crachás e materiais participantes",responsavel:"Eventos",start:"2026-08-18",end:"2026-08-18",startReal:"",endReal:""},
+                {id:63,name:"Emissão certificados",responsavel:"Educação/Eventos",start:"2026-08-30",end:"2026-08-30",startReal:"",endReal:""},
+                {id:64,name:"Materiais descartáveis cirúrgicos",responsavel:"Supply Chain",start:"2026-08-10",end:"2026-08-10",startReal:"",endReal:""},
+                {id:65,name:"Produtos de limpeza e desinfecção",responsavel:"Supply Chain",start:"2026-08-15",end:"2026-08-15",startReal:"",endReal:""},
+                {id:66,name:"EPIs para participantes",responsavel:"Supply Chain",start:"2026-08-15",end:"2026-08-15",startReal:"",endReal:""},
+                {id:67,name:"Materiais escritório e sinalização",responsavel:"Logística",start:"2026-08-18",end:"2026-08-18",startReal:"",endReal:""},
+                {id:68,name:"Kits participantes",responsavel:"Educação",start:"2026-08-20",end:"2026-08-20",startReal:"",endReal:""},
+                {id:69,name:"Confirmação presença professores",responsavel:"Educação",start:"2026-04-30",end:"2026-04-30",startReal:"",endReal:""},
+                {id:70,name:"Passagens aéreas professores",responsavel:"Logística",start:"2026-06-30",end:"2026-06-30",startReal:"",endReal:""},
+                {id:71,name:"Hospedagem professores",responsavel:"Logística",start:"2026-08-10",end:"2026-08-10",startReal:"",endReal:""},
+                {id:72,name:"Transporte local professores",responsavel:"Logística",start:"2026-08-23",end:"2026-08-23",startReal:"",endReal:""},
+                {id:73,name:"Definição programa científico",responsavel:"Educação",start:"2026-04-30",end:"2026-04-30",startReal:"2026-04-22",endReal:"2026-04-22"},
+                {id:74,name:"Apresentações PowerPoint",responsavel:"Educação",start:"2026-08-15",end:"2026-08-15",startReal:"",endReal:""},
+                {id:75,name:"Material didático impresso",responsavel:"Eventos",start:"2026-08-18",end:"2026-08-18",startReal:"",endReal:""},
+                {id:76,name:"Cronograma finalizado",responsavel:"Educação/Eventos",start:"2026-08-20",end:"2026-08-20",startReal:"",endReal:""}
             ],
             deliverables: [
-                {id:1, name:"Cadáveres confirmados (10 peças)", responsavel:"Educação/Produto", done:true},
-                {id:2, name:"Importação concluída", responsavel:"Supply Chain", done:false},
-                {id:3, name:"Transporte confirmado", responsavel:"Logística", done:false},
-                {id:4, name:"Contrato Universidade Positivo", responsavel:"Jurídico", done:false},
-                {id:5, name:"Contrato fornecedores", responsavel:"Jurídico", done:true},
-                {id:6, name:"Motores cirúrgicos", responsavel:"Educação/Produto", done:false},
-                {id:7, name:"Arco em C (empréstimo GE)", responsavel:"Educação/Produto", done:true},
-                {id:8, name:"Instrumentais Medartis", responsavel:"Educação/Produto", done:false},
-                {id:9, name:"Layout sala cirúrgica (8 estações)", responsavel:"Eventos", done:false},
-                {id:10, name:"Mesas cirúrgicas montadas", responsavel:"Logística", done:false},
-                {id:11, name:"Iluminação e ventilação OK", responsavel:"Logística", done:false},
-                {id:12, name:"Instalação elétrica", responsavel:"Logística", done:false},
-                {id:13, name:"Lista participantes confirmados", responsavel:"Educação/Eventos", done:false},
-                {id:14, name:"Materiais descartáveis", responsavel:"Supply Chain", done:false},
-                {id:15, name:"EPIs para participantes", responsavel:"Supply Chain", done:false},
-                {id:16, name:"Kits participantes", responsavel:"Educação", done:false},
-                {id:17, name:"Passagens e hospedagem professores", responsavel:"Logística", done:false},
-                {id:18, name:"Cronograma finalizado", responsavel:"Educação/Eventos", done:false}
+                {id:1,name:"Cadáveres confirmados (10 peças)",responsavel:"Educação/Produto",done:true},
+                {id:2,name:"Importação concluída",responsavel:"Supply Chain",done:false},
+                {id:3,name:"Transporte confirmado",responsavel:"Logística",done:false},
+                {id:4,name:"Contrato Universidade Positivo",responsavel:"Jurídico",done:false},
+                {id:5,name:"Contrato fornecedores",responsavel:"Jurídico",done:true},
+                {id:6,name:"Motores cirúrgicos",responsavel:"Educação/Produto",done:false},
+                {id:7,name:"Arco em C (empréstimo GE)",responsavel:"Educação/Produto",done:true},
+                {id:8,name:"Instrumentais Medartis",responsavel:"Educação/Produto",done:false},
+                {id:9,name:"Layout sala cirúrgica (8 estações)",responsavel:"Eventos",done:false},
+                {id:10,name:"Mesas cirúrgicas montadas",responsavel:"Logística",done:false},
+                {id:11,name:"Iluminação e ventilação OK",responsavel:"Logística",done:false},
+                {id:12,name:"Instalação elétrica",responsavel:"Logística",done:false},
+                {id:13,name:"Lista participantes confirmados",responsavel:"Educação/Eventos",done:false},
+                {id:14,name:"Materiais descartáveis",responsavel:"Supply Chain",done:false},
+                {id:15,name:"EPIs para participantes",responsavel:"Supply Chain",done:false},
+                {id:16,name:"Kits participantes",responsavel:"Educação",done:false},
+                {id:17,name:"Passagens e hospedagem professores",responsavel:"Logística",done:false},
+                {id:18,name:"Cronograma finalizado",responsavel:"Educação/Eventos",done:false}
             ],
             dayWidth: 5,
             filterArea: "Todos",
@@ -415,12 +613,12 @@
         const Storage = {
             isOnline() { return ganttDb !== null; },
             save() {
-                if (!ganttDb) { UI.toast('Sem conexao com o servidor - dados mantidos localmente', 'warning'); return; }
+                if (!ganttDb) { UI.toast('Sem conexão com o servidor - dados mantidos localmente', 'warning'); return; }
                 Promise.all([
                     ganttDb.ref('gantt_tasks').set(AppState.tasks),
                     ganttDb.ref('gantt_deliverables').set(AppState.deliverables)
                 ]).then(function() { UI.toast(t('toastSaved'), "success"); })
-                 .catch(function(e) { UI.toast(t('toastError'), "error"); });
+                 .catch(function() { UI.toast(t('toastError'), "error"); });
             },
             saveSilent() {
                 if (!ganttDb) return;
@@ -428,12 +626,12 @@
                 ganttDb.ref('gantt_deliverables').set(AppState.deliverables).catch(function() {});
             },
             load() {
-                if (!ganttDb) { App.renderAll(); UI.toast('Sem conexao - usando dados locais', 'info'); return; }
+                if (!ganttDb) { App.renderAll(); UI.toast('Sem conexão - usando dados locais', 'info'); return; }
                 ganttDb.ref('gantt_tasks').once('value').then(function(snap) {
                     var v = snap.val();
                     if (v && Array.isArray(v) && v.length > 0) {
                         AppState.tasks = v;
-                        AppState.nextId = AppState.tasks.reduce(function(m, t) { return Math.max(m, t.id); }, 0) + 1;
+                        AppState.nextId = AppState.tasks.reduce(function(m, tk) { return Math.max(m, tk.id); }, 0) + 1;
                     }
                     return ganttDb.ref('gantt_deliverables').once('value');
                 }).then(function(snap2) {
@@ -455,7 +653,7 @@
                     var v = snap.val();
                     if (v && Array.isArray(v) && v.length > 0) {
                         AppState.tasks = v;
-                        AppState.nextId = AppState.tasks.reduce(function(m, t) { return Math.max(m, t.id); }, 0) + 1;
+                        AppState.nextId = AppState.tasks.reduce(function(m, tk) { return Math.max(m, tk.id); }, 0) + 1;
                     }
                     return ganttDb.ref('gantt_deliverables').once('value');
                 }).then(function(snap2) {
@@ -469,19 +667,12 @@
             },
             exportData() {
                 try {
-                    var data = {
-                        version: 1,
-                        exportedAt: new Date().toISOString(),
-                        tasks: AppState.tasks,
-                        deliverables: AppState.deliverables
-                    };
+                    var data = { version: 1, exportedAt: new Date().toISOString(), tasks: AppState.tasks, deliverables: AppState.deliverables };
                     var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                     var url = URL.createObjectURL(blob);
                     var a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'gantt_hw_' + new Date().toISOString().slice(0,10) + '.json';
-                    a.click();
-                    URL.revokeObjectURL(url);
+                    a.href = url; a.download = 'gantt_neoortho_' + new Date().toISOString().slice(0,10) + '.json';
+                    a.click(); URL.revokeObjectURL(url);
                     UI.toast(t('toastExported'), "success");
                 } catch (e) { UI.toast(t('toastExportError'), "error"); }
             },
@@ -490,64 +681,210 @@
                 reader.onload = function(e) {
                     try {
                         var data = JSON.parse(e.target.result);
-                        if (!data.tasks || !Array.isArray(data.tasks)) {
-                            UI.toast('Arquivo invalido: formato nao reconhecido', 'error');
-                            return;
-                        }
+                        if (!data.tasks || !Array.isArray(data.tasks)) { UI.toast('Arquivo inválido: formato não reconhecido', 'error'); return; }
                         AppState.tasks = data.tasks;
-                        AppState.nextId = AppState.tasks.reduce(function(m, t) { return Math.max(m, t.id); }, 0) + 1;
+                        AppState.nextId = AppState.tasks.reduce(function(m, tk) { return Math.max(m, tk.id); }, 0) + 1;
                         if (data.deliverables && Array.isArray(data.deliverables)) {
                             AppState.deliverables = data.deliverables;
                             AppState.nextDelivId = AppState.deliverables.reduce(function(m, d) { return Math.max(m, d.id); }, 0) + 1;
                         }
-                        Storage.saveSilent();
-                        App.renderAll();
+                        Storage.saveSilent(); App.renderAll();
                         UI.toast('Dados importados: ' + AppState.tasks.length + ' atividades, ' + AppState.deliverables.length + ' entregas', 'success');
-                    } catch (err) {
-                        UI.toast('Erro ao importar: arquivo JSON invalido', 'error');
-                    }
+                    } catch (err) { UI.toast('Erro ao importar: arquivo JSON inválido', 'error'); }
                 };
                 reader.readAsText(file);
             }
         };
 
         const Stats = {
-            render() { const ft = Filter.getFiltered(); const doneCount = AppState.deliverables.filter(d => d.done).length; const areasSet = new Set(); ft.forEach(t => { const parts = t.responsavel.split("/"); parts.forEach(a => { const trimmed = a.trim(); if (trimmed) areasSet.add(trimmed); }); }); document.getElementById('statTasks').textContent = ft.length; document.getElementById('statAreas').textContent = areasSet.size; document.getElementById('statDays').textContent = AppState.totalDays + ' dias'; document.getElementById('statDeliv').textContent = doneCount + '/' + AppState.deliverables.length; }
+            render() {
+                var ft = Filter.getFiltered();
+                var doneCount = AppState.deliverables.filter(function(d) { return d.done; }).length;
+                var areasSet = new Set();
+                ft.forEach(function(task) {
+                    task.responsavel.split("/").forEach(function(a) { var trimmed = a.trim(); if (trimmed) areasSet.add(trimmed); });
+                });
+                document.getElementById('statTasks').textContent = ft.length;
+                document.getElementById('statAreas').textContent = areasSet.size;
+                document.getElementById('statDays').textContent = AppState.totalDays + ' dias';
+                document.getElementById('statDeliv').textContent = doneCount + '/' + AppState.deliverables.length;
+                document.getElementById('statTasksLabel').textContent = t('statTasks');
+                document.getElementById('statAreasLabel').textContent = t('statAreas');
+                document.getElementById('statDaysLabel').textContent = t('statDays');
+                document.getElementById('statDelivLabel').textContent = t('statDeliv');
+            }
         };
 
         const Filter = {
-            getAllAreas() { const s = new Set(); AppState.tasks.forEach(t => { t.responsavel.split("/").forEach(a => s.add(a.trim())); }); return ["Todos", ...Array.from(s).sort()]; },
-            getFiltered() { let result = [...AppState.tasks]; result.sort((a, b) => { const dateA = DateUtils.toDate(a.start); const dateB = DateUtils.toDate(b.start); if (!dateA && !dateB) return a.id - b.id; if (!dateA) return 1; if (!dateB) return -1; if (dateA.getTime() !== dateB.getTime()) return dateA - dateB; const endA = DateUtils.toDate(a.end); const endB = DateUtils.toDate(b.end); if (endA && endB && endA.getTime() !== endB.getTime()) return endA - endB; return a.id - b.id; }); if (AppState.filterArea === "Todos") return result; return result.filter(t => t.responsavel.includes(AppState.filterArea)); },
+            getAllAreas() {
+                var s = new Set();
+                AppState.tasks.forEach(function(task) { task.responsavel.split("/").forEach(function(a) { s.add(a.trim()); }); });
+                return ["Todos"].concat(Array.from(s).sort());
+            },
+            getFiltered() {
+                var result = AppState.tasks.slice();
+                result.sort(function(a, b) {
+                    var dateA = DateUtils.toDate(a.start), dateB = DateUtils.toDate(b.start);
+                    if (!dateA && !dateB) return a.id - b.id;
+                    if (!dateA) return 1; if (!dateB) return -1;
+                    if (dateA.getTime() !== dateB.getTime()) return dateA - dateB;
+                    var endA = DateUtils.toDate(a.end), endB = DateUtils.toDate(b.end);
+                    if (endA && endB && endA.getTime() !== endB.getTime()) return endA - endB;
+                    return a.id - b.id;
+                });
+                if (AppState.filterArea === "Todos") return result;
+                return result.filter(function(task) { return task.responsavel.includes(AppState.filterArea); });
+            },
             set(area) { AppState.filterArea = area; App.renderAll(); },
-            render() { const areas = this.getAllAreas(); document.getElementById('filterTags').innerHTML = areas.map(a => { const isActive = AppState.filterArea === a; const col = a === "Todos" ? 'var(--accent)' : Gantt.getColor(a); return '<button class="ftag' + (isActive ? ' active' : '') + '" data-area="' + a + '" ' + (isActive ? 'style="background:' + col + ';border-color:' + col + ';color:#fff;"' : '') + '>' + a + '</button>'; }).join(''); }
+            render() {
+                var areas = this.getAllAreas();
+                document.getElementById('filterTags').innerHTML = areas.map(function(a) {
+                    var isActive = AppState.filterArea === a;
+                    var col = a === "Todos" ? 'var(--neo-purple)' : Gantt.getColor(a);
+                    return '<button class="ftag' + (isActive ? ' active' : '') + '" data-area="' + a + '" ' + (isActive ? 'style="background:' + col + ';border-color:' + col + ';color:#fff;"' : '') + '>' + a + '</button>';
+                }).join('');
+            }
         };
 
         const Gantt = {
-            getColor(resp) { for (const [area, color] of Object.entries(AppState.areaColors)) { if (resp.includes(area)) return color; } return "#58595B"; },
-            changeZoom(delta) { AppState.dayWidth = Math.max(2, Math.min(20, AppState.dayWidth + delta)); document.getElementById('zoomLvl').textContent = AppState.dayWidth; this.render(); },
-            render() { try { const ft = Filter.getFiltered(); const tw = AppState.totalDays * AppState.dayWidth; const rh = 52; const totalH = ft.length * rh; const headerHTML = this.buildHeader(tw); const gridHTML = this.buildGrid(tw, totalH); const { sidebarHTML, rowsHTML } = this.buildRows(ft, tw, rh); const box = document.getElementById('ganttBox'); const st = box.scrollTop, sl = box.scrollLeft; box.innerHTML = '<div class="gantt-chart"><div class="gantt-sidebar"><div class="gantt-sidebar-header"><span style="flex:1;">Atividade</span><span style="width:110px; text-align:center;">Planejado</span><span style="width:110px; text-align:center;">Realizado</span></div>' + sidebarHTML + '</div><div class="gantt-timeline" style="width:' + tw + 'px;min-width:' + tw + 'px;">' + headerHTML + '<div class="timeline-body" style="width:' + tw + 'px;min-width:' + tw + 'px;position:relative;"><div style="position:absolute;top:0;left:0;width:' + tw + 'px;height:' + totalH + 'px;pointer-events:none;z-index:0;">' + gridHTML + '</div><div style="position:relative;z-index:1;">' + rowsHTML + '</div></div></div></div>'; box.scrollTop = st; box.scrollLeft = sl; } catch (error) { UI.toast(t('toastDrawError'), "error"); } },
-            buildHeader(tw) { const mn = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']; let mhdr = '', whdr = ''; let cur = new Date(AppState.timelineStart); while (cur <= AppState.timelineEnd) { const y = cur.getFullYear(), m = cur.getMonth(); const ms = new Date(y, m, 1), me = new Date(y, m+1, 0); const es = ms < AppState.timelineStart ? AppState.timelineStart : ms; const ee = me > AppState.timelineEnd ? AppState.timelineEnd : me; const l = DateUtils.diffDays(AppState.timelineStart, es) * AppState.dayWidth; const w = (DateUtils.diffDays(es, ee) + 1) * AppState.dayWidth; mhdr += '<div class="month-hdr" style="left:' + l + 'px;width:' + w + 'px;">' + mn[m] + ' ' + y + '</div>'; cur = new Date(y, m+1, 1); } for (let d=0; d<AppState.totalDays; d++) { const dt = new Date(AppState.timelineStart.getTime() + d * DateUtils.MSPD); if (dt.getDay() === 1) whdr += '<div class="week-hdr" style="left:' + d*AppState.dayWidth + 'px;width:' + 7*AppState.dayWidth + 'px;">' + dt.getDate() + '/' + (dt.getMonth()+1) + '</div>'; } return '<div class="timeline-header" style="width:' + tw + 'px;min-width:' + tw + 'px;">' + mhdr + whdr + '</div>'; },
-            buildGrid(tw, totalH) { let html = ''; for (let d=0; d<AppState.totalDays; d++) { const dt = new Date(AppState.timelineStart.getTime() + d * DateUtils.MSPD); if (dt.getDay() === 1) html += '<div class="grid-line" style="left:' + d*AppState.dayWidth + 'px;height:' + totalH + 'px;"></div>'; if (dt.getDay() === 0 || dt.getDay() === 6) html += '<div style="position:absolute;left:' + d*AppState.dayWidth + 'px;top:0;width:' + AppState.dayWidth + 'px;height:' + totalH + 'px;background:rgba(0,0,0,0.02);pointer-events:none;"></div>'; } const today = new Date(); today.setHours(0,0,0,0); const diffToday = DateUtils.diffDays(AppState.timelineStart, today); if (diffToday >= 0 && diffToday < AppState.totalDays) { const leftPos = diffToday * AppState.dayWidth; html += '<div class="today-marker" style="left:' + leftPos + 'px; height:' + totalH + 'px;"></div>'; } return html; },
-            buildRows(ft, tw, rh) { let sidebarHTML = '', rowsHTML = ''; ft.forEach(t => { const col = this.getColor(t.responsavel); const startD = DateUtils.toDate(t.start); const endD = DateUtils.toDate(t.end); if (!startD || !endD) return; const so = DateUtils.diffDays(AppState.timelineStart, startD) * AppState.dayWidth; const dur = DateUtils.diffDays(startD, endD) + 1; const bw = Math.max(dur * AppState.dayWidth, AppState.dayWidth); const dateLabelPlanned = DateUtils.formatShort(startD) + (startD.getTime() !== endD.getTime() ? ' — ' + DateUtils.formatShort(endD) : ''); let isRealized = false, soReal = 0, bwReal = 0, dateLabelReal = t('pending'); const realStartD = DateUtils.toDate(t.startReal); const realEndD = DateUtils.toDate(t.endReal); if (realStartD && realEndD) { isRealized = true; soReal = DateUtils.diffDays(AppState.timelineStart, realStartD) * AppState.dayWidth; const durReal = DateUtils.diffDays(realStartD, realEndD) + 1; bwReal = Math.max(durReal * AppState.dayWidth, AppState.dayWidth); dateLabelReal = DateUtils.formatShort(realStartD) + (realStartD.getTime() !== realEndD.getTime() ? ' — ' + DateUtils.formatShort(realEndD) : ''); } sidebarHTML += '<div class="sidebar-row" data-id="' + t.id + '"><div class="sidebar-cell main"><div class="cdot" style="background:' + col + ';"></div><span title="' + t.name + '">' + t.name + '</span></div><div class="sidebar-cell date" title="' + dateLabelPlanned + '">' + dateLabelPlanned + '</div><div class="sidebar-cell date realized ' + (isRealized ? '' : 'text-gray-400 font-normal') + '" title="' + dateLabelReal + '">' + dateLabelReal + '</div></div>'; rowsHTML += '<div class="timeline-row" data-id="' + t.id + '" style="height:' + rh + 'px;"><div class="gantt-bar planned" style="left:' + so + 'px;width:' + bw + 'px;border-color:' + col + ';" title="Planejado: ' + t.name + '\n' + dateLabelPlanned + '\n' + t.responsavel + '"><div class="bfill" style="background:' + col + ';"></div></div>'; if (isRealized) { rowsHTML += '<div class="gantt-bar realized" style="left:' + soReal + 'px;width:' + bwReal + 'px;" title="Realizado: ' + t.name + '\n' + dateLabelReal + '\n' + t.responsavel + '"><div class="bfill" style="background:' + col + ';"></div><span class="btxt">' + (bwReal > 60 ? t.name.substring(0, Math.floor(bwReal/6))+'...' : '') + '</span></div>'; } rowsHTML += '</div>'; }); return { sidebarHTML, rowsHTML }; }
+            getColor(resp) {
+                for (var area in AppState.areaColors) {
+                    if (resp.indexOf(area) !== -1) return AppState.areaColors[area];
+                }
+                return "#58595B";
+            },
+            changeZoom(delta) {
+                AppState.dayWidth = Math.max(2, Math.min(20, AppState.dayWidth + delta));
+                document.getElementById('zoomLvl').textContent = AppState.dayWidth;
+                this.render();
+            },
+            render() {
+                try {
+                    var ft = Filter.getFiltered();
+                    var tw = AppState.totalDays * AppState.dayWidth;
+                    var rh = 52;
+                    var totalH = ft.length * rh;
+                    var headerHTML = this.buildHeader(tw);
+                    var gridHTML = this.buildGrid(tw, totalH);
+                    var result = this.buildRows(ft, tw, rh);
+                    var box = document.getElementById('ganttBox');
+                    var st = box.scrollTop, sl = box.scrollLeft;
+                    box.innerHTML = '<div class="gantt-chart">' +
+                        '<div class="gantt-sidebar">' +
+                            '<div class="gantt-sidebar-header">' +
+                                '<span style="flex:1;">' + t('activity') + '</span>' +
+                                '<span style="width:115px;text-align:center;">' + t('planned') + '</span>' +
+                                '<span style="width:115px;text-align:center;">' + t('realized') + '</span>' +
+                            '</div>' +
+                            result.sidebarHTML +
+                        '</div>' +
+                        '<div class="gantt-timeline" style="width:' + tw + 'px;min-width:' + tw + 'px;">' +
+                            headerHTML +
+                            '<div class="timeline-body" style="width:' + tw + 'px;min-width:' + tw + 'px;position:relative;">' +
+                                '<div style="position:absolute;top:0;left:0;width:' + tw + 'px;height:' + totalH + 'px;pointer-events:none;z-index:0;">' + gridHTML + '</div>' +
+                                '<div style="position:relative;z-index:1;">' + result.rowsHTML + '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                    box.scrollTop = st; box.scrollLeft = sl;
+                } catch (error) { UI.toast(t('toastDrawError'), "error"); }
+            },
+            buildHeader(tw) {
+                var mn = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+                var mhdr = '', whdr = '';
+                var cur = new Date(AppState.timelineStart);
+                while (cur <= AppState.timelineEnd) {
+                    var y = cur.getFullYear(), m = cur.getMonth();
+                    var ms = new Date(y, m, 1), me = new Date(y, m+1, 0);
+                    var es = ms < AppState.timelineStart ? AppState.timelineStart : ms;
+                    var ee = me > AppState.timelineEnd ? AppState.timelineEnd : me;
+                    var l = DateUtils.diffDays(AppState.timelineStart, es) * AppState.dayWidth;
+                    var w = (DateUtils.diffDays(es, ee) + 1) * AppState.dayWidth;
+                    mhdr += '<div class="month-hdr" style="left:' + l + 'px;width:' + w + 'px;">' + mn[m] + ' ' + y + '</div>';
+                    cur = new Date(y, m+1, 1);
+                }
+                for (var d = 0; d < AppState.totalDays; d++) {
+                    var dt = new Date(AppState.timelineStart.getTime() + d * DateUtils.MSPD);
+                    if (dt.getDay() === 1) whdr += '<div class="week-hdr" style="left:' + d*AppState.dayWidth + 'px;width:' + 7*AppState.dayWidth + 'px;">' + dt.getDate() + '/' + (dt.getMonth()+1) + '</div>';
+                }
+                return '<div class="timeline-header" style="width:' + tw + 'px;min-width:' + tw + 'px;">' + mhdr + whdr + '</div>';
+            },
+            buildGrid(tw, totalH) {
+                var html = '';
+                for (var d = 0; d < AppState.totalDays; d++) {
+                    var dt = new Date(AppState.timelineStart.getTime() + d * DateUtils.MSPD);
+                    if (dt.getDay() === 1) html += '<div class="grid-line" style="left:' + d*AppState.dayWidth + 'px;height:' + totalH + 'px;"></div>';
+                    if (dt.getDay() === 0 || dt.getDay() === 6) html += '<div style="position:absolute;left:' + d*AppState.dayWidth + 'px;top:0;width:' + AppState.dayWidth + 'px;height:' + totalH + 'px;background:rgba(92,45,145,0.015);pointer-events:none;"></div>';
+                }
+                var today = new Date(); today.setHours(0,0,0,0);
+                var diffToday = DateUtils.diffDays(AppState.timelineStart, today);
+                if (diffToday >= 0 && diffToday < AppState.totalDays) {
+                    html += '<div class="today-marker" style="left:' + diffToday*AppState.dayWidth + 'px;height:' + totalH + 'px;"></div>';
+                }
+                return html;
+            },
+            buildRows(ft, tw, rh) {
+                var sidebarHTML = '', rowsHTML = '';
+                ft.forEach(function(task) {
+                    var col = Gantt.getColor(task.responsavel);
+                    var startD = DateUtils.toDate(task.start), endD = DateUtils.toDate(task.end);
+                    if (!startD || !endD) return;
+                    var so = DateUtils.diffDays(AppState.timelineStart, startD) * AppState.dayWidth;
+                    var dur = DateUtils.diffDays(startD, endD) + 1;
+                    var bw = Math.max(dur * AppState.dayWidth, AppState.dayWidth);
+                    var dateLabelPlanned = DateUtils.formatShort(startD) + (startD.getTime() !== endD.getTime() ? ' \u2014 ' + DateUtils.formatShort(endD) : '');
+                    var isRealized = false, soReal = 0, bwReal = 0, dateLabelReal = t('pending');
+                    var realStartD = DateUtils.toDate(task.startReal), realEndD = DateUtils.toDate(task.endReal);
+                    if (realStartD && realEndD) {
+                        isRealized = true;
+                        soReal = DateUtils.diffDays(AppState.timelineStart, realStartD) * AppState.dayWidth;
+                        var durReal = DateUtils.diffDays(realStartD, realEndD) + 1;
+                        bwReal = Math.max(durReal * AppState.dayWidth, AppState.dayWidth);
+                        dateLabelReal = DateUtils.formatShort(realStartD) + (realStartD.getTime() !== realEndD.getTime() ? ' \u2014 ' + DateUtils.formatShort(realEndD) : '');
+                    }
+                    sidebarHTML += '<div class="sidebar-row" data-id="' + task.id + '">' +
+                        '<div class="sidebar-cell main"><div class="cdot" style="background:' + col + ';"></div><span title="' + task.name + '">' + task.name + '</span></div>' +
+                        '<div class="sidebar-cell date" title="' + dateLabelPlanned + '">' + dateLabelPlanned + '</div>' +
+                        '<div class="sidebar-cell date realized' + (isRealized ? '' : ' text-gray-400 font-normal') + '" title="' + dateLabelReal + '">' + dateLabelReal + '</div>' +
+                    '</div>';
+                    rowsHTML += '<div class="timeline-row" data-id="' + task.id + '" style="height:' + rh + 'px;">' +
+                        '<div class="gantt-bar planned" style="left:' + so + 'px;width:' + bw + 'px;border-color:' + col + ';" title="' + t('planned') + ': ' + task.name + '\n' + dateLabelPlanned + '\n' + task.responsavel + '"><div class="bfill" style="background:' + col + ';"></div></div>';
+                    if (isRealized) {
+                        var barText = bwReal > 60 ? task.name.substring(0, Math.floor(bwReal/6)) + '...' : '';
+                        rowsHTML += '<div class="gantt-bar realized" style="left:' + soReal + 'px;width:' + bwReal + 'px;" title="' + t('realized') + ': ' + task.name + '\n' + dateLabelReal + '\n' + task.responsavel + '"><div class="bfill" style="background:' + col + ';"></div><span class="btxt">' + barText + '</span></div>';
+                    }
+                    rowsHTML += '</div>';
+                });
+                return { sidebarHTML: sidebarHTML, rowsHTML: rowsHTML };
+            }
         };
 
         const Deliverables = {
-            toggle(id) { const d = AppState.deliverables.find(x => x.id === id); if (d) { d.done = !d.done; Storage.saveSilent(); App.renderAll(); UI.toast(d.done ? '"' + d.name + '"' + t('toastDelivDone') : '"' + d.name + '"' + t('toastDelivReopened'), 'success'); } },
+            toggle(id) {
+                var d = AppState.deliverables.find(function(x) { return x.id === id; });
+                if (d) {
+                    d.done = !d.done; Storage.saveSilent(); App.renderAll();
+                    UI.toast('"' + d.name + '"' + (d.done ? t('toastDelivDone') : t('toastDelivReopened')), 'success');
+                }
+            },
             render() {
-                const doneCount = AppState.deliverables.filter(d => d.done).length; const total = AppState.deliverables.length;
+                var doneCount = AppState.deliverables.filter(function(d) { return d.done; }).length;
+                var total = AppState.deliverables.length;
                 document.getElementById('delivProgTxt').textContent = doneCount + '/' + total;
                 document.getElementById('delivBar').style.width = (total > 0 ? (doneCount / total * 100) : 0) + '%';
-                document.getElementById('delivGrid').innerHTML = AppState.deliverables.map(d => {
-                    const col = Gantt.getColor(d.responsavel);
-                    return '<div class="flex items-start gap-3 rounded-lg p-3 transition-all border bg-white ' + (d.done ? 'opacity-50' : '') + '" style="border-color: var(--border); cursor: pointer;" onclick="Modal.openEditDeliverable(' + d.id + ')" title="Clique para editar">' +
-                        '<input type="checkbox" class="dcheck mt-1" ' + (d.done ? 'checked' : '') + ' data-deliv-id="' + d.id + '" onclick="event.stopPropagation(); Deliverables.toggle(' + d.id + ')" style="border-color:' + col + '40;">' +
-                        '<div class="flex-1 min-w-0">' +
-                            '<div class="text-xs font-medium ' + (d.done ? 'line-through text-gray-400' : 'text-gray-800') + '">' + d.name + '</div>' +
-                            '<div class="text-xs mt-1 text-gray-500">' + d.responsavel + '</div>' +
+                document.getElementById('delivTitle').innerHTML = t('delivTitle');
+                document.getElementById('delivGrid').innerHTML = AppState.deliverables.map(function(d) {
+                    var col = Gantt.getColor(d.responsavel);
+                    return '<div class="neo-deliv-card' + (d.done ? ' done' : '') + '" style="--card-color:' + col + ';" onclick="Modal.openEditDeliverable(' + d.id + ')" title="Clique para editar">' +
+                        '<div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:' + col + ';border-radius:3px 0 0 3px;"></div>' +
+                        '<input type="checkbox" class="dcheck" ' + (d.done ? 'checked' : '') + ' data-deliv-id="' + d.id + '" onclick="event.stopPropagation(); Deliverables.toggle(' + d.id + ')" style="border-color:' + col + '40;">' +
+                        '<div style="flex:1;min-width:0;padding-left:4px;">' +
+                            '<div class="deliv-name" style="font-size:12px;font-weight:600;color:var(--text);">' + d.name + '</div>' +
+                            '<div style="font-size:11px;margin-top:3px;color:var(--muted);">' + d.responsavel + '</div>' +
                         '</div>' +
-                        '<div class="flex items-center gap-2">' +
-                            '<i class="fas fa-pen text-gray-300 hover:text-gray-500" style="font-size:10px;"></i>' +
-                            '<div style="width:8px;height:8px;border-radius:50%;background:' + col + ';flex-shrink:0;"></div>' +
+                        '<div style="display:flex;align-items:center;gap:6px;">' +
+                            '<i class="fas fa-pen" style="font-size:9px;color:#C4C8CF;"></i>' +
+                            '<div style="width:8px;height:8px;border-radius:3px;background:' + col + ';flex-shrink:0;"></div>' +
                         '</div>' +
                     '</div>';
                 }).join('');
@@ -564,52 +901,68 @@
                 document.getElementById('editEnd').value = '2026-08-24';
                 document.getElementById('editStartReal').value = '';
                 document.getElementById('editEndReal').value = '';
-                document.getElementById('modalTitle').textContent = 'Nova Atividade';
+                document.getElementById('modalTitle').textContent = t('modalTitleTask');
                 document.getElementById('labelName').textContent = t('labelActivity');
+                document.getElementById('labelResp').textContent = t('labelResp');
+                document.getElementById('labelPlannedStart').textContent = t('labelPlannedStart');
+                document.getElementById('labelPlannedEnd').textContent = t('labelPlannedEnd');
+                document.getElementById('labelRealStart').textContent = t('labelRealStart');
+                document.getElementById('labelRealEnd').textContent = t('labelRealEnd');
                 document.getElementById('taskFields').classList.remove('hidden');
                 document.getElementById('deliverableFields').classList.add('hidden');
                 document.getElementById('delBtn').style.display = 'none';
                 document.getElementById('editModal').classList.add('active');
             },
-            openEdit(id) {
+            openEditTask(id) {
+                var task = AppState.tasks.find(function(t) { return t.id === id; });
+                if (!task) return;
                 AppState.modalMode = 'task';
-                const t = AppState.tasks.find(x => x.id === id); if (!t) return;
-                document.getElementById('editId').value = t.id;
-                document.getElementById('editName').value = t.name;
-                document.getElementById('editResp').value = t.responsavel;
-                document.getElementById('editStart').value = DateUtils.toInputFormat(t.start);
-                document.getElementById('editEnd').value = DateUtils.toInputFormat(t.end);
-                document.getElementById('editStartReal').value = DateUtils.toInputFormat(t.startReal);
-                document.getElementById('editEndReal').value = DateUtils.toInputFormat(t.endReal);
+                document.getElementById('editId').value = task.id;
+                document.getElementById('editName').value = task.name;
+                document.getElementById('editResp').value = task.responsavel;
+                document.getElementById('editStart').value = task.start;
+                document.getElementById('editEnd').value = task.end;
+                document.getElementById('editStartReal').value = task.startReal || '';
+                document.getElementById('editEndReal').value = task.endReal || '';
                 document.getElementById('modalTitle').textContent = t('modalTitleTask');
                 document.getElementById('labelName').textContent = t('labelActivity');
+                document.getElementById('labelResp').textContent = t('labelResp');
+                document.getElementById('labelPlannedStart').textContent = t('labelPlannedStart');
+                document.getElementById('labelPlannedEnd').textContent = t('labelPlannedEnd');
+                document.getElementById('labelRealStart').textContent = t('labelRealStart');
+                document.getElementById('labelRealEnd').textContent = t('labelRealEnd');
                 document.getElementById('taskFields').classList.remove('hidden');
                 document.getElementById('deliverableFields').classList.add('hidden');
                 document.getElementById('delBtn').style.display = '';
                 document.getElementById('editModal').classList.add('active');
             },
-            openAddDeliverable() {
+            openAddDeliv() {
                 AppState.modalMode = 'deliverable';
                 document.getElementById('editId').value = '';
                 document.getElementById('editName').value = '';
                 document.getElementById('editResp').value = '';
                 document.getElementById('editDone').checked = false;
-                document.getElementById('modalTitle').textContent = 'Nova Entrega';
+                document.getElementById('modalTitle').textContent = t('modalTitleDeliv');
                 document.getElementById('labelName').textContent = t('labelItem');
+                document.getElementById('labelResp').textContent = t('labelResp');
+                document.getElementById('labelDone').textContent = t('labelDone');
                 document.getElementById('taskFields').classList.add('hidden');
                 document.getElementById('deliverableFields').classList.remove('hidden');
                 document.getElementById('delBtn').style.display = 'none';
                 document.getElementById('editModal').classList.add('active');
             },
             openEditDeliverable(id) {
+                var d = AppState.deliverables.find(function(x) { return x.id === id; });
+                if (!d) return;
                 AppState.modalMode = 'deliverable';
-                const d = AppState.deliverables.find(x => x.id === id); if (!d) return;
                 document.getElementById('editId').value = d.id;
                 document.getElementById('editName').value = d.name;
                 document.getElementById('editResp').value = d.responsavel;
                 document.getElementById('editDone').checked = d.done;
                 document.getElementById('modalTitle').textContent = t('modalTitleDeliv');
                 document.getElementById('labelName').textContent = t('labelItem');
+                document.getElementById('labelResp').textContent = t('labelResp');
+                document.getElementById('labelDone').textContent = t('labelDone');
                 document.getElementById('taskFields').classList.add('hidden');
                 document.getElementById('deliverableFields').classList.remove('hidden');
                 document.getElementById('delBtn').style.display = '';
@@ -617,115 +970,161 @@
             },
             close() { document.getElementById('editModal').classList.remove('active'); },
             save() {
-                const idStr = document.getElementById('editId').value;
-                const name = document.getElementById('editName').value.trim();
-                const resp = document.getElementById('editResp').value.trim();
-                if (!name || !resp) { UI.toast(t('toastFillFields'), "error"); return; }
+                var id = document.getElementById('editId').value;
+                var name = document.getElementById('editName').value.trim();
+                var resp = document.getElementById('editResp').value.trim();
+
+                if (!name || !resp) { UI.toast(t('toastFillFields'), 'warning'); return; }
+
                 if (AppState.modalMode === 'task') {
-                    const startStr = document.getElementById('editStart').value; const endStr = document.getElementById('editEnd').value; const startRealStr = document.getElementById('editStartReal').value; const endRealStr = document.getElementById('editEndReal').value;
-                    if (!startStr || !endStr) { UI.toast(t('toastFillDates'), "error"); return; }
-                    if (!DateUtils.toDate(startStr) || !DateUtils.toDate(endStr)) { UI.toast(t('toastInvalidDate'), "error"); return; }
-                    if (new Date(startStr) > new Date(endStr)) { UI.toast(t('toastInvalidEnd'), "error"); return; }
-                    if ((startRealStr && !endRealStr) || (!startRealStr && endRealStr)) { UI.toast(t('toastFillRealDates'), "error"); return; }
-                    if (startRealStr && endRealStr) { if (!DateUtils.toDate(startRealStr) || !DateUtils.toDate(endRealStr)) { UI.toast(t('toastInvalidRealDate'), "error"); return; } if (new Date(startRealStr) > new Date(endRealStr)) { UI.toast(t('toastInvalidRealEnd'), "error"); return; } }
-                    if (idStr) { const idNum = parseInt(idStr, 10); const taskIndex = AppState.tasks.findIndex(t => t.id === idNum); if (taskIndex !== -1) { AppState.tasks[taskIndex].name = name; AppState.tasks[taskIndex].responsavel = resp; AppState.tasks[taskIndex].start = startStr; AppState.tasks[taskIndex].end = endStr; AppState.tasks[taskIndex].startReal = startRealStr; AppState.tasks[taskIndex].endReal = endRealStr; } UI.toast(t('toastActivityUpdated')); } else { AppState.tasks.push({ id: AppState.nextId++, name, responsavel: resp, start: startStr, end: endStr, startReal: startRealStr, endReal: endRealStr }); UI.toast(t('toastActivityAdded')); }
-                } else if (AppState.modalMode === 'deliverable') {
-                    const done = document.getElementById('editDone').checked;
-                    if (idStr) { const idNum = parseInt(idStr, 10); const delIndex = AppState.deliverables.findIndex(d => d.id === idNum); if (delIndex !== -1) { AppState.deliverables[delIndex].name = name; AppState.deliverables[delIndex].responsavel = resp; AppState.deliverables[delIndex].done = done; } UI.toast(t('toastDelivUpdated')); } else { AppState.deliverables.push({ id: AppState.nextDelivId++, name, responsavel: resp, done: done }); UI.toast(t('toastDelivAdded')); }
+                    var start = document.getElementById('editStart').value;
+                    var end = document.getElementById('editEnd').value;
+                    var startReal = document.getElementById('editStartReal').value;
+                    var endReal = document.getElementById('editEndReal').value;
+                    if (!start || !end) { UI.toast(t('toastFillDates'), 'warning'); return; }
+                    var sd = DateUtils.toDate(start), ed = DateUtils.toDate(end);
+                    if (!sd || !ed) { UI.toast(t('toastInvalidDate'), 'error'); return; }
+                    if (ed < sd) { UI.toast(t('toastInvalidEnd'), 'error'); return; }
+                    if ((startReal && !endReal) || (!startReal && endReal)) { UI.toast(t('toastFillRealDates'), 'warning'); return; }
+                    if (startReal && endReal) {
+                        var srd = DateUtils.toDate(startReal), erd = DateUtils.toDate(endReal);
+                        if (!srd || !erd) { UI.toast(t('toastInvalidRealDate'), 'error'); return; }
+                        if (erd < srd) { UI.toast(t('toastInvalidRealEnd'), 'error'); return; }
+                    }
+                    if (id) {
+                        var task = AppState.tasks.find(function(t) { return t.id === parseInt(id); });
+                        if (task) {
+                            task.name = name; task.responsavel = resp;
+                            task.start = start; task.end = end;
+                            task.startReal = startReal; task.endReal = endReal;
+                            UI.toast(t('toastActivityUpdated'), 'success');
+                        }
+                    } else {
+                        AppState.tasks.push({ id: AppState.nextId++, name: name, responsavel: resp, start: start, end: end, startReal: startReal, endReal: endReal });
+                        UI.toast(t('toastActivityAdded'), 'success');
+                    }
+                } else {
+                    var done = document.getElementById('editDone').checked;
+                    if (id) {
+                        var deliv = AppState.deliverables.find(function(d) { return d.id === parseInt(id); });
+                        if (deliv) { deliv.name = name; deliv.responsavel = resp; deliv.done = done; UI.toast(t('toastDelivUpdated'), 'success'); }
+                    } else {
+                        AppState.deliverables.push({ id: AppState.nextDelivId++, name: name, responsavel: resp, done: done });
+                        UI.toast(t('toastDelivAdded'), 'success');
+                    }
                 }
-                Storage.saveSilent(); Modal.close(); App.renderAll();
+                Storage.saveSilent(); this.close(); App.renderAll();
             },
             deleteItem() {
-                const idStr = document.getElementById('editId').value;
-                if (idStr && confirm(t('confirmDelete'))) {
-                    const idNum = parseInt(idStr, 10);
-                    if (AppState.modalMode === 'task') { AppState.tasks = AppState.tasks.filter(x => x.id !== idNum); UI.toast(t('toastActivityRemoved')); }
-                    else if (AppState.modalMode === 'deliverable') { AppState.deliverables = AppState.deliverables.filter(x => x.id !== idNum); UI.toast(t('toastDelivRemoved')); }
-                    Storage.saveSilent(); Modal.close(); App.renderAll();
+                if (!confirm(t('confirmDelete'))) return;
+                var id = parseInt(document.getElementById('editId').value);
+                if (!id) return;
+                if (AppState.modalMode === 'task') {
+                    AppState.tasks = AppState.tasks.filter(function(t) { return t.id !== id; });
+                    UI.toast(t('toastActivityRemoved'), 'success');
+                } else {
+                    AppState.deliverables = AppState.deliverables.filter(function(d) { return d.id !== id; });
+                    UI.toast(t('toastDelivRemoved'), 'success');
                 }
+                Storage.saveSilent(); this.close(); App.renderAll();
             }
         };
 
         const UI = {
-            toast(msg, type) { type = type || 'success'; const el = document.createElement('div'); el.className = 'toast ' + type; el.textContent = msg; document.getElementById('toastBox').appendChild(el); setTimeout(() => el.remove(), 3200); },
-            toggleDeliverables() { const sec = document.getElementById('delivSec'); const btn = document.getElementById('btnDeliv'); const isHidden = sec.classList.contains('hidden'); if (isHidden) { sec.classList.remove('hidden'); btn.style.borderColor = '#00A651'; btn.style.color = '#00A651'; } else { sec.classList.add('hidden'); btn.style.borderColor = ''; btn.style.color = ''; } },
-            renderLegend() { const ft = Filter.getFiltered(); const activeAreas = new Set(); ft.forEach(t => { t.responsavel.split("/").forEach(a => { const trimmed = a.trim(); if (trimmed) activeAreas.add(trimmed); }); }); const legendItems = Object.entries(AppState.areaColors).filter(([area]) => activeAreas.has(area)); document.getElementById('legendBox').innerHTML = legendItems.map(([a, c]) => '<div class="flex items-center gap-2"><div style="width:12px;height:12px;border-radius:3px;background:' + c + ';border:1px solid rgba(0,0,0,0.1);"></div><span class="text-xs text-gray-600">' + a + '</span></div>').join(''); },
-            renderDatalist() { const areas = Filter.getAllAreas().filter(a => a !== "Todos"); document.getElementById('respList').innerHTML = areas.map(a => '<option value="' + a + '">').join(''); }
+            toast(msg, type) {
+                var box = document.getElementById('toastBox');
+                var el = document.createElement('div');
+                el.className = 'toast ' + (type || 'info');
+                el.textContent = msg;
+                box.appendChild(el);
+                setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3200);
+            },
+            updateLang() {
+                document.getElementById('headerTitle').textContent = 'Cadaver Lab IBRA / Medartis';
+                document.getElementById('headerSub').textContent = t('subtitle');
+                document.getElementById('btnSaveLabel').textContent = t('btnSave');
+                document.getElementById('btnLoadLabel').textContent = t('btnLoad');
+                document.getElementById('btnExportLabel').textContent = t('btnExport');
+                document.getElementById('btnImportLabel').textContent = t('btnImport');
+                document.getElementById('btnDelivLabel').textContent = t('btnDeliv');
+                document.getElementById('btnAddLabel').textContent = t('btnAdd');
+                document.getElementById('zoomLabel').textContent = t('zoom');
+                document.getElementById('btnDeleteLabel').textContent = t('btnDelete');
+                document.getElementById('btnCancelLabel').textContent = t('btnCancel');
+                document.getElementById('btnSaveChangesLabel').textContent = t('btnSaveChanges');
+                document.getElementById('legendTitle').textContent = t('legendTitle');
+                document.getElementById('langLabel').textContent = lang === 'pt' ? 'EN' : 'PT';
+            },
+            renderLegend() {
+                var areas = Filter.getAllAreas().filter(function(a) { return a !== 'Todos'; });
+                document.getElementById('legendBox').innerHTML = areas.map(function(a) {
+                    var col = Gantt.getColor(a);
+                    return '<div class="neo-legend-item"><div class="neo-legend-dot" style="background:' + col + ';"></div>' + a + '</div>';
+                }).join('');
+            },
+            updateRespDatalist() {
+                var set = new Set();
+                AppState.tasks.forEach(function(t) { if (t.responsavel) set.add(t.responsavel); });
+                AppState.deliverables.forEach(function(d) { if (d.responsavel) set.add(d.responsavel); });
+                document.getElementById('respList').innerHTML = Array.from(set).map(function(r) { return '<option value="' + r + '">'; }).join('');
+            }
         };
-
-        // ============================================================
-        // TOGGLE IDIOMA
-        // ============================================================
-        function toggleLang(){
-            lang = lang === 'pt' ? 'en' : 'pt';
-            localStorage.setItem('gantt_lang', lang);
-            applyLanguage();
-            App.renderAll();
-        }
-
-        function applyLanguage(){
-            var el;
-            el = document.getElementById('headerTitle'); if (el) el.textContent = lang === 'pt' ? 'Cadaver Lab IBRA / Medartis' : 'Cadaver Lab IBRA / Medartis';
-            el = document.getElementById('headerSub'); if (el) el.textContent = lang === 'pt' ? '24 e 25 de agosto de 2026' : 'August 24-25, 2026';
-            el = document.getElementById('langLabel'); if (el) el.textContent = lang === 'pt' ? 'EN' : 'PT';
-            el = document.getElementById('btnSaveLabel'); if (el) el.textContent = t('btnSave');
-            el = document.getElementById('btnLoadLabel'); if (el) el.textContent = t('btnLoad');
-            el = document.getElementById('btnExportLabel'); if (el) el.textContent = t('btnExport');
-            el = document.getElementById('btnImportLabel'); if (el) el.textContent = t('btnImport');
-            el = document.getElementById('btnDelivLabel'); if (el) el.textContent = t('btnDeliv');
-            el = document.getElementById('btnAddLabel'); if (el) el.textContent = t('btnAdd');
-            el = document.getElementById('labelName'); if (el) el.textContent = t('labelName');
-            el = document.querySelector('label[for="editResp"]'); if (el) el.textContent = t('labelResp');
-            var taskLabels = document.querySelectorAll('#taskFields label');
-            if (taskLabels[0]) taskLabels[0].textContent = t('labelPlannedStart');
-            if (taskLabels[1]) taskLabels[1].textContent = t('labelPlannedEnd');
-            if (taskLabels[2]) taskLabels[2].textContent = t('labelRealStart');
-            if (taskLabels[3]) taskLabels[3].textContent = t('labelRealEnd');
-            el = document.querySelector('label[for="editDone"]'); if (el) el.textContent = t('labelDone');
-            el = document.getElementById('delBtn'); if (el) el.innerHTML = '<i class="fas fa-trash-alt mr-1"></i>' + t('btnDelete');
-            el = document.getElementById('btnCancel'); if (el) el.textContent = t('btnCancel');
-            el = document.getElementById('btnSave'); if (el) el.textContent = t('btnSaveChanges');
-            el = document.querySelector('.gantt-sidebar-header span:first-child'); if (el) el.textContent = t('activity');
-            var sideSpans = document.querySelectorAll('.gantt-sidebar-header span');
-            if (sideSpans[1]) sideSpans[1].textContent = t('planned');
-            if (sideSpans[2]) sideSpans[2].textContent = t('realized');
-            el = document.getElementById('delivSec'); if (el) { var h2 = el.querySelector('h2'); if (h2) h2.textContent = t('delivTitle'); }
-            el = document.getElementById('btnAddDeliv'); if (el) el.innerHTML = '<i class="fas fa-plus text-xs"></i> ' + t('btnAddDeliv');
-            el = document.getElementById('legendBox'); if (el && el.previousElementSibling) el.previousElementSibling.textContent = t('legendTitle');
-        }
 
         const App = {
-            renderAll() { Stats.render(); Filter.render(); Gantt.render(); Deliverables.render(); UI.renderLegend(); UI.renderDatalist(); },
-            bindEvents() {
-                document.getElementById('btnTranslate').addEventListener('click', toggleLang);
-                document.getElementById('btnDeliv').addEventListener('click', UI.toggleDeliverables);
-                document.getElementById('btnAdd').addEventListener('click', Modal.openAdd);
-                document.getElementById('btnAddDeliv').addEventListener('click', Modal.openAddDeliverable);
-                document.getElementById('btnSaveData').addEventListener('click', () => Storage.save());
-                document.getElementById('btnLoadData').addEventListener('click', () => Storage.load());
-                document.getElementById('btnExportData').addEventListener('click', () => Storage.exportData());
-                document.getElementById('btnImportData').addEventListener('click', () => document.getElementById('importDbInput').click());
-                document.getElementById('filterTags').addEventListener('click', (e) => { const btn = e.target.closest('.ftag'); if (btn && btn.dataset.area) Filter.set(btn.dataset.area); });
-                document.getElementById('zoomIn').addEventListener('click', () => Gantt.changeZoom(1));
-                document.getElementById('zoomOut').addEventListener('click', () => Gantt.changeZoom(-1));
-                document.getElementById('ganttBox').addEventListener('click', (e) => { const row = e.target.closest('.timeline-row') || e.target.closest('.sidebar-row'); if (row && row.dataset.id) Modal.openEdit(parseInt(row.dataset.id, 10)); });
-                document.getElementById('delivGrid').addEventListener('click', (e) => { if (e.target.classList.contains('dcheck')) { e.preventDefault(); const id = parseInt(e.target.dataset.delivId, 10); if (!isNaN(id)) Deliverables.toggle(id); } });
-                document.getElementById('btnCancel').addEventListener('click', Modal.close);
-                document.getElementById('btnSave').addEventListener('click', Modal.save);
-                document.getElementById('delBtn').addEventListener('click', Modal.deleteItem);
-                document.getElementById('editModal').addEventListener('click', (e) => { if (e.target === e.currentTarget) Modal.close(); });
-            },
-            init() { this.bindEvents(); Storage.autoLoad(); applyLanguage(); this.renderAll(); }
+            renderAll() {
+                Stats.render(); Filter.render(); Gantt.render(); Deliverables.render();
+                UI.renderLegend(); UI.updateRespDatalist();
+            }
         };
+
+        /* ── Event Bindings ── */
+        document.getElementById('btnTranslate').addEventListener('click', function() {
+            lang = lang === 'pt' ? 'en' : 'pt';
+            localStorage.setItem('gantt_lang', lang);
+            UI.updateLang(); App.renderAll();
+        });
+        document.getElementById('btnSaveData').addEventListener('click', function() { Storage.save(); });
+        document.getElementById('btnLoadData').addEventListener('click', function() { Storage.load(); });
+        document.getElementById('btnExportData').addEventListener('click', function() { Storage.exportData(); });
+        document.getElementById('btnImportData').addEventListener('click', function() { document.getElementById('importDbInput').click(); });
+        document.getElementById('btnAdd').addEventListener('click', function() { Modal.openAdd(); });
+        document.getElementById('btnDeliv').addEventListener('click', function() {
+            var sec = document.getElementById('delivSec');
+            sec.classList.toggle('hidden');
+            this.querySelector('i').classList.toggle('fa-clipboard-check');
+            this.querySelector('i').classList.toggle('fa-chevron-up');
+        });
+        document.getElementById('btnAddDeliv').addEventListener('click', function() { Modal.openAddDeliv(); });
+        document.getElementById('zoomIn').addEventListener('click', function() { Gantt.changeZoom(1); });
+        document.getElementById('zoomOut').addEventListener('click', function() { Gantt.changeZoom(-1); });
+        document.getElementById('btnCancel').addEventListener('click', function() { Modal.close(); });
+        document.getElementById('btnSave').addEventListener('click', function() { Modal.save(); });
+        document.getElementById('delBtn').addEventListener('click', function() { Modal.deleteItem(); });
+        document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) Modal.close(); });
+
+        document.getElementById('filterTags').addEventListener('click', function(e) {
+            var tag = e.target.closest('.ftag');
+            if (tag) Filter.set(tag.getAttribute('data-area'));
+        });
+
+        document.getElementById('ganttBox').addEventListener('click', function(e) {
+            var row = e.target.closest('.sidebar-row, .timeline-row');
+            if (row) { var id = parseInt(row.getAttribute('data-id')); if (id) Modal.openEditTask(id); }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') Modal.close();
+        });
 
         function handleDbImport(event) {
             var file = event.target.files[0];
-            if (!file) return;
-            Storage.importData(file);
+            if (file) Storage.importData(file);
             event.target.value = '';
         }
 
-        document.addEventListener('DOMContentLoaded', () => App.init());
+        /* ── Init ── */
+        UI.updateLang();
+        Storage.autoLoad();
     </script>
 </body>
 </html>
