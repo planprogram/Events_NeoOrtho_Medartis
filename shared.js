@@ -4,9 +4,6 @@
    ============================================= */
 
 /* ---- Firebase Config (shared) ---- */
-/* Note: Initialization is performed by each host page (app.js, Gantt, etc.)
-   to avoid double-initializeApp errors from shared.js. This file only
-   exports the config constant for reference. */
 var NEO_FIREBASE_CONFIG = {
     apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
     authDomain: "neoorthomedartis.firebaseapp.com",
@@ -17,6 +14,50 @@ var NEO_FIREBASE_CONFIG = {
     appId: "1:48492402152:web:c395acaf1e365d491bc05d",
     measurementId: "G-W4JC235S2Y"
 };
+
+/* ---- Firebase Initialization (single source) ---- */
+/* Initializes Firebase once. Safe to call from shared.js — checks if
+   already initialized to avoid double-initializeApp errors.
+   Handles both cases: SDK loaded before or after shared.js */
+var NEO_FB_APP = null;
+var NEO_FB_DB = null;
+var NEO_FB_AUTH = null;
+var NEO_FB_READY = false;
+
+function _tryInitFirebase() {
+    if (typeof firebase === 'undefined') return false;
+    try {
+        if (!firebase.apps.length) {
+            NEO_FB_APP = firebase.initializeApp(NEO_FIREBASE_CONFIG);
+            console.log('[shared.js] Firebase initialized');
+        } else {
+            NEO_FB_APP = firebase.app();
+            console.log('[shared.js] Firebase already initialized — reusing app');
+        }
+        NEO_FB_DB = firebase.database();
+        if (typeof firebase.auth === 'function') {
+            NEO_FB_AUTH = firebase.auth();
+        }
+        NEO_FB_READY = true;
+        return true;
+    } catch (e) {
+        console.error('[shared.js] Firebase init error:', e);
+        return false;
+    }
+}
+
+// Try immediately (works if SDK already loaded)
+if (!_tryInitFirebase()) {
+    // SDK not loaded yet — poll for it (handles pages where shared.js loads before SDK)
+    var _fbPollCount = 0;
+    var _fbPoll = setInterval(function() {
+        _fbPollCount++;
+        if (_tryInitFirebase() || _fbPollCount > 50) {
+            clearInterval(_fbPoll);
+            if (_fbPollCount > 50) console.warn('[shared.js] Firebase SDK never loaded');
+        }
+    }, 100);
+}
 
 /* ---- Toast Notification ---- */
 function sharedToast(msg, type) {

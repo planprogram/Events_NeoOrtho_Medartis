@@ -56,8 +56,6 @@
       --radius-lg: 12px;
       --radius-xl: 16px;
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
     body {
       font-family: 'Outfit', sans-serif;
       background: var(--bg);
@@ -496,23 +494,6 @@
     .btn-confirm-yes.warn { background: var(--warning); }
     .btn-confirm-yes.warn:hover { background: #9a7509; }
 
-    /* TOAST */
-    #toastContainer {
-      position: fixed; top: 80px; right: 20px; z-index: 2000;
-      display: flex; flex-direction: column; gap: 8px;
-    }
-    .toast {
-      padding: 12px 20px; border-radius: var(--radius); font-size: 13px; font-weight: 500;
-      color: #fff; box-shadow: var(--shadow-lg); transform: translateX(120%);
-      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex; align-items: center; gap: 10px; max-width: 420px;
-    }
-    .toast.show { transform: translateX(0); }
-    .toast.success { background: var(--success); }
-    .toast.error { background: var(--danger); }
-    .toast.info { background: var(--primary); }
-    .toast.warning { background: var(--warning); }
-
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
@@ -764,28 +745,10 @@
 
   <script>
     // ============================================================
-    // FIREBASE INIT
+    // FIREBASE — uses shared.js (NEO_FB_APP, NEO_FB_DB)
     // ============================================================
-    var fbApp, fbDb;
-    try {
-      if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-        fbApp = firebase.initializeApp({
-          apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
-          authDomain: "neoorthomedartis.firebaseapp.com",
-          databaseURL: "https://neoorthomedartis-default-rtdb.firebaseio.com",
-          projectId: "neoorthomedartis",
-          storageBucket: "neoorthomedartis.firebasestorage.app",
-          messagingSenderId: "48492402152",
-          appId: "1:48492402152:web:c395acaf1e365d491bc05d",
-          measurementId: "G-W4JC235S2Y"
-        });
-      } else if (typeof firebase !== 'undefined') {
-        fbApp = firebase.app();
-      }
-      fbDb = (typeof firebase !== 'undefined') ? firebase.database() : null;
-    } catch(e) {
-      console.error('Firebase init error:', e);
-    }
+    var fbApp = (typeof NEO_FB_APP !== 'undefined') ? NEO_FB_APP : null;
+    var fbDb = (typeof NEO_FB_DB !== 'undefined') ? NEO_FB_DB : null;
 
     // ============================================================
     // IDIOMA

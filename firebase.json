@@ -5,8 +5,7 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**",
-      "deploy.js",
-      "run-node.bat"
+      "$null"
     ]
   },
   "database": {

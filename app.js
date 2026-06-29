@@ -1,18 +1,6 @@
-// Firebase Config
-if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-    firebase.initializeApp({
-        apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
-        authDomain: "neoorthomedartis.firebaseapp.com",
-        databaseURL: "https://neoorthomedartis-default-rtdb.firebaseio.com",
-        projectId: "neoorthomedartis",
-        storageBucket: "neoorthomedartis.firebasestorage.app",
-        messagingSenderId: "48492402152",
-        appId: "1:48492402152:web:c395acaf1e365d491bc05d",
-        measurementId: "G-W4JC235S2Y"
-    });
-}
-const db = (typeof firebase !== 'undefined') ? firebase.database() : null;
-const auth = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth() : null;
+// Firebase — uses shared.js (NEO_FB_APP, NEO_FB_DB, NEO_FB_AUTH)
+const db = (typeof NEO_FB_DB !== 'undefined') ? NEO_FB_DB : null;
+const auth = (typeof NEO_FB_AUTH !== 'undefined') ? NEO_FB_AUTH : null;
 
 // Hub links data
 const hubLinks = [
