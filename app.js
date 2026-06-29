@@ -23,6 +23,7 @@ const COVERS = Array.from({length:12},(_,i) => {
     return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300"><rect width="600" height="300" fill="hsl(${hue},40%,85%)"/><text x="300" y="150" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="24" fill="hsl(${hue},40%,40%)">NeoOrtho Medartis</text></svg>`)}`;
 });
 let people = [], projects = [], allUsers = [];
+let ganttTasks = [], ganttDeliverables = [], ganttMeta = {};
 let currentUser = null, currentUserRole = '';
 let currentFilter = 'all', searchQuery = '';
 let tempPermissions = [], pendingConfirmAction = null;
@@ -78,10 +79,97 @@ async function loadData() {
         console.error('Users load error:', err.code, err.message);
         u = null;
     }
+    // Load Gantt data (tasks + deliverables)
+    try {
+        const ganttTasksSnap = await db.ref('gantt_tasks').once('value');
+        const ganttDelivSnap = await db.ref('gantt_deliverables').once('value');
+        const ganttMetaSnap = await db.ref('gantt_meta').once('value');
+        const loadedTasks = ganttTasksSnap.val();
+        const loadedDeliv = ganttDelivSnap.val();
+        const loadedMeta = ganttMetaSnap.val();
+        if (loadedTasks && Array.isArray(loadedTasks) && loadedTasks.length > 0) {
+            ganttTasks = loadedTasks;
+        } else if (typeof GANTT_SEED_TASKS !== 'undefined') {
+            await db.ref('gantt_tasks').set(GANTT_SEED_TASKS);
+            ganttTasks = GANTT_SEED_TASKS.slice();
+        }
+        if (loadedDeliv && Array.isArray(loadedDeliv) && loadedDeliv.length > 0) {
+            ganttDeliverables = loadedDeliv;
+        } else if (typeof GANTT_SEED_DELIVERABLES !== 'undefined') {
+            await db.ref('gantt_deliverables').set(GANTT_SEED_DELIVERABLES);
+            ganttDeliverables = GANTT_SEED_DELIVERABLES.slice();
+        }
+        if (loadedMeta && typeof loadedMeta === 'object') {
+            ganttMeta = loadedMeta;
+        } else if (typeof GANTT_PROJECT_META !== 'undefined') {
+            await db.ref('gantt_meta').set(GANTT_PROJECT_META);
+            ganttMeta = Object.assign({}, GANTT_PROJECT_META);
+        }
+    } catch(err) {
+        console.error('Gantt load error:', err.code, err.message);
+        // Fallback to seed data if available
+        if (typeof GANTT_SEED_TASKS !== 'undefined') ganttTasks = GANTT_SEED_TASKS.slice();
+        if (typeof GANTT_SEED_DELIVERABLES !== 'undefined') ganttDeliverables = GANTT_SEED_DELIVERABLES.slice();
+        if (typeof GANTT_PROJECT_META !== 'undefined') ganttMeta = Object.assign({}, GANTT_PROJECT_META);
+    }
     people = toArray(p);
     projects = toArray(pr);
     allUsers = toArray(u);
 }
+
+// Save Gantt data to Firebase (called from Gantt page)
+async function saveGanttData(tasks, deliverables) {
+    if (!db) { console.warn('Firebase DB not available'); return false; }
+    try {
+        await db.ref('gantt_tasks').set(tasks);
+        await db.ref('gantt_deliverables').set(deliverables);
+        ganttTasks = tasks.slice();
+        ganttDeliverables = deliverables.slice();
+        return true;
+    } catch(err) {
+        console.error('Gantt save error:', err);
+        return false;
+    }
+}
+
+// Load Gantt data from Firebase (called from Gantt page)
+async function loadGanttData() {
+    if (!db) { return null; }
+    try {
+        const tasksSnap = await db.ref('gantt_tasks').once('value');
+        const delivSnap = await db.ref('gantt_deliverables').once('value');
+        const metaSnap = await db.ref('gantt_meta').once('value');
+        const tasks = tasksSnap.val();
+        const deliv = delivSnap.val();
+        const meta = metaSnap.val();
+        if (tasks && Array.isArray(tasks) && tasks.length > 0) {
+            ganttTasks = tasks;
+        }
+        if (deliv && Array.isArray(deliv) && deliv.length > 0) {
+            ganttDeliverables = deliv;
+        }
+        if (meta && typeof meta === 'object') {
+            ganttMeta = meta;
+        }
+        return {
+            tasks: ganttTasks,
+            deliverables: ganttDeliverables,
+            meta: ganttMeta
+        };
+    } catch(err) {
+        console.error('Gantt load error:', err);
+        return {
+            tasks: ganttTasks,
+            deliverables: ganttDeliverables,
+            meta: ganttMeta
+        };
+    }
+}
+
+// Expose Gantt functions globally for the Gantt page
+window.saveGanttData = saveGanttData;
+window.loadGanttData = loadGanttData;
+
 function toArray(obj) {
     if (!obj) return [];
     if (Array.isArray(obj)) return obj.filter(Boolean);

@@ -12,6 +12,7 @@
     <script src="shared.js"></script>
     <script src="libs/js/firebase-app-compat.js"></script>
     <script src="libs/js/firebase-database-compat.js"></script>
+    <script src="gantt-seed-data.js"></script>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'DM Sans', sans-serif; background: #F0F1F3; color: #1e293b; margin: 0; }
@@ -447,19 +448,8 @@
     <input type="file" id="importDbInput" accept=".json" style="display:none" onchange="handleDbImport(event)">
 
     <script>
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-            firebase.initializeApp({
-                apiKey: "AIzaSyChLYj0irOa1k-D07v4bf6wt-75CzhJu8I",
-                authDomain: "neoorthomedartis.firebaseapp.com",
-                databaseURL: "https://neoorthomedartis-default-rtdb.firebaseio.com",
-                projectId: "neoorthomedartis",
-                storageBucket: "neoorthomedartis.firebasestorage.app",
-                messagingSenderId: "48492402152",
-                appId: "1:48492402152:web:c395acaf1e365d491bc05d",
-                measurementId: "G-W4JC235S2Y"
-            });
-        }
-        var ganttDb = (typeof firebase !== 'undefined') ? firebase.database() : null;
+        /* Use shared Firebase instance from shared.js (NEO_FB_DB) */
+        var ganttDb = (typeof NEO_FB_DB !== 'undefined' && NEO_FB_DB !== null) ? NEO_FB_DB : null;
 
         var lang = localStorage.getItem('gantt_lang') || 'pt';
 
@@ -614,56 +604,94 @@
             isOnline() { return ganttDb !== null; },
             save() {
                 if (!ganttDb) { UI.toast('Sem conexão com o servidor - dados mantidos localmente', 'warning'); return; }
-                Promise.all([
-                    ganttDb.ref('gantt_tasks').set(AppState.tasks),
-                    ganttDb.ref('gantt_deliverables').set(AppState.deliverables)
-                ]).then(function() { UI.toast(t('toastSaved'), "success"); })
-                 .catch(function() { UI.toast(t('toastError'), "error"); });
+                if (typeof saveGanttData === 'function') {
+                    saveGanttData(AppState.tasks, AppState.deliverables).then(function(ok) {
+                        if (ok) { UI.toast(t('toastSaved'), "success"); }
+                        else { UI.toast(t('toastError'), "error"); }
+                    });
+                } else {
+                    ganttDb.ref('gantt_tasks').set(AppState.tasks).catch(function() {});
+                    ganttDb.ref('gantt_deliverables').set(AppState.deliverables).catch(function() {});
+                    UI.toast(t('toastSaved'), "success");
+                }
             },
             saveSilent() {
                 if (!ganttDb) return;
-                ganttDb.ref('gantt_tasks').set(AppState.tasks).catch(function() {});
-                ganttDb.ref('gantt_deliverables').set(AppState.deliverables).catch(function() {});
+                if (typeof saveGanttData === 'function') {
+                    saveGanttData(AppState.tasks, AppState.deliverables).catch(function() {});
+                } else {
+                    ganttDb.ref('gantt_tasks').set(AppState.tasks).catch(function() {});
+                    ganttDb.ref('gantt_deliverables').set(AppState.deliverables).catch(function() {});
+                }
             },
             load() {
                 if (!ganttDb) { App.renderAll(); UI.toast('Sem conexão - usando dados locais', 'info'); return; }
-                ganttDb.ref('gantt_tasks').once('value').then(function(snap) {
-                    var v = snap.val();
-                    if (v && Array.isArray(v) && v.length > 0) {
-                        AppState.tasks = v;
+                var handleLoad = function(data) {
+                    if (data && data.tasks && Array.isArray(data.tasks) && data.tasks.length > 0) {
+                        AppState.tasks = data.tasks;
                         AppState.nextId = AppState.tasks.reduce(function(m, tk) { return Math.max(m, tk.id); }, 0) + 1;
                     }
-                    return ganttDb.ref('gantt_deliverables').once('value');
-                }).then(function(snap2) {
-                    var v2 = snap2.val();
-                    if (v2 && Array.isArray(v2) && v2.length > 0) {
-                        AppState.deliverables = v2;
+                    if (data && data.deliverables && Array.isArray(data.deliverables) && data.deliverables.length > 0) {
+                        AppState.deliverables = data.deliverables;
                         AppState.nextDelivId = AppState.deliverables.reduce(function(m, d) { return Math.max(m, d.id); }, 0) + 1;
                     }
                     App.renderAll();
                     UI.toast(t('toastLoaded'), "info");
-                }).catch(function() {
-                    App.renderAll();
-                    UI.toast(t('toastNoData'), "info");
-                });
+                };
+                var handleErr = function() { App.renderAll(); UI.toast(t('toastNoData'), "info"); };
+                if (typeof loadGanttData === 'function') {
+                    loadGanttData().then(handleLoad).catch(handleErr);
+                } else {
+                    ganttDb.ref('gantt_tasks').once('value').then(function(snap) {
+                        var v = snap.val();
+                        if (v && Array.isArray(v) && v.length > 0) {
+                            AppState.tasks = v;
+                            AppState.nextId = AppState.tasks.reduce(function(m, tk) { return Math.max(m, tk.id); }, 0) + 1;
+                        }
+                        return ganttDb.ref('gantt_deliverables').once('value');
+                    }).then(function(snap2) {
+                        var v2 = snap2.val();
+                        if (v2 && Array.isArray(v2) && v2.length > 0) {
+                            AppState.deliverables = v2;
+                            AppState.nextDelivId = AppState.deliverables.reduce(function(m, d) { return Math.max(m, d.id); }, 0) + 1;
+                        }
+                        App.renderAll();
+                        UI.toast(t('toastLoaded'), "info");
+                    }).catch(handleErr);
+                }
             },
             autoLoad() {
                 if (!ganttDb) { App.renderAll(); return; }
-                ganttDb.ref('gantt_tasks').once('value').then(function(snap) {
-                    var v = snap.val();
-                    if (v && Array.isArray(v) && v.length > 0) {
-                        AppState.tasks = v;
+                var handleLoad = function(data) {
+                    if (data && data.tasks && Array.isArray(data.tasks) && data.tasks.length > 0) {
+                        AppState.tasks = data.tasks;
                         AppState.nextId = AppState.tasks.reduce(function(m, tk) { return Math.max(m, tk.id); }, 0) + 1;
                     }
-                    return ganttDb.ref('gantt_deliverables').once('value');
-                }).then(function(snap2) {
-                    var v2 = snap2.val();
-                    if (v2 && Array.isArray(v2) && v2.length > 0) {
-                        AppState.deliverables = v2;
+                    if (data && data.deliverables && Array.isArray(data.deliverables) && data.deliverables.length > 0) {
+                        AppState.deliverables = data.deliverables;
                         AppState.nextDelivId = AppState.deliverables.reduce(function(m, d) { return Math.max(m, d.id); }, 0) + 1;
                     }
                     App.renderAll();
-                }).catch(function() { App.renderAll(); });
+                };
+                if (typeof loadGanttData === 'function') {
+                    loadGanttData().then(handleLoad).catch(function() { App.renderAll(); });
+                } else {
+                    ganttDb.ref('gantt_tasks').once('value').then(function(snap) {
+                        var v = snap.val();
+                        if (v && Array.isArray(v) && v.length > 0) {
+                            AppState.tasks = v;
+                            AppState.nextId = AppState.tasks.reduce(function(m, tk) { return Math.max(m, tk.id); }, 0) + 1;
+                        }
+                        return ganttDb.ref('gantt_deliverables').once('value');
+                    }).then(function(snap2) {
+                        var v2 = snap2.val();
+                        if (v2 && Array.isArray(v2) && v2.length > 0) {
+                            AppState.deliverables = v2;
+                            AppState.nextDelivId = AppState.deliverables.reduce(function(m, d) { return Math.max(m, d.id); }, 0) + 1;
+                        }
+                        App.renderAll();
+                    }).catch(function() { App.renderAll(); });
+                }
             },
             exportData() {
                 try {
