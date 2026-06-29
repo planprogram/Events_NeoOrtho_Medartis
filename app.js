@@ -1,15 +1,18 @@
+// GitHub Pages base URL — ALTERE SEU_USERNAME para seu usuario do GitHub
+const GITHUB_BASE = 'https://SEU_USERNAME.github.io/Events_NeoOrtho_Medartis/';
+
 // Firebase — uses shared.js (NEO_FB_APP, NEO_FB_DB, NEO_FB_AUTH)
 const db = (typeof NEO_FB_DB !== 'undefined') ? NEO_FB_DB : null;
 const auth = (typeof NEO_FB_AUTH !== 'undefined') ? NEO_FB_AUTH : null;
 
-// Hub links data
+// Hub links data (GitHub Pages URLs)
 const hubLinks = [
-    { name: 'Curso Essential', desc: 'Gestao de projetos - Curso Essential', icon: 'fa-graduation-cap', color: '#7B2D8E', url: 'Essential.html' },
-    { name: 'Steps2Walk Gantt', desc: 'Grafico Gantt do projeto Steps2Walk v3', icon: 'fa-chart-gantt', color: '#1A3E6B', url: 'Gantt - Steps2Walk v3.html' },
-    { name: 'EAD NeoOrtho', desc: 'Plataforma EAD - Medical Device Training (Coluna, Trauma, CMF)', icon: 'fa-laptop-code', color: '#8B5CF6', url: 'EAD - NeoOrtho.html' },
-    { name: 'Cadaver Lab Foot & Ankle', desc: 'Gestao de projetos - IBRA Foot and Ankle', icon: 'fa-bone', color: '#28A745', url: 'Cadaver Lab IBRA (Apoio Medartis) Foot and Ankle - Gestao de Projetos.html' },
-    { name: 'Cadaver Lab Hand & Wrist', desc: 'Gestao de projetos - IBRA Hand and Wrist', icon: 'fa-hand-holding-medical', color: '#E67E22', url: 'Cadaver Lab IBRA (Apoio Medartis) Hand and Wrist - Gestao de Projetos.html' },
-    { name: 'Template Step by Step', desc: 'Template de treinamento hands-on - procedimentos passo a passo', icon: 'fa-list-ol', color: '#00B3B9', url: 'Template Step by Step.html' }
+    { name: 'Curso Essential', desc: 'Gestao de projetos - Curso Essential', icon: 'fa-graduation-cap', color: '#7B2D8E', url: GITHUB_BASE + 'Essential.html' },
+    { name: 'Steps2Walk Gantt', desc: 'Grafico Gantt do projeto Steps2Walk v3', icon: 'fa-chart-gantt', color: '#1A3E6B', url: GITHUB_BASE + 'Gantt - Steps2Walk v3.html' },
+    { name: 'EAD NeoOrtho', desc: 'Plataforma EAD - Medical Device Training (Coluna, Trauma, CMF)', icon: 'fa-laptop-code', color: '#8B5CF6', url: GITHUB_BASE + 'EAD - NeoOrtho.html' },
+    { name: 'Cadaver Lab Foot & Ankle', desc: 'Gestao de projetos - IBRA Foot and Ankle', icon: 'fa-bone', color: '#28A745', url: GITHUB_BASE + 'Cadaver Lab IBRA (Apoio Medartis) Foot and Ankle - Gestao de Projetos.html' },
+    { name: 'Cadaver Lab Hand & Wrist', desc: 'Gestao de projetos - IBRA Hand and Wrist', icon: 'fa-hand-holding-medical', color: '#E67E22', url: GITHUB_BASE + 'Cadaver Lab IBRA (Apoio Medartis) Hand and Wrist - Gestao de Projetos.html' },
+    { name: 'Template Step by Step', desc: 'Template de treinamento hands-on - procedimentos passo a passo', icon: 'fa-list-ol', color: '#00B3B9', url: GITHUB_BASE + 'Template Step by Step.html' }
 ];
 
 // State

@@ -1,0 +1,17 @@
+# Firebase (removido - migrando para GitHub Pages)
+firebase.json
+.firebaserc
+database.rules.json
+.firebase/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+node_modules/
