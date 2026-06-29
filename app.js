@@ -1,5 +1,5 @@
-// GitHub Pages base URL — ALTERE SEU_USERNAME para seu usuario do GitHub
-const GITHUB_BASE = 'https://SEU_USERNAME.github.io/Events_NeoOrtho_Medartis/';
+// GitHub Pages base URL
+const GITHUB_BASE = 'https://planprogram.github.io/Events_NeoOrtho_Medartis/';
 
 // Firebase — uses shared.js (NEO_FB_APP, NEO_FB_DB, NEO_FB_AUTH)
 // These are populated asynchronously after NEO_FB_READY_PROMISE resolves.
