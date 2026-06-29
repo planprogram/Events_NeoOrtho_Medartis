@@ -9,6 +9,8 @@
   <script src="libs/js/xlsx.full.min.js"></script>
   <script src="libs/js/jspdf.umd.min.js"></script>
   <script src="libs/js/jspdf.plugin.autotable.min.js"></script>
+  <script src="libs/js/firebase-app-compat.js"></script>
+  <script src="libs/js/firebase-database-compat.js"></script>
   <style>
     :root{--primary:#2a2a2a;--primary-dark:#1a1a1a;--primary-light:#4a4a4a;--bg:#f3f3f3;--card:#fff;--text:#1a1a1a;--text-muted:#777;--border:#e0e0e0;--border-light:#ececec;--success:#2d8a4e;--success-bg:#edf7f0;--success-border:#c1e6cb;--warning:#b8860b;--warning-bg:#fef9ed;--warning-border:#f0ddb8;--danger:#c0392b;--danger-bg:#fcf0ee;--danger-border:#f0c4be;--cancel:#888;--cancel-bg:#f6f6f6;--cancel-border:#e0e0e0;--import-bg:#edf7f5;--import-border:#b8e0d8;--export-bg:#fdf8ed;--export-border:#e8d88a;--shadow-sm:0 1px 3px rgba(0,0,0,.04);--shadow-md:0 4px 12px rgba(0,0,0,.06);--shadow-lg:0 8px 30px rgba(0,0,0,.08);--shadow-xl:0 16px 48px rgba(0,0,0,.1);--radius-sm:5px;--radius:8px;--radius-lg:12px;--radius-xl:16px}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -383,7 +385,7 @@
     // ============================================================
     // IDIOMA
     // ============================================================
-    var lang = localStorage.getItem('ibra_fa_lang') || 'pt';
+    var lang = 'pt';
 
     var L = {
       pt: {
@@ -613,18 +615,59 @@
     function parseDate(d){if(!d||d.indexOf('/')===-1)return null;var p=d.split('/').map(Number);return(p.length!==3||p.some(isNaN))?null:new Date(p[2],p[1]-1,p[0]);}
 
     // ============================================================
-    // PERSISTÊNCIA
+    // PERSISTÊNCIA (Firebase)
     // ============================================================
-    var STORAGE_KEY = 'ibra_fa_sp_oct2026_tasks';
+    var db = firebase.database().ref('ibra_fa_cronograma');
+    var dbLang = firebase.database().ref('ibra_fa_lang');
+    var firebaseReady = false;
 
-    function saveToStorage(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(tasks));}catch(e){}}
-    function loadFromStorage(){try{var d=localStorage.getItem(STORAGE_KEY);if(d){tasks=JSON.parse(d);nextId=Math.max.apply(null,tasks.map(function(x){return x.id;}).concat([0]))+1;return true;}}catch(e){}return false;}
-    
+    function initFirebase(){
+      try{
+        if(typeof firebase === 'undefined' || !firebase.database) return;
+        firebaseReady = true;
+      }catch(e){ firebaseReady = false; }
+    }
+
+    function saveToFirebase(){
+      if(!firebaseReady) return;
+      db.set(JSON.parse(JSON.stringify(tasks))).catch(function(e){ console.warn('Firebase save error:', e); });
+    }
+
+    function loadFromFirebase(){
+      return new Promise(function(resolve){
+        if(!firebaseReady){ resolve(false); return; }
+        db.once('value').then(function(snapshot){
+          var d = snapshot.val();
+          if(d && Array.isArray(d) && d.length > 0){
+            tasks = d;
+            nextId = Math.max.apply(null, tasks.map(function(x){return x.id;}).concat([0])) + 1;
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        }).catch(function(e){ console.warn('Firebase load error:', e); resolve(false); });
+      });
+    }
+
+    function saveLangToFirebase(v){
+      if(!firebaseReady) return;
+      dbLang.set(v).catch(function(e){ console.warn('Firebase lang save error:', e); });
+    }
+
+    function loadLangFromFirebase(){
+      return new Promise(function(resolve){
+        if(!firebaseReady){ resolve(null); return; }
+        dbLang.once('value').then(function(snapshot){
+          resolve(snapshot.val());
+        }).catch(function(e){ resolve(null); });
+      });
+    }
+
     // ============================================================
     // SAVE / IMPORT / EXPORT (Unified)
     // ============================================================
     function saveData() {
-      saveToStorage();
+      saveToFirebase();
       showToast('Dados salvos com sucesso!', 'success');
     }
 
@@ -644,7 +687,7 @@
     // ============================================================
     function toggleLang(){
       lang = lang === 'pt' ? 'en' : 'pt';
-      localStorage.setItem('ibra_fa_lang', lang);
+      saveLangToFirebase(lang);
       applyLanguage();
       updateDashboard();
       renderTable();
@@ -839,7 +882,7 @@
       function commit(){
         var val=inp.value.trim();
         if(type==='date'&&val)val=isoToDate(val);
-        task[field]=val;saveToStorage();updateDashboard();renderTable();populateFilters();
+        task[field]=val;saveToFirebase();updateDashboard();renderTable();populateFilters();
         showToast(t('tUpdated')+field,'success');
       }
       inp.addEventListener('blur',commit);
@@ -851,7 +894,7 @@
 
     function updateField(id,field,value){
       var task=tasks.find(function(x){return x.id===id;});
-      if(!task)return;task[field]=value;saveToStorage();updateDashboard();renderTable();populateFilters();
+      if(!task)return;task[field]=value;saveToFirebase();updateDashboard();renderTable();populateFilters();
       showToast(t('tStatus')+value,'success');
     }
 
@@ -903,7 +946,7 @@
         tasks.push({id:nextId++,categoria:cat,entrega:ent,responsavel:resp,prazoPlanejado:pp,prazoReal:pr,status:st,observacoes:obs});
         showToast(t('tAdded'),'success');
       }
-      saveToStorage();closeModal();updateDashboard();renderTable();populateFilters();
+      saveToFirebase();closeModal();updateDashboard();renderTable();populateFilters();
     }
 
     // ============================================================
@@ -927,8 +970,8 @@
     }
     function closeConfirmModal(){document.getElementById('confirmModal').classList.remove('active');confirmAction=null;deleteTargetId=null;}
     function executeConfirm(){
-      if(confirmAction==='delete'&&deleteTargetId!==null){tasks=tasks.filter(function(x){return x.id!==deleteTargetId;});saveToStorage();showToast(t('tDeleted'),'info');}
-      else if(confirmAction==='reset'){tasks=JSON.parse(JSON.stringify(INITIAL_TASKS));nextId=Math.max.apply(null,tasks.map(function(x){return x.id;}))+1;localStorage.removeItem(STORAGE_KEY);showToast(t('tReset'),'warning');}
+      if(confirmAction==='delete'&&deleteTargetId!==null){tasks=tasks.filter(function(x){return x.id!==deleteTargetId;});saveToFirebase();showToast(t('tDeleted'),'info');}
+      else if(confirmAction==='reset'){tasks=JSON.parse(JSON.stringify(INITIAL_TASKS));nextId=Math.max.apply(null,tasks.map(function(x){return x.id;}))+1;saveToFirebase();showToast(t('tReset'),'warning');}
       closeConfirmModal();updateDashboard();renderTable();populateFilters();
     }
     function clearFilters(){document.getElementById('searchInput').value='';document.getElementById('filterCategoria').value='';document.getElementById('filterStatus').value='';document.getElementById('filterResponsavel').value='';renderTable();}
@@ -941,7 +984,7 @@
       var f=ev.target.files[0];if(!f)return;
       var r=new FileReader();
       r.onload=function(e){
-        try{var d=JSON.parse(e.target.result);if(Array.isArray(d)){tasks=d;nextId=Math.max.apply(null,tasks.map(function(x){return x.id;}).concat([0]))+1;saveToStorage();updateDashboard();renderTable();populateFilters();showToast(t('tImported')+d.length+t('tTasks'),'success');}else{showToast(t('tInvalid'),'error');}}
+        try{var d=JSON.parse(e.target.result);if(Array.isArray(d)){tasks=d;nextId=Math.max.apply(null,tasks.map(function(x){return x.id;}).concat([0]))+1;saveToFirebase();updateDashboard();renderTable();populateFilters();showToast(t('tImported')+d.length+t('tTasks'),'success');}else{showToast(t('tInvalid'),'error');}}
         catch(err){showToast(t('tReadErr'),'error');}
       };
       r.readAsText(f);ev.target.value='';
@@ -1015,12 +1058,17 @@
     // INICIALIZAÇÃO
     // ============================================================
     (function(){
-      var loaded=loadFromStorage();
-      applyLanguage();
-      populateFilters();
-      updateDashboard();
-      renderTable();
-      if(loaded) showToast(t('tRestored'),'info');
+      initFirebase();
+      loadLangFromFirebase().then(function(savedLang){
+        if(savedLang === 'en' || savedLang === 'pt'){ lang = savedLang; }
+        loadFromFirebase().then(function(loaded){
+          applyLanguage();
+          populateFilters();
+          updateDashboard();
+          renderTable();
+          if(loaded) showToast(t('tRestored'),'info');
+        });
+      });
     })();
   </script>
 </body>
