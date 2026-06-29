@@ -58,21 +58,24 @@ function _tryInitFirebase() {
 }
 
 /* Try immediately (works if SDK already loaded).
-   If SDK is not loaded yet, listen for DOMContentLoaded (fires after HTML
-   is parsed, before images/CSS finish) and window.load as a second fallback.
+   If SDK is not loaded yet, use a lightweight polling mechanism that checks
+   every 50ms if window.firebase has become available. This is more reliable
+   than DOMContentLoaded for scripts loaded at the end of <body>, since the
+   DOMContentLoaded event may fire before those scripts finish executing.
    Also add a safety timeout so the promise never hangs forever. */
 if (!_tryInitFirebase()) {
-    document.addEventListener('DOMContentLoaded', _tryInitFirebase);
-    window.addEventListener('load', _tryInitFirebase);
-    /* Safety: if after 10 seconds Firebase still isn't loaded, resolve anyway
-       so the app can show an error instead of hanging silently. */
-    setTimeout(function() {
-        if (!NEO_FB_READY) {
-            console.warn('[shared.js] Firebase SDK load timeout (10s) — proceeding without Firebase');
-            NEO_FB_READY = true;
-            if (_NEO_FB_READY_RESOLVE) _NEO_FB_READY_RESOLVE();
+    var _fbRetryCount = 0;
+    var _fbRetry = setInterval(function() {
+        _fbRetryCount++;
+        if (_tryInitFirebase() || _fbRetryCount > 200) {
+            clearInterval(_fbRetry);
+            if (_fbRetryCount > 200 && !NEO_FB_READY) {
+                console.warn('[shared.js] Firebase SDK load timeout (10s) — proceeding without Firebase');
+                NEO_FB_READY = true;
+                if (_NEO_FB_READY_RESOLVE) _NEO_FB_READY_RESOLVE();
+            }
         }
-    }, 10000);
+    }, 50);
 }
 
 /* ---- Toast Notification ---- */
