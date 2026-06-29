@@ -16,13 +16,19 @@ var NEO_FIREBASE_CONFIG = {
 };
 
 /* ---- Firebase Initialization (single source) ---- */
-/* Initializes Firebase once. Safe to call from shared.js — checks if
-   already initialized to avoid double-initializeApp errors.
-   Handles both cases: SDK loaded before or after shared.js */
+/* Initializes Firebase once. Uses a Promise-based ready mechanism so
+   consumers (app.js) can await initialization reliably instead of polling. */
 var NEO_FB_APP = null;
 var NEO_FB_DB = null;
 var NEO_FB_AUTH = null;
 var NEO_FB_READY = false;
+var _NEO_FB_READY_RESOLVE = null;
+
+/* Global promise that resolves when Firebase is initialized.
+   Usage in app.js: await NEO_FB_READY_PROMISE; */
+var NEO_FB_READY_PROMISE = new Promise(function(resolve) {
+    _NEO_FB_READY_RESOLVE = resolve;
+});
 
 function _tryInitFirebase() {
     if (typeof firebase === 'undefined') return false;
@@ -39,24 +45,34 @@ function _tryInitFirebase() {
             NEO_FB_AUTH = firebase.auth();
         }
         NEO_FB_READY = true;
+        /* Resolve the promise so any awaiting code can proceed */
+        if (_NEO_FB_READY_RESOLVE) _NEO_FB_READY_RESOLVE();
         return true;
     } catch (e) {
         console.error('[shared.js] Firebase init error:', e);
+        /* Still resolve so consumers don't hang forever on error */
+        NEO_FB_READY = true;
+        if (_NEO_FB_READY_RESOLVE) _NEO_FB_READY_RESOLVE();
         return false;
     }
 }
 
-// Try immediately (works if SDK already loaded)
+/* Try immediately (works if SDK already loaded).
+   If SDK is not loaded yet, listen for DOMContentLoaded (fires after HTML
+   is parsed, before images/CSS finish) and window.load as a second fallback.
+   Also add a safety timeout so the promise never hangs forever. */
 if (!_tryInitFirebase()) {
-    // SDK not loaded yet — poll for it (handles pages where shared.js loads before SDK)
-    var _fbPollCount = 0;
-    var _fbPoll = setInterval(function() {
-        _fbPollCount++;
-        if (_tryInitFirebase() || _fbPollCount > 50) {
-            clearInterval(_fbPoll);
-            if (_fbPollCount > 50) console.warn('[shared.js] Firebase SDK never loaded');
+    document.addEventListener('DOMContentLoaded', _tryInitFirebase);
+    window.addEventListener('load', _tryInitFirebase);
+    /* Safety: if after 10 seconds Firebase still isn't loaded, resolve anyway
+       so the app can show an error instead of hanging silently. */
+    setTimeout(function() {
+        if (!NEO_FB_READY) {
+            console.warn('[shared.js] Firebase SDK load timeout (10s) — proceeding without Firebase');
+            NEO_FB_READY = true;
+            if (_NEO_FB_READY_RESOLVE) _NEO_FB_READY_RESOLVE();
         }
-    }, 100);
+    }, 10000);
 }
 
 /* ---- Toast Notification ---- */

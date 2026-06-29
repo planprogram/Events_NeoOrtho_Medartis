@@ -2,8 +2,9 @@
 const GITHUB_BASE = 'https://SEU_USERNAME.github.io/Events_NeoOrtho_Medartis/';
 
 // Firebase — uses shared.js (NEO_FB_APP, NEO_FB_DB, NEO_FB_AUTH)
-const db = (typeof NEO_FB_DB !== 'undefined') ? NEO_FB_DB : null;
-const auth = (typeof NEO_FB_AUTH !== 'undefined') ? NEO_FB_AUTH : null;
+// These are populated asynchronously after NEO_FB_READY_PROMISE resolves.
+let db = null;
+let auth = null;
 
 // Hub links data (GitHub Pages URLs)
 const hubLinks = [
@@ -284,23 +285,42 @@ async function handleRegister(e) {
     }
 }
 
-// Auth state listener
-auth.onAuthStateChanged(async function(user) {
-    if (user) {
-        currentUser = user;
-        const snap = await db.ref('users/' + user.uid).once('value');
-        const data = snap.val();
-        if (data) {
-            currentUserRole = data.role || 'viewer';
-            updateSidebarForUser(data);
-        }
-        showApp();
-    } else {
-        currentUser = null;
-        currentUserRole = '';
-        showLogin();
+// Auth state listener — waits for Firebase to be ready before attaching.
+// This prevents "Cannot read properties of null (reading 'onAuthStateChanged')"
+// when app.js runs before shared.js finishes initializing Firebase.
+async function setupAuthListener() {
+    if (typeof NEO_FB_READY_PROMISE !== 'undefined') {
+        await NEO_FB_READY_PROMISE;
     }
-});
+    /* Re-read globals now that Firebase is initialized */
+    db = (typeof NEO_FB_DB !== 'undefined') ? NEO_FB_DB : null;
+    auth = (typeof NEO_FB_AUTH !== 'undefined') ? NEO_FB_AUTH : null;
+
+    if (!auth) {
+        console.error('[app.js] Firebase Auth not available after initialization');
+        document.getElementById('authErrorMsg').textContent = 'Firebase Auth failed to initialize. Check configuration.';
+        document.getElementById('authError').classList.add('show');
+        return;
+    }
+
+    auth.onAuthStateChanged(async function(user) {
+        if (user) {
+            currentUser = user;
+            const snap = await db.ref('users/' + user.uid).once('value');
+            const data = snap.val();
+            if (data) {
+                currentUserRole = data.role || 'viewer';
+                updateSidebarForUser(data);
+            }
+            showApp();
+        } else {
+            currentUser = null;
+            currentUserRole = '';
+            showLogin();
+        }
+    });
+}
+setupAuthListener();
 
 function updateSidebarForUser(data) {
     const inits = (data.name || 'U').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
@@ -842,8 +862,15 @@ function confirmAction() { if(pendingConfirmAction) pendingConfirmAction(); clos
 function showToast(msg, type) { sharedToast(msg, type); }
 function fmtDate(d) { if(!d) return '\u2014'; try { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); } catch(e) { return d; } }
 
-// Init
+// Init — waits for Firebase to be ready before loading data
 async function init() {
+    if (typeof NEO_FB_READY_PROMISE !== 'undefined') {
+        await NEO_FB_READY_PROMISE;
+    }
+    /* Re-read globals in case they weren't set yet */
+    db = (typeof NEO_FB_DB !== 'undefined') ? NEO_FB_DB : null;
+    auth = (typeof NEO_FB_AUTH !== 'undefined') ? NEO_FB_AUTH : null;
+
     document.getElementById('loadingScreen').classList.add('hide');
     document.getElementById('loginScreen').classList.add('visible');
     try { await loadData(); } catch(e) { console.warn('Pre-load failed:', e); }
