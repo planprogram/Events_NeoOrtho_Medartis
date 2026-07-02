@@ -354,6 +354,15 @@
     }
     .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; min-width: 1020px; }
+    /* Table column layout improvements: fixed layout with specific column widths */
+    #taskTable { table-layout: fixed; }
+    #taskTable th, #taskTable td { overflow: hidden; text-overflow: ellipsis; }
+    /* Allow wrapping for long description and notes columns */
+    #taskTable td:nth-child(2), #taskTable td:nth-child(8) { white-space: normal; }
+    /* Resizer handle */
+    thead th { position: relative; }
+    .col-resizer { position: absolute; top: 0; right: 0; width: 8px; cursor: col-resize; height: 100%; user-select: none; }
+    .col-resizer:after { content: ''; position: absolute; left: 3px; top: 20%; bottom: 20%; width: 2px; background: rgba(0,0,0,0.12); border-radius: 2px; }
     thead { background: var(--primary-dark); position: sticky; top: 0; z-index: 10; }
     thead th {
       padding: 14px 16px; font-size: 11px; font-weight: 700;
@@ -600,10 +609,6 @@
             <label>Fim do Curso</label>
             <input type="date" id="eventEndDate">
           </div>
-          <button class="btn-generate" onclick="generateTimeline()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            GERAR CRONOGRAMA
-          </button>
         </div>
       </div>
       <div class="date-banner-bottom">
@@ -614,7 +619,7 @@
           </div>
         </div>
         <div class="timeline-mini-info" id="timelineInfo">
-          Defina as datas e clique em <strong>Gerar Cronograma</strong>
+          Importe o arquivo JSON para carregar o cronograma.
         </div>
       </div>
     </div>
@@ -672,6 +677,17 @@
     <section class="table-wrapper">
       <div class="table-scroll">
         <table id="taskTable" role="grid">
+          <colgroup>
+            <col style="width:14%">
+            <col style="width:30%">
+            <col style="width:12%">
+            <col style="width:6%">
+            <col style="width:8%">
+            <col style="width:8%">
+            <col style="width:6%">
+            <col style="width:12%">
+            <col style="width:4%">
+          </colgroup>
           <thead>
             <tr>
               <th>Categoria</th>
@@ -735,7 +751,7 @@
         <div class="confirm-text" id="confirmText">Tem certeza?</div>
         <div class="confirm-actions">
           <button class="btn-modal secondary" onclick="closeConfirmModal()">Cancelar</button>
-          <button class="btn-confirm-yes" id="confirmYesBtn" onclick="executeConfirm()">Confirmar</button>
+          <button class="btn-confirm-yes" id="confirmYesBtn" onclick="if (typeof confirmCallback === 'function') { confirmCallback(); }">Confirmar</button>
         </div>
       </div>
     </div>
@@ -1152,6 +1168,19 @@
       var p = s.split('-');
       if (p.length !== 3) return null;
       return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+    }
+
+    function safeJsonParse(text) {
+      if (!text) return null;
+      if (text.charCodeAt(0) === 0xFEFF) {
+        text = text.slice(1);
+      }
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        var cleaned = text.replace(/,\s*(?=[}\]])/g, '');
+        return JSON.parse(cleaned);
+      }
     }
 
     function formatDate(d) {
@@ -1715,10 +1744,13 @@
       var reader = new FileReader();
       reader.onload = async function(e) {
         try {
-          var data = JSON.parse(e.target.result);
+          var data = safeJsonParse(e.target.result);
+          if (Array.isArray(data)) {
+            data = { tasks: data };
+          }
           if (data && Array.isArray(data.tasks)) {
             tasks = data.tasks;
-            nextId = Math.max.apply(null, tasks.map(function(t) { return t.id; })) + 1;
+            nextId = tasks.length > 0 ? Math.max.apply(null, tasks.map(function(t) { return t.id || 0; })) + 1 : 1;
             if (data.eventStartDate) document.getElementById('eventStartDate').value = data.eventStartDate;
             if (data.eventEndDate) document.getElementById('eventEndDate').value = data.eventEndDate;
             if (data.eventStartDate) EVENT_DATE = parseDate(data.eventStartDate);
@@ -1981,11 +2013,84 @@
     }
 
     // ============================================================
+    // COLUMN RESIZING
+    // ============================================================
+    function saveColWidths(widths) {
+      try { localStorage.setItem('taskTableColWidths', JSON.stringify(widths)); } catch(e) {}
+    }
+
+    function loadColWidths() {
+      try { var v = localStorage.getItem('taskTableColWidths'); if (!v) return null; return JSON.parse(v); } catch(e) { return null; }
+    }
+
+    function applyColWidths(widths) {
+      if (!widths || !Array.isArray(widths)) return;
+      var colgroup = document.querySelector('#taskTable colgroup');
+      if (!colgroup) return;
+      var cols = colgroup.children;
+      for (var i=0;i<cols.length && i<widths.length;i++) {
+        cols[i].style.width = widths[i];
+      }
+    }
+
+    function makeTableResizable(tableId) {
+      var table = document.getElementById(tableId);
+      if (!table) return;
+      var colgroup = table.querySelector('colgroup');
+      if (!colgroup) return;
+      var ths = table.querySelectorAll('thead th');
+      ths.forEach(function(th, index) {
+        th.style.position = 'relative';
+        if (index === ths.length - 1) return; // skip last
+        var res = document.createElement('div');
+        res.className = 'col-resizer';
+        res.style.position = 'absolute';
+        res.style.top = '0';
+        res.style.right = '0';
+        res.style.width = '8px';
+        res.style.cursor = 'col-resize';
+        res.style.userSelect = 'none';
+        res.style.height = '100%';
+        res.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          var startX = e.clientX;
+          var tableRect = table.getBoundingClientRect();
+          var cols = Array.from(colgroup.children);
+          var startWidths = cols.map(function(c){ return c.getBoundingClientRect().width; });
+          function onMove(ev) {
+            var dx = ev.clientX - startX;
+            var min = 40; // px
+            var leftWidth = Math.max(min, startWidths[index] + dx);
+            var rightWidth = Math.max(min, startWidths[index+1] - dx);
+            var total = cols.reduce(function(sum,c){ return sum + c.getBoundingClientRect().width; }, 0);
+            // compute percentages
+            cols[index].style.width = ((leftWidth / total) * 100).toFixed(2) + '%';
+            cols[index+1].style.width = ((rightWidth / total) * 100).toFixed(2) + '%';
+          }
+          function onUp() {
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+            // save current widths
+            var w = Array.from(colgroup.children).map(function(c){ return c.style.width || (c.getBoundingClientRect().width/ table.getBoundingClientRect().width*100).toFixed(2) + '%'; });
+            saveColWidths(w);
+          }
+          document.addEventListener('mousemove', onMove);
+          document.addEventListener('mouseup', onUp);
+        });
+        th.appendChild(res);
+      });
+      // load saved widths
+      var saved = loadColWidths();
+      if (saved) applyColWidths(saved);
+    }
+
+    // ============================================================
     // INICIALIZAR
     // ============================================================
     async function init() {
       await loadFromFirebase();
       applyLang();
+      makeTableResizable('taskTable');
       renderTable();
       updateDashboard();
       updateDaysCounter();
