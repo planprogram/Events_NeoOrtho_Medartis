@@ -12,7 +12,6 @@ const hubLinks = [
     { name: 'Steps2Walk Gantt', desc: 'Grafico Gantt do projeto Steps2Walk v3', icon: 'fa-chart-gantt', color: '#1A3E6B', url: GITHUB_BASE + 'Gantt - Steps2Walk v3.html' },
     { name: 'EAD NeoOrtho', desc: 'Plataforma EAD - Medical Device Training (Coluna, Trauma, CMF)', icon: 'fa-laptop-code', color: '#8B5CF6', url: GITHUB_BASE + 'EAD - NeoOrtho.html' },
     { name: 'Cadaver Lab Foot & Ankle', desc: 'Gestao de projetos - IBRA Foot and Ankle', icon: 'fa-bone', color: '#28A745', url: GITHUB_BASE + 'Cadaver Lab IBRA (Apoio Medartis) Foot and Ankle - Gestão de Projetos.html' },
-    { name: 'Cadaver Lab Hand & Wrist', desc: 'Gestao de projetos - IBRA Hand and Wrist', icon: 'fa-hand-holding-medical', color: '#E67E22', url: GITHUB_BASE + 'Cadaver Lab IBRA (Apoio Medartis) Hand and Wrist - Gestão de Projetos.html' },
     { name: 'Template Step by Step', desc: 'Template de treinamento hands-on - procedimentos passo a passo', icon: 'fa-list-ol', color: '#00B3B9', url: GITHUB_BASE + 'Template Step by Step.html' }
 ];
 
